@@ -184,13 +184,13 @@ def lint(raw_html: str) -> list[Finding]:
             clip(m.group(0)),
         ))
 
-    # ── P0-4: sans-serif display face ─────────────────────────────────
+    # ── P0-4: hardcoded font-family bypassing --font-display ──────────
     m = DISPLAY_SANS_RE.search(html)
     if m:
         out.append(Finding(
             "P0", "sans-display",
-            "A heading rule uses Inter / Roboto / system-sans as the display face — not the serif the seed binds.",
-            'Use `font-family: var(--font-display)` on h1/h2/h3 and let the active design system pick the serif. Override only if the active direction is "tech / utility" or "modern minimal".',
+            "A heading rule hardcodes Inter / Roboto / system-sans instead of using var(--font-display).",
+            'Use `font-family: var(--font-display)` on h1/h2/h3 and bind the font stack in :root.',
             clip(m.group(0)),
         ))
 
@@ -305,7 +305,15 @@ def lint(raw_html: str) -> list[Finding]:
 
     # ── P1-3: too many accent uses inline in the rendered body ────────
     style_stripped = re.sub(r"<style[\s\S]*?</style>", "", html, flags=re.I)
-    accent_uses = len(re.findall(r"var\(--accent\)", style_stripped))
+    # Count each <svg>...</svg> schematic as at most 1 accent moment even if multiple
+    # internal <path>/<polygon>/<circle> nodes reference var(--accent).
+    body_for_accent = re.sub(
+        r"<svg[\s\S]*?</svg>",
+        lambda m: "var(--accent)" if "var(--accent)" in m.group(0) else "",
+        style_stripped,
+        flags=re.I,
+    )
+    accent_uses = len(re.findall(r"var\(--accent\)", body_for_accent))
     if accent_uses > 6:
         out.append(Finding(
             "P1", "accent-overuse",
@@ -349,6 +357,19 @@ def lint(raw_html: str) -> list[Finding]:
             f"{len(sections) - len(tagged)} of {len(sections)} <section>s lack data-design-id (or data-screen-label).",
             'Add data-design-id="kebab-slug" (or data-screen-label="01 Cover" for slides) to every top-level <section> so an editor or agent can target it.',
         ))
+
+    # ── P1-5: multi-section landing page lacking flagship visual craft ─
+    if not slide_matches and len(sections) >= 3 and re.search(r'data-design-id\s*=\s*["\']hero', html, re.I):
+        has_craft = bool(re.search(
+            r'\b(bento-hairline|bento-visual|app-window|index-showcase|hero-stage)\b',
+            style_stripped, re.I,
+        ))
+        if not has_craft:
+            out.append(Finding(
+                "P1", "missing-visual-craft",
+                "Landing page has 3+ sections but lacks 2025–2026 visual product craft (.hero-stage, .app-window, .bento-hairline, .bento-visual, or .index-showcase).",
+                "Anchor the hero with a multi-pane .app-window or telemetry stage, and use .bento-hairline with .bento-visual SVG schematics or .index-showcase for features instead of plain-text icon grids.",
+            ))
 
     # ── P0/P1: accessibility statics + computed contrast ──────────────
     out.extend(check_a11y(html))

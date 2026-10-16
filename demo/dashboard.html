@@ -15,31 +15,34 @@
   <style>
     /* ── tokens — bind once, never outside this block ─────────────────── */
     :root {
-      --bg:      oklch(98% 0.005 250);
-      --surface: oklch(100% 0 0);
-      --fg:      oklch(22% 0.02 240);
-      --muted:   oklch(50% 0.018 240);
-      --border:  oklch(90% 0.008 240);
-      --accent:  oklch(58% 0.16 145);
+      --bg:        oklch(13% 0.006 255);
+      --surface:   oklch(16% 0.008 255);
+      --surface-2: oklch(20% 0.010 255);
+      --fg:        oklch(96% 0.004 255);
+      --muted:     oklch(68% 0.012 255);
+      --border:    oklch(24% 0.010 255);
+      --accent:    oklch(80% 0.17 152);
+      --accent-on: oklch(15% 0.02 152);
 
       /* derived — do not change */
       --accent-soft: color-mix(in oklch, var(--accent) 14%, transparent);
       --fg-soft:     color-mix(in oklch, var(--fg) 6%, transparent);
+      --specular:    inset 0 1px 0 color-mix(in oklch, var(--fg) 8%, transparent);
 
-      --font-display: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
-      --font-body:    -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
-      --font-mono:    'JetBrains Mono', 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+      --font-display: -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Display', system-ui, sans-serif;
+      --font-body:    -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Text', system-ui, sans-serif;
+      --font-mono:    'JetBrains Mono', 'Geist Mono', 'IBM Plex Mono', ui-monospace, Menlo, monospace;
 
-      --fs-title: 22px;
-      --fs-h2: 18px;
+      --fs-title: 20px;
+      --fs-h2: 17px;
       --fs-body: 14px;
       --fs-meta: 12.5px;
       --fs-kpi: 30px;
 
       --gap-xs: 8px; --gap-sm: 12px; --gap-md: 16px; --gap-lg: 24px; --gap-xl: 32px;
 
-      --radius: 10px;
-      --radius-lg: 16px;
+      --radius: 6px;
+      --radius-lg: 10px;
       --ease-standard: cubic-bezier(0.2, 0, 0, 1);
     }
 
@@ -142,13 +145,20 @@
       max-width: 1220px;
     }
 
-    .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--gap-md); }
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
     .kpi {
       display: flex; flex-direction: column; gap: 6px;
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 18px;
+      padding: 18px 20px;
+      box-shadow: var(--specular);
     }
     .kpi-label {
       font-family: var(--font-mono); font-size: 11px;
@@ -156,6 +166,7 @@
       color: var(--muted);
     }
     .kpi-value {
+      font-family: var(--font-mono);
       font-size: var(--fs-kpi); font-weight: 600;
       letter-spacing: -0.02em; font-variant-numeric: tabular-nums; line-height: 1.1;
     }
@@ -168,6 +179,7 @@
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
       padding: 18px 20px;
+      box-shadow: var(--specular);
     }
     .card-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--gap-md); }
     .chartfig { margin: 0; }

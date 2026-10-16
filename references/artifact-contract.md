@@ -7,87 +7,80 @@ Every artifact is **one self-contained HTML file** (`index.html` unless the proj
 - `<!doctype html>` → `<html lang="en">` → `<head>` (charset, viewport, `<title>`) → one `<style>` block → `<body>` → optional single `<script>` block for behavior → `</html>`.
 - All CSS inline in the single `<style>`. No `<link>` stylesheets, no external JS, no CDN imports. Google Fonts only when DESIGN.md explicitly names a face that cannot be system-stacked.
 - Semantic structure: `<header>`, `<main>`, `<section>`, `<aside>`, `<footer>`.
-- Charts are hand-rolled inline SVG (`<polyline>`, `<rect>`, `<circle>`) — no chart libraries. Chart craft rules live in `references/data-viz.md`.
+- Charts and architectural schematics are hand-rolled inline SVG (`<polyline>`, `<path>`, `<polygon>`, `<rect>`, `<circle>`) — no chart libraries. Chart craft rules live in `references/data-viz.md`.
 - `data-design-id="kebab-slug"` on every top-level `<section>` (comment-mode anchoring).
 
 ## Tokens
 
 - One `:root` block carries the palette and type scale. Everything downstream references `var(--token)`; derived tones use `color-mix(in oklch, ...)`.
-- Never pure `#000` / `#fff` for surfaces — use the DESIGN.md values (fall back to `#0f0f0f` / `#fafafa`).
+- Always bind the core eight tokens: `--bg`, `--surface`, `--surface-2`, `--fg`, `--muted`, `--border`, `--accent`, and `--accent-on` (contrast ink for text inside `--accent` buttons/badges).
+- Never pure `#000` / `#fff` for page backgrounds — use the DESIGN.md or `references/directions.md` values (e.g., obsidian `oklch(13% 0.006 255)` for dark structural themes, `oklch(98% 0.004 95)` for light paper).
 - Aim for zero raw hex outside `:root` (hard budget: ~12; a lint finding fires above that).
 
-## Dark mode
+## Dark-first vs light-first themes
 
-Light by default; when DESIGN.md defines a dark tier, implement it as a **token swap — never a second stylesheet**:
+- **AI infrastructure, developer tools, agent runtimes, cloud platforms, and CLI/SDK products** default to a **dark-native flagship direction** (`dark-structural-grid`, `neo-brutalist-terminal`, or `atmospheric-craft-dark` in `references/directions.md`) unless the brief or `DESIGN.md` specifies light mode.
+- When supporting both tiers, implement the secondary tier as a **token swap — never a second stylesheet** inside `@media (prefers-color-scheme: dark)` (or `light`).
+- The linter computes contrast per theme scope — run it once and verify `fg/bg`, `fg/surface`, `muted/bg`, and `accent-on/accent`.
 
-- Redeclare only the core tokens (`bg`, `surface`, `fg`, `muted`, `border`, `accent`, `accent-on`) inside `@media (prefers-color-scheme: dark)` on `:root`, using dark-appropriate values (`#0f0f0f`-grade bg, `#f0f0f0`-grade fg, borders ≈ 8% white).
-- The linter computes contrast per theme scope — run it once and read the `(theme N)` rows.
-- Decks already carry per-slide `light` / `dark`; never mix the two mechanisms in one file.
-
-## Page composition (landing / prototype)
+## Page composition (2025–2026 Flagship Landing / Prototype)
 
 Default rhythms — pick one, then state the section list before writing HTML:
 
-| Page kind | Rhythm |
+| Page kind | Flagship Rhythm |
 |---|---|
-| Landing | hero → 3 features → stat row *or* quote → split detail → CTA strip → footer |
-| Marketing / editorial | hero-center → log list → split detail → CTA strip |
-| Pricing | hero-center → comparison table → CTA strip |
-| Docs index | hero-center → log list → CTA strip |
+| AI Infra / DevTool / SaaS Landing | `hero-stage` (Hero + multi-pane IDE/runtime window) → `bento-telemetry` (3-col gapless hairline schematic bento) → `bento-architecture` *or* `indexed-showcase` (`01`–`04` tab matrix) → `compare` (hairline matrix) → `cta` → `footer` |
+| Product / Studio App | `hero-stage` (atmospheric hero + 3-pane studio canvas) → `indexed-showcase` → `bento-telemetry` → `pricing` → `cta` |
+| Marketing / Editorial | `hero-split` → `log list` → `quote` → `compare` → `cta` |
+| Pricing | `hero-center` → `pricing` (gapless hairline 3-tier matrix) → `compare` → `cta` |
 
-Rules:
+### High-Craft Architecture Rules (Non-Negotiable):
 
-- One hero, one CTA ask at the end. Alternate section types — two stat rows in a row, two quote blocks, or two feature triplets read as visual fatigue.
-- Headlines under 14 words; leads under two sentences / ~60ch (`max-width: 60ch`).
-- CTA labels say what happens: "Start free" beats "Get started"; "Read the story" beats "Learn more".
-- At most one decorative flourish per page (a pull quote, a striking stat, one micro-interaction) — one, not three.
-- Single accent, ≤ 2 visible uses per screen (default pair: eyebrow + primary CTA).
-- Hero: 40–60vh typical for utility pages; generous but not full-screen unless the direction says so.
-- Sections separated by whitespace first; borders/dividers only between unrelated top-level sections.
-- `assets/section-skeletons.html` ships the canonical blocks (nav, hero variants, features, comparison, quote, stat, pricing, prose, CTA, footer) — start from those, not from scratch.
+1. **Hero Product Stage Required:** Never ship a bare text-only hero floating in empty space for a software product. Anchor the hero with a concrete product proof:
+   - A multi-pane `.app-window` (left project tree, middle agent/prompt trace, right dot-matrix canvas preview), OR
+   - A live `.term` CLI session / execution graph, OR
+   - A high-precision SVG architectural schematic.
+2. **Ban "3 Small Icons Over Paragraphs" Feature Sections:** Generic 3-column icon-plus-sentence grids read as low-effort AI templates. Instead, use:
+   - **Gapless Hairline Bento (`.bento-hairline`):** Exposed `1px` structural grid (`gap: 1px; background: var(--border)`) where every `.bento-cell` includes a `.bento-visual` schematic (speed/latency arc gauge + `.cmd-pill`, isometric wireframe volume layers, DAG node pipeline `FORK → BUILD → EVAL`, or wireframe region globe), OR
+   - **Numbered Index Showcase (`.index-showcase`):** Flush `01`–`04` monospace vertical tabs paired with a framed command-palette/agent-plan card and `.spec-list` engineering bullets.
+3. **Dual-Tone & Block-Highlight Headlines:** Use lightness or block contrast inside `h1`/`h2` to create visual hierarchy:
+   - Dual-tone: `<span class="tone-muted">Fast, Scalable, Stateful</span> Infrastructure for AI Agents.`
+   - Block-highlight: `Give your AI secure access <mark class="tone-block">in minutes</mark>`
+4. **Structural Chrome & Monospace Telemetry:** Use `var(--font-mono)` for numbered tabs (`01`), card titles (`.mono-title`), coordinates, latency badges, and command pills.
+5. **Single Accent Budget (≤ 2 visible uses per screen):** Neutrals (`--bg`, `--surface`, `--surface-2`, `--border`, `--fg`, `--muted`) do 90% of the work; `--accent` is reserved for the primary CTA, active index indicator, and key telemetry signal stroke.
+6. **Copy Discipline:** Headlines under 14 words; leads under two sentences (`max-width: 60ch`). Concrete engineering nouns and verifiable mechanisms — zero filler, zero invented metrics.
 
-## Imagery
+## Imagery & Schematics
 
-- **Real referents get the real image.** For a named person, product, brand mark, cover, artwork, landmark, or place: fetch the correct real image, copy it into the project, reference it relatively. Never generate, draw, or substitute a look-alike.
-- **Illustrative / atmospheric subjects**: prefer real fetched photography; image generation is a fallback.
-- Replace the seed's `.ph-img` scaffold with `<img class="content-img" width="[intrinsic w]" height="[intrinsic h]" alt="[description]">` — keep the intrinsic ratio, full frame, no `object-fit: cover` on content images. Bounded on one axis for unusually tall/wide images.
-- If no compliant asset can be acquired: keep an intentional, **labeled** placeholder (`.ph-img` with descriptive text) and disclose the limitation in the delivery summary.
-- No remote hotlinks, no placeholder CDNs (unsplash, placehold.co, picsum). All images project-local.
+- **Real referents get the real image.** For a named person, product, brand mark, cover, artwork, or landmark: fetch the correct real image, copy it into the project, reference it relatively.
+- **Technical & product concepts get inline SVG/HTML schematics.** Build crisp monoline/isometric SVG diagrams (`stroke="var(--border)"` + signal highlights in `var(--accent)` and `var(--accent-soft)`) and realistic HTML/CSS micro-interfaces (`.app-window`, `.dag-grid`, `.cmd-pill`).
+- No remote hotlinks, no placeholder CDNs (unsplash, placehold.co, picsum).
 
 ## Dashboards
 
-Single-screen admin / analytics artifact — start from `assets/dashboard-seed.html` and keep the chart rules in `references/data-viz.md`:
+Single-screen admin / observability / fleet console artifact — start from `assets/dashboard-seed.html` and keep the chart rules in `references/data-viz.md`:
 
-- **Left sidebar** (220–260px): brand mark, 6–8 nav links with icons, active state in the DS accent.
-- **Top bar**: page title left; search + avatar/status right. Sidebar and top bar sticky; main scrolls independently (CSS grid shell).
-- **Main**: row 1 — 3–4 KPI cards (label, one big number in mono tabular-nums, delta vs prior period); row 2 — primary inline-SVG chart; row 3 — secondary chart or table (recent events, top items).
-- Real metric names and plausible values from the brief's domain — never "Metric A". Delta lines, not colored progress bars under numbers.
-- Every KPI/delta carries its comparison period in words ("+12% vs last week"); numbered columns right-aligned in mono.
-- Density follows the DESIGN.md mood (and its density dial) — tight rows for trading/ops, airy for consumer.
-- Accent budget still ≤ 2: typically sidebar active + one chart highlight.
+- **Left sidebar** (220–260px): brand mark + version tag, 6–8 nav links with monoline icons, active state.
+- **Top bar**: page title left; search + action button right. Sticky chrome, main scrolls independently.
+- **Main**:
+  - Row 1 — Gapless hairline KPI strip (`.kpis`): 3–4 KPI cells (monospace uppercase label, tabular-nums value, delta vs prior period in words).
+  - Row 2 — Primary inline-SVG telemetry chart + secondary peer/node breakdown card.
+  - Row 3 — Dense hairline data table with sort affordance, hover rows, status pills, and right-aligned monospace numeric columns.
 
 ## Mobile screens
 
-- One screen = one job (feed, detail, onboarding, profile, checkout, or focus/hero). If the brief combines two, ship one and offer the other.
-- Render inside the device frame from `assets/mobile-seed.html` (status bar with inline-SVG icons, sensor cutout, home indicator, tab bar) — keep the frame, don't re-implement it per screen.
+- One screen = one job (feed, detail, onboarding, profile, checkout, or focus/hero).
+- Render inside the device frame from `assets/mobile-seed.html` (status bar with inline-SVG icons, sensor cutout, home indicator, tab bar).
 - Tap targets ≥ 44px; single accent ≤ 2 uses; numerics in mono; display in `var(--font-display)`.
 
 ## Responsive
 
-- Break at 920px (seeds ship this): multi-column grids collapse to one column; no fixed widths.
-- Verify mentally at 1440 / 768 / 375: no horizontal scroll, no clipped tables (wrap tables in an overflow container).
-- Fluid type via `clamp()` for display sizes; fixed px for UI text.
+- Break at 920px (seeds ship this): multi-column grids, `.bento-hairline`, `.app-panes`, and `.index-showcase` collapse cleanly to one column; no fixed widths.
+- Verify mentally at 1440 / 768 / 375: no horizontal scroll, no clipped tables.
 
 ## Behavior & motion
 
-- Static by default; interactions follow the choreography in `references/motion.md` (durations, three easing curves, one entrance per view).
-- Any artifact that animates ships the `prefers-reduced-motion` kill switch (recipe in `motion.md`).
+- Static by default; interactions follow the choreography in `references/motion.md`.
+- Any artifact that animates ships the `prefers-reduced-motion` kill switch.
 - No `scrollIntoView()` anywhere. Use `scrollTo({ left, top, behavior })` on the actual scroller.
-- Hover states on all links and buttons; `:focus-visible` ring from `--focus-ring` or the seed's equivalent on everything interactive.
-
-## Preview, export, handoff
-
-- Preview: open the file in a browser, or serve locally (`python3 -m http.server`) when relative assets are involved.
-- Verify visually before delivering — screenshot the artifact (any headless Chrome: `chrome --headless --screenshot=out.png --window-size=1440,900 index.html`) and apply the soul test to the image, not to your memory of the code.
-- Exports: print-to-PDF works (include a clean print path for decks); HTML is the source of truth.
-- Handoff: the artifact is real HTML/CSS — drop it into a codebase, port components to the stack, or use it as the visual spec. Mention the natural next step in one line.
+- Hover states on all links and buttons; `:focus-visible` ring on everything interactive.

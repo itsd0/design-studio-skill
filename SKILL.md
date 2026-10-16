@@ -11,14 +11,15 @@ Turn a brief into **single-file HTML artifacts** driven by a **DESIGN.md brand c
 ## Non-negotiables
 
 1. **One self-contained file.** `index.html` — all CSS in a single `<style>` block, no external CSS/JS, inline SVG for charts, system-first fonts. Real images are copied into the project and referenced relatively.
-2. **One token block.** Palette and type live in a single `:root` with standard names (`--bg`, `--surface`, `--fg`, `--muted`, `--border`, `--accent`, `--font-display`, `--font-body`, `--font-mono`). No raw hex outside it; derive tones with `color-mix()`.
+2. **One token block.** Palette and type live in a single `:root` with standard names (`--bg`, `--surface`, `--surface-2`, `--fg`, `--muted`, `--border`, `--accent`, `--accent-on`, `--font-display`, `--font-body`, `--font-mono`). No raw hex outside it; derive tones with `color-mix()`.
 3. **DESIGN.md is the brand contract.** Read it before writing HTML. Never invent tokens — if a value is missing, use the closest existing token.
-4. **Accent budget: at most 2 visible uses per screen.** Links demote to `--fg` when a CTA shares the screen.
-5. **No AI-slop tropes**: no purple/indigo defaults, no two-stop "trust" gradients, no emoji-as-icons, no rounded card with a colored left border, no invented metrics, no filler copy. Full list in `references/quality-gates.md`.
-6. **Anchor every section.** `data-design-id="kebab-slug"` on each top-level `<section>`; decks use `data-screen-label="01 Cover"`.
-7. **No `scrollIntoView()`** anywhere — it breaks embed and preview iframes.
-8. **Self-check before delivery.** Run `python3 scripts/lint.py <file>` until zero P0 findings — fix every contrast `✗` — then walk the P0 checklist in `references/quality-gates.md`.
-9. **Deliver with a one-line summary** naming the file. Never paste the full HTML into chat.
+4. **2025–2026 Flagship Visual Architecture.** Never ship a bare text-only hero or "3 small icons over paragraphs" feature sections. Every product/landing page must include a **Hero Product Stage** (`.app-window` multi-pane studio/IDE frame, `.term` session, or live telemetry schematic) and **Schematic Bento / Indexed Feature Sections** (`.bento-hairline` with `.bento-visual` SVG diagrams: gauges, isometric layers, `FORK → BUILD → EVAL` DAG pipelines, wireframe globes, and `.index-showcase` `01`–`04` tabs).
+5. **Accent budget: at most 2 visible uses per screen.** Links demote to `--fg` when a CTA shares the screen. Always bind `--accent-on` so primary buttons have crisp WCAG contrast.
+6. **No AI-slop tropes**: no purple/indigo defaults, no two-stop "trust" gradients, no emoji-as-icons, no rounded card with a colored left border, no invented metrics, no filler copy. Full list in `references/quality-gates.md`.
+7. **Anchor every section.** `data-design-id="kebab-slug"` on each top-level `<section>`; decks use `data-screen-label="01 Cover"`.
+8. **No `scrollIntoView()`** anywhere — it breaks embed and preview iframes.
+9. **Self-check before delivery.** Run `python3 scripts/lint.py <file>` until zero P0 findings — fix every contrast `✗` — then walk the P0/P1 checklist in `references/quality-gates.md`.
+10. **Deliver with a one-line summary** naming the file. Never paste the full HTML into chat.
 
 ## Workflow
 
@@ -33,13 +34,13 @@ Capture: product, audience, goal, artifact kind (landing / prototype / dashboard
 
 ### 2 · Direction & design system
 
-- **Brand exists** (URL, screenshot, brand assets): sample the six seed tokens and write or update `DESIGN.md` per `references/design-md.md` — including the dials. Start from `assets/design-md.template.md`.
-- **No brand**: pick ONE direction from `references/directions.md` (editorial · modern minimal · human · tech utility · brutalist). State the direction and its accent in one sentence. Offer up to three options only if the user explicitly asks to compare.
+- **Brand exists** (URL, screenshot, brand assets): sample the core tokens (`--bg`, `--surface`, `--surface-2`, `--fg`, `--muted`, `--border`, `--accent`, `--accent-on`) and write or update `DESIGN.md` per `references/design-md.md` — including the dials. Start from `assets/design-md.template.md`.
+- **No brand**: pick ONE direction from `references/directions.md` (`dark-structural-grid` · `neo-brutalist-terminal` · `atmospheric-craft-dark` · `editorial-monocle` · `modern-minimal` · `human-approachable` · `tech-utility` · `brutalist-experimental`). For AI infrastructure, developer tools, agent runtimes, and technical SaaS, default to one of the dark-native flagship directions (`dark-structural-grid`, `neo-brutalist-terminal`, or `atmospheric-craft-dark`) unless light mode is requested. State the direction and its accent in one sentence.
 - Bind palette and fonts **verbatim** — never improvise hex values from a direction's label.
 
 ### 3 · Plan before pixels
 
-- **Landing / prototype**: choose 4–6 sections with alternating rhythm (hero → features → stat *or* quote → split detail → CTA). State the section list to the user before writing HTML.
+- **Landing / prototype**: choose 4–6 sections with flagship visual rhythm (`hero-stage` with `.app-window` studio/runtime preview → `bento-telemetry` gapless hairline schematics → `bento-architecture` *or* `indexed-showcase` `01`–`04` tab matrix → `compare` hairline table *or* `pricing` → `cta`). State the section list to the user before writing HTML.
 - **Deck**: pick the slide count by format (5–10 min talk ≈ 6 slides; 15 min ≈ 8–10; 20–30 min ≈ 12–18) and sketch the theme rhythm — `01 hero light · 02 light · 03 hero dark …`. No 3+ same-theme slides in a row; for 8+ slides include at least one `hero dark` and one `hero light`.
 - **Dashboard**: classify the monitored domain, then define specific KPI names and plausible values — no "Metric A / Metric B".
 - **Mobile**: one screen = one job. Pick the screen (feed, detail, onboarding, profile, checkout) and the single decision it supports.
@@ -47,7 +48,7 @@ Capture: product, audience, goal, artifact kind (landing / prototype / dashboard
 ### 4 · Build
 
 - Start from the seed for the artifact kind: `assets/prototype-seed.html` (pages), `assets/dashboard-seed.html`, `assets/mobile-seed.html`, `assets/deck-seed.html` — copy it to `index.html` (or the slug the user expects).
-- For app/UI states beyond the seeds, paste from `assets/ui-patterns.html` (buttons, fields, modal, toast, empty, skeleton, tabs, menu, table toolbar); paste page sections from `assets/section-skeletons.html`. Replace every `[REPLACE]` with real, brief-derived copy — zero filler.
+- For app/UI states beyond the seeds, paste from `assets/ui-patterns.html` (buttons, fields, modal, toast, empty, skeleton, tabs, menu, table toolbar); paste page sections from `assets/section-skeletons.html` (`hero-stage`, `bento-telemetry`, `bento-architecture`, `indexed-showcase`, `compare`, `pricing`, `cta`). Customize every `.bento-visual` SVG schematic, `.app-window` pane, and `.dag-grid` to match the brief's exact domain — zero filler.
 - Imagery: use real assets when obtainable (fetch the correct real image, copy it into the project, set intrinsic `width`/`height` on `<img class="content-img">`). Otherwise keep an **intentionally labeled** placeholder and disclose the limitation. Never hotlink; never invent a stand-in for a real person, product, or landmark.
 - Motion follows `references/motion.md`: transform/opacity only, exits faster than enters, and any artifact that animates ships the reduced-motion path.
 - Stateful and data surfaces cover the five states per `references/ux-flows.md`; charts follow `references/data-viz.md`.
