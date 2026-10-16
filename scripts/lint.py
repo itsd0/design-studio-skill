@@ -4,10 +4,13 @@ Design Studio anti-slop linter.
 
 Greppy, deterministic, no dependencies. It does NOT parse HTML — a finding
 always includes a snippet so you can verify it. Rules mirror
-references/quality-gates.md ("the seven cardinal sins" + soft tells).
+references/quality-gates.md ("the seven cardinal sins" + soft tells), plus
+computed WCAG contrast for the core token pairs and static accessibility
+checks (alt text, labels, lang, zoom, focus, headings).
 
 Usage:
     python3 scripts/lint.py artifact.html [more.html ...]
+    python3 scripts/lint.py --json artifact.html        # machine-readable
 
 Exit status: 1 if any P0 finding (must fix before delivery), else 0.
 P0/P1/P2 meaning: see references/quality-gates.md.
@@ -15,6 +18,8 @@ P0/P1/P2 meaning: see references/quality-gates.md.
 
 from __future__ import annotations
 
+import json
+import math
 import re
 import sys
 from dataclasses import dataclass
@@ -345,6 +350,11 @@ def lint(raw_html: str) -> list[Finding]:
             'Add data-design-id="kebab-slug" (or data-screen-label="01 Cover" for slides) to every top-level <section> so an editor or agent can target it.',
         ))
 
+    # ── P0/P1: accessibility statics + computed contrast ──────────────
+    out.extend(check_a11y(html))
+    contrast_findings, _ = check_contrast(html)
+    out.extend(contrast_findings)
+
     return out
 
 
@@ -353,6 +363,9 @@ def lint(raw_html: str) -> list[Finding]:
 
 def extract_css_tokens(html: str) -> list[dict]:
     scopes: list[dict] = []
+    # strip HTML comments first — artifact headers describe the file and often
+    # mention "<style>", which would otherwise hijack the style-block regex
+    html = re.sub(r"<!--[\s\S]*?-->", "", html)
     for block in re.finditer(r"<style[^>]*>([\s\S]*?)</style>", html, re.I):
         css = re.sub(r"/\*[\s\S]*?\*/", "", block.group(1))
         for m in re.finditer(r"([^{}]*)\{([^{}]*)\}", css):
@@ -555,6 +568,221 @@ def is_bare_global_selector(s: str) -> bool:
     return s in (":root", "html", "body")
 
 
+# ── accessibility statics ──────────────────────────────────────────────────
+
+
+def check_a11y(html: str) -> list[Finding]:
+    """Static accessibility checks that grep can genuinely decide."""
+    out: list[Finding] = []
+
+    # P0: <html> without a lang attribute
+    hm = re.search(r"<html\b([^>]*)>", html, re.I)
+    if hm and not re.search(r"\blang\s*=", hm.group(1), re.I):
+        out.append(Finding(
+            "P0", "lang-missing",
+            "<html> has no lang attribute — screen readers have to guess the language.",
+            'Add lang="en" (or the artifact\'s language) to the <html> tag.',
+            clip(hm.group(0)),
+        ))
+
+    # P1: pinch-zoom blocked
+    vm = re.search(r"""<meta[^>]+name\s*=\s*["']viewport["'][^>]*>""", html, re.I)
+    if vm and re.search(r"(user-scalable\s*=\s*no|maximum-scale\s*=\s*1(\.0*)?\b)", vm.group(0), re.I):
+        out.append(Finding(
+            "P1", "zoom-blocked",
+            "Viewport blocks pinch-zoom (user-scalable=no / maximum-scale=1).",
+            "Remove both from the viewport meta — blocking zoom breaks low-vision users.",
+            clip(vm.group(0)),
+        ))
+
+    # P0: <img> without alt
+    no_alt = [
+        t for t in re.findall(r"<img\b[^>]*>", html, re.I)
+        if not re.search(r"\balt\s*=", t, re.I)
+    ]
+    if no_alt:
+        out.append(Finding(
+            "P0", "img-alt",
+            f"{len(no_alt)} <img> tag(s) without an alt attribute.",
+            'Add alt="description" for meaningful images or alt="" for decorative ones.',
+            clip(no_alt[0]),
+        ))
+
+    # P0: form controls without a label
+    fields = re.findall(r"<(?:input|textarea|select)\b[^>]*>", html, re.I)
+    for_labels = set(re.findall(r"""<label[^>]*\bfor\s*=\s*["']([^"']+)["']""", html, re.I))
+    label_blocks = re.findall(r"<label\b[\s\S]*?</label>", html, re.I)
+    unlabeled: list[str] = []
+    for tag in fields:
+        if re.search(r"""\btype\s*=\s*["']?(hidden|submit|button|reset|image)\b""", tag, re.I):
+            continue
+        if re.search(r"\baria-label(?:ledby)?\s*=", tag, re.I):
+            continue
+        idm = re.search(r"""\bid\s*=\s*["']([^"']+)["']""", tag)
+        if idm and idm.group(1) in for_labels:
+            continue
+        if any(tag in block for block in label_blocks):
+            continue
+        unlabeled.append(tag)
+    if unlabeled:
+        out.append(Finding(
+            "P0", "input-unlabeled",
+            f"{len(unlabeled)} form control(s) without a label or aria-label.",
+            'Pair each control with <label for="id">, aria-label, or wrap it in a <label> element.',
+            clip(unlabeled[0]),
+        ))
+
+    # heading structure — full documents only; fragment files get a pass
+    if re.search(r"<html\b", html, re.I):
+        h1s = len(re.findall(r"<h1\b", html, re.I))
+        if h1s != 1:
+            out.append(Finding(
+                "P1", "heading-structure",
+                f"Found {h1s} <h1> element(s) — a page needs exactly one top-level heading.",
+                "Keep one <h1> (the page or artifact title) and demote the rest to h2/h3, in order.",
+            ))
+        levels = [int(m) for m in re.findall(r"<h([1-6])\b", html, re.I)]
+        for prev, cur in zip(levels, levels[1:]):
+            if cur > prev + 1:
+                out.append(Finding(
+                    "P2", "heading-order",
+                    f"Heading order skips a level (h{prev} to h{cur}) — breaks screen-reader outlines.",
+                    f"Insert an h{prev + 1} in between, or demote the h{cur}.",
+                ))
+                break
+
+    # P1: justified text (hard to read on the web)
+    if re.search(r"text-align\s*:\s*justify", html, re.I):
+        out.append(Finding(
+            "P1", "justify-text",
+            "text-align: justify detected — rivers of whitespace, worst at small sizes.",
+            "Use left-aligned text (the default). Justification is a print habit.",
+        ))
+
+    # P1: focus outlines removed without a replacement
+    css = "".join(m.group(1) for m in re.finditer(r"<style[^>]*>([\s\S]*?)</style>", html, re.I))
+    css = re.sub(r"/\*[\s\S]*?\*/", "", css)
+    if re.search(r"outline\s*:\s*(none|0)\b", css, re.I) and not re.search(r":focus-visible", css, re.I):
+        out.append(Finding(
+            "P1", "focus-removed",
+            "An outline is removed but no :focus-visible replacement exists.",
+            "Never remove focus rings without replacement — add a :focus-visible ring (2px accent, 2px offset) on every interactive element.",
+        ))
+
+    return out
+
+
+# ── color parsing & computed WCAG contrast ────────────────────────────────
+
+WCAG_TEXT_MIN = 4.5
+WCAG_LARGE_MIN = 3.0
+
+# (foreground token, background token, is-primary-text, description)
+CONTRAST_PAIRS: list[tuple[str, str, bool, str]] = [
+    ("fg", "bg", True, "primary text on the page background"),
+    ("fg", "surface", True, "primary text on cards / surfaces"),
+    ("muted", "bg", False, "secondary text on the background"),
+    ("muted", "surface", False, "secondary text on surfaces"),
+    ("accent", "bg", False, "accent text on the background"),
+    ("accent", "surface", False, "accent text on surfaces"),
+    ("accent-on", "accent", False, "label text on the accent fill"),
+]
+
+
+def _srgb_to_linear(c: float) -> float:
+    return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
+
+
+def parse_color(value: str) -> tuple[float, float, float] | None:
+    """Parse hex / oklch() / rgb() to LINEAR sRGB components. None if unsupported."""
+    v = value.strip().lower()
+
+    m = re.fullmatch(r"#([0-9a-f]{3}|[0-9a-f]{6})(?:[0-9a-f]{2})?", v)
+    if m:
+        h = m.group(1)
+        if len(h) == 3:
+            h = "".join(ch * 2 for ch in h)
+        r, g, b = (int(h[i:i + 2], 16) / 255 for i in (0, 2, 4))
+        return (_srgb_to_linear(r), _srgb_to_linear(g), _srgb_to_linear(b))
+
+    m = re.fullmatch(r"oklch\(\s*([\d.]+)(%?)\s+([\d.]+)\s+([\d.]+)(?:deg)?\s*\)", v)
+    if m:
+        L = float(m.group(1)) / (100 if m.group(2) == "%" else 1)
+        C, hue = float(m.group(3)), float(m.group(4))
+        rad = hue * math.pi / 180.0
+        a, b = C * math.cos(rad), C * math.sin(rad)
+        l_ = L + 0.3963377774 * a + 0.2158037573 * b
+        m_ = L - 0.1055613458 * a - 0.0638541728 * b
+        s_ = L - 0.0894841775 * a - 1.2914855480 * b
+        l, mm, s = l_ ** 3, m_ ** 3, s_ ** 3
+        r = 4.0767416621 * l - 3.3077115913 * mm + 0.2309699292 * s
+        g = -1.2684380046 * l + 2.6097574011 * mm - 0.3413193965 * s
+        bb = -0.0041960863 * l - 0.7034186147 * mm + 1.7076147010 * s
+        return (min(1.0, max(0.0, r)), min(1.0, max(0.0, g)), min(1.0, max(0.0, bb)))
+
+    m = re.fullmatch(r"rgb\(\s*(\d+)[\s,]+(\d+)[\s,]+(\d+)\s*\)", v)
+    if m:
+        r, g, b = (int(x) / 255 for x in m.groups())
+        return (_srgb_to_linear(r), _srgb_to_linear(g), _srgb_to_linear(b))
+
+    return None
+
+
+def relative_luminance(rgb: tuple[float, float, float]) -> float:
+    r, g, b = rgb
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+
+def contrast_ratio(rgb1: tuple[float, float, float], rgb2: tuple[float, float, float]) -> float:
+    l1, l2 = relative_luminance(rgb1), relative_luminance(rgb2)
+    if l2 > l1:
+        l1, l2 = l2, l1
+    return (l1 + 0.05) / (l2 + 0.05)
+
+
+def check_contrast(html: str) -> tuple[list[Finding], str | None]:
+    """Compute WCAG ratios for the core token pairs from the :root block(s).
+
+    Returns findings plus a one-line summary for the CLI/JSON output. Findings
+    fire only below 3:1 (genuinely unreadable). Ratios between 3:1 and 4.5:1
+    are reported in the summary as "large/UI only" — small text at those
+    ratios needs a darker shade, which is a design decision, not a lint
+    violation.
+    """
+    scopes = extract_css_tokens(html)
+    if not scopes:
+        return [], None
+    themes = build_resolved_themes(scopes)
+    findings: list[Finding] = []
+    parts: list[str] = []
+    for t_idx, tmap in enumerate(themes):
+        for a_name, b_name, is_primary, label in CONTRAST_PAIRS:
+            key_a, key_b = f"--{a_name}", f"--{b_name}"
+            if key_a not in tmap or key_b not in tmap:
+                continue
+            c1 = parse_color(resolve_css_vars(tmap[key_a], tmap))
+            c2 = parse_color(resolve_css_vars(tmap[key_b], tmap))
+            if not c1 or not c2:
+                continue
+            ratio = contrast_ratio(c1, c2)
+            theme_note = "" if t_idx == 0 else f" (theme {t_idx + 1})"
+            pair = f"{a_name}/{b_name}{theme_note}"
+            if ratio < WCAG_LARGE_MIN or (is_primary and ratio < WCAG_TEXT_MIN):
+                findings.append(Finding(
+                    "P1", "contrast-text",
+                    f"Contrast {pair} = {ratio:.1f}:1 — {label} is below the readable minimum.",
+                    "Darken the lighter side of the pair (or lighten it on dark themes). "
+                    "Body text needs 4.5:1; large text (24px+, or 18.7px+ bold) needs 3:1.",
+                ))
+                parts.append(f"{pair} {ratio:.1f}:1 ✗")
+            elif ratio < WCAG_TEXT_MIN:
+                parts.append(f"{pair} {ratio:.1f}:1 (large/UI only)")
+            else:
+                parts.append(f"{pair} {ratio:.1f}:1 ✓")
+    summary = " · ".join(parts) if parts else None
+    return findings, summary
+
+
 # ── misc helpers ──────────────────────────────────────────────────────────
 
 
@@ -580,22 +808,40 @@ SEVERITY_ORDER = {"P0": 0, "P1": 1, "P2": 2}
 
 
 def main(argv: list[str]) -> int:
+    as_json = "--json" in argv
     files = [a for a in argv[1:] if not a.startswith("-")]
     if not files:
         print(__doc__.strip())
         return 2
 
     total_p0 = 0
+    report: list[dict] = []
     for path in files:
         p = Path(path)
         if not p.is_file():
-            print(f"lint · {path}\n  skipped — file not found\n")
+            if as_json:
+                report.append({"path": path, "error": "file not found"})
+            else:
+                print(f"lint · {path}\n  skipped — file not found\n")
             continue
-        findings = sorted(
-            lint(p.read_text(encoding="utf-8")), key=lambda f: SEVERITY_ORDER[f.severity]
-        )
+        raw = p.read_text(encoding="utf-8")
+        findings = sorted(lint(raw), key=lambda f: SEVERITY_ORDER[f.severity])
         counts = {s: sum(1 for f in findings if f.severity == s) for s in ("P0", "P1", "P2")}
         total_p0 += counts["P0"]
+        _, contrast = check_contrast(raw)
+
+        if as_json:
+            report.append({
+                "path": path,
+                "counts": counts,
+                "contrast": contrast,
+                "findings": [
+                    {"severity": f.severity, "id": f.id, "message": f.message,
+                     "fix": f.fix, "snippet": f.snippet}
+                    for f in findings
+                ],
+            })
+            continue
 
         print(f"lint · {path}")
         for f in findings:
@@ -605,8 +851,13 @@ def main(argv: list[str]) -> int:
                 print(f"        near: `{f.snippet}`")
         if not findings:
             print("  clean — no findings.")
+        if contrast:
+            print(f"  contrast: {contrast}")
         verdict = "FAIL (fix P0 before shipping)" if counts["P0"] else "pass"
         print(f"  {counts['P0']} P0 · {counts['P1']} P1 · {counts['P2']} P2 — {verdict}\n")
+
+    if as_json:
+        print(json.dumps({"files": report, "total_p0": total_p0}, indent=2))
 
     return 1 if total_p0 else 0
 

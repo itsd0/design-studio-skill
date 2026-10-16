@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Good fixture</title>
+  <style>
+    :root {
+      --bg: #fafaf7; --surface: #ffffff; --fg: #1a1916;
+      --muted: #6b6964; --border: #e8e5df; --accent: #c96442;
+    }
+    body { margin: 0; background: var(--bg); color: var(--fg); font-family: system-ui, sans-serif; }
+    main { max-width: 60ch; margin: 0 auto; padding: 48px 24px; }
+    .eyebrow {
+      font-family: ui-monospace, monospace;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .btn { border: 1px solid var(--border); background: var(--surface); color: var(--fg); padding: 10px 16px; border-radius: 8px; }
+    .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  </style>
+</head>
+<body>
+  <main>
+    <section data-design-id="intro">
+      <p class="eyebrow">Fixture</p>
+      <h1>One claim, stated plainly.</h1>
+      <p>A short paragraph with no filler and no invented numbers.</p>
+      <button class="btn">Read the docs</button>
+    </section>
+  </main>
+</body>
+</html>

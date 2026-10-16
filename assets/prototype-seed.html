@@ -271,6 +271,31 @@
     .log-row p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
     .log-row .pull { text-align: right; }
     @media (max-width: 920px) { .log-row { grid-template-columns: 1fr; gap: var(--gap-xs); } }
+
+    /* ── pricing ──────────────────────────────────────────────────────── */
+    .card-emphasis { border-color: var(--fg); }
+    .price {
+      font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+      font-size: 40px; letter-spacing: -0.03em;
+      margin: var(--gap-md) 0 var(--gap-lg);
+    }
+    .price .per { font-size: 14px; color: var(--muted); letter-spacing: 0; margin-left: 2px; }
+    .tier-list { list-style: none; margin: 0 0 var(--gap-lg); padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .tier-list li { font-size: 14px; color: var(--muted); padding-left: 18px; position: relative; }
+    .tier-list li::before { content: '\2013'; position: absolute; left: 0; color: var(--muted); }
+
+    /* ── prose block (docs / long-form) ───────────────────────────────── */
+    .prose { max-width: 68ch; }
+    .prose p { margin: 0 0 var(--gap-md); color: var(--muted); font-size: 15px; }
+    .prose h3 { margin: var(--gap-lg) 0 var(--gap-xs); }
+    .code {
+      font-family: var(--font-mono); font-size: 13px; line-height: 1.7;
+      color: var(--fg);
+      background: color-mix(in oklch, var(--fg) 4%, transparent);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 14px 16px; margin: 0 0 var(--gap-md);
+      overflow-x: auto; white-space: pre;
+    }
   </style>
 </head>
 <body>

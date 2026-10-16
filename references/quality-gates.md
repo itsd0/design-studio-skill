@@ -1,6 +1,6 @@
 # Quality gates — craft rules and the review checklist
 
-Universal rules that apply on top of any DESIGN.md. The design system decides *which* values; this file decides *how* they behave. P0 = must pass before delivery; P1 = should pass; P2 = nice to have.
+Universal rules that apply on top of any DESIGN.md. The design system decides *which* values; this file decides *how* they behave. P0 = must pass before delivery; P1 = should pass; P2 = nice to have. `scripts/lint.py` auto-checks the mechanical half — run it early and often.
 
 ## The seven cardinal sins (P0, auto-checked by `scripts/lint.py`)
 
@@ -19,6 +19,16 @@ Universal rules that apply on top of any DESIGN.md. The design system decides *w
 - More than ~12 raw hex values outside `:root`.
 - `var(--accent)` used 6+ times inline in the rendered body.
 
+## Calibrating the three cliché looks
+
+These are the looks an agent drifts toward when it hasn't committed to a direction. Recognize them; ship one only if the brief *explicitly* asks for it — and then with every craft budget in this file intact.
+
+1. **The pastel SaaS.** Indigo→violet gradient hero, two rounded ghost buttons, three identical feature cards, Inter everywhere, glassmorphism nav, a "Trusted by" row of blank gray logo slabs.
+2. **The dark-mode dev tool.** Near-black background, neon green/cyan glow accents, monospace headlines, terminal typing animation, grid overlay, fake log lines.
+3. **The beige editorial clone.** Warm paper background, high-contrast serif display, faux-justified prose, an italic accent in every heading, film grain overlay, drop caps.
+
+The cure is never "add more style" — it's going back to the brief and asking what only *this* product would do.
+
 ## Typography
 
 - **Scale:** multiplicative (1.2 / 1.25), 6–8 sizes max per artifact. Display 48–72 · H1 32–48 · H2 24–32 · H3 20–24 · body 15–18 · small 13–14 · caption 11–12.
@@ -28,33 +38,36 @@ Universal rules that apply on top of any DESIGN.md. The design system decides *w
 - **Pairs:** max 2 typefaces per artifact, always with a system fallback. Never `font-family: system-ui` alone on a heading.
 - **Line length:** 50–75 characters (`max-width: 65ch` is a safe default; 60ch in seeds).
 - **Weights:** exactly 3 — read (400/450), emphasize (510/550), announce (590/600). 700+ is rarely needed.
-- **Above the fold:** no more than 3 type sizes visible. Never `text-align: justify` on the web.
+- **Above the fold:** no more than 3 type sizes visible. Never `text-align: justify` on the web (lint P1).
 
 ## Color
 
 - **Layers:** neutrals 70–90% of pixels (`--bg/--surface/--fg/--muted/--border`) · one accent 5–10% · semantic 0–5% · effect <1% (gradients, glows — rarely justified).
 - **Accent discipline:** ≤ 2 visible uses per screen (one eyebrow + one CTA, or one accent card + one tab). Links count as accent — demote to `--fg` underline when a CTA shares the screen. Hover/focus rings count; ration accordingly.
-- **Contrast gates:** body text 4.5:1 · large text (>18px or 14px bold) 3:1 · UI components against adjacent surfaces 3:1. Low-contrast brand colors get a darker `600`-level shade for text, reserving the bright variant for fills.
+- **Contrast gates:** body text 4.5:1 · large text (≥24px, or ≥18.7px bold) 3:1 · UI components against adjacent surfaces 3:1. The linter computes and prints the core pairs (`fg/bg`, `fg/surface`, `muted/bg`, `muted/surface`, `accent/bg`, `accent/surface`, `accent-on/accent`) per theme — fix every `✗`; treat `(large/UI only)` pairs as fills and display-size text, or step one shade darker for small copy.
 - **Dark themes:** never `#000` / `#fff` — `#0f0f0f` bg, `#f0f0f0` fg. Prefer semi-transparent white borders (`rgba(255,255,255,0.08)`) over solid dark borders.
 - **Naming by purpose** (`--accent`, `--success`), never by hue (`--blue-500`) — hue names lock out theming.
 
 ## State coverage (anything with stateful UI)
 
-Every interactive element defines: default → hover → focus-visible → active → disabled. Data surfaces define: loading (skeleton or spinner), empty (an empty state that explains), error (recoverable, with a path forward). Forms define: helper text, validation timing (on blur/submit, not per keystroke), error message next to the field, success feedback. Never ship only the happy path.
+Every interactive element defines: default → hover → focus-visible → active → disabled. Data surfaces define: loading (skeleton or spinner), empty (an empty state that explains), error (recoverable, with a path forward). Forms define: helper text, validation timing (on blur/submit, not per keystroke), error message next to the field, success feedback. Never ship only the happy path. Playbooks for all five data states live in `references/ux-flows.md`; the component-by-component contracts live in `references/ui-patterns.md`.
 
-## Accessibility baseline (non-negotiable, not exhaustive)
+## Accessibility baseline (WCAG 2.2 AA — measured, not vibes)
 
-- Every input has a visible or `aria-label` label; errors are linked to their field.
-- Interactive targets ≥ 44px (touch) / comfortably clickable (pointer).
-- `:focus-visible` ring on everything interactive — visible, never removed without replacement.
-- Semantic landmarks (`header`/`main`/`nav`/`footer`), one `h1` per page, headings in order.
-- Images: meaningful `alt`; decorative images `alt=""`.
-- Color is never the only signal (status pills carry text, not just hue).
-- Respect `prefers-reduced-motion` for anything that moves.
+The linter enforces the static half: `lang`, `alt`, control labels, zoom, focus-visible, heading structure, computed contrast. The rest is a checklist:
+
+- [ ] Keyboard: every action reachable with Tab/Enter/Esc alone; focus order matches reading order; focus visible at every stop.
+- [ ] Zoom: usable at 200% with no horizontal scroll; `user-scalable=no` never ships (lint P1).
+- [ ] Contrast: no `✗` pairs in the linter's contrast line; small accent text uses a darker shade, not the fill color.
+- [ ] Labels: every control has a visible label or `aria-label`; field errors are linked to their field (lint P0).
+- [ ] Targets ≥ 44px touch; spacing prevents mis-taps.
+- [ ] Motion: `prefers-reduced-motion` path present wherever anything animates (`references/motion.md`).
+- [ ] Color is never the only signal (status pills carry text, not just hue).
+- [ ] Structure: one `h1`, headings in order, semantic landmarks — the lint checks the mechanical parts.
 
 ## Motion discipline
 
-150–250ms durations, purposeful, with a stable easing curve (`cubic-bezier(0.2, 0, 0, 1)` is a good default). Motion explains a state change (hover, open, advance) — it never decorates empty space. Animate `transform` / `opacity`, not layout properties. One memorable micro-interaction per artifact; three is a fidget.
+Durations, the three easing curves, choreography rules and the reduced-motion kill switch live in `references/motion.md`. Short version: motion explains a state change or it gets deleted; `transform`/`opacity` only; exits faster than enters; one memorable micro-interaction per artifact.
 
 ## Laws of UX (composition decisions)
 
@@ -77,6 +90,7 @@ Every interactive element defines: default → hover → focus-visible → activ
 - [ ] `data-design-id` on every top-level `<section>` (decks: `data-screen-label` on every slide).
 - [ ] No `scrollIntoView()`; mobile reflow works at ≤ 920px.
 - [ ] Decks only: every slide has a theme class; no 3+ same-theme in a row; the nav script is intact.
+- [ ] A11y statics clear: `lang` present, every `<img>` has `alt`, every control has a label (all lint P0s).
 
 **P1 — should pass**
 
@@ -86,6 +100,9 @@ Every interactive element defines: default → hover → focus-visible → activ
 - [ ] One image style per page; content images keep intrinsic ratio and full frame.
 - [ ] ALL-CAPS carries ≥ 0.06em tracking; display sizes carry negative tracking (Latin only).
 - [ ] Decks: cover ≤ 8 words, one quote per deck, closing slide decisive; no overflow at 1280×800 and 1440×900.
+- [ ] Linter contrast line: no `✗`; `(large/UI only)` pairs appear only at display/bold sizes or in fills.
+- [ ] Any artifact that animates ships its reduced-motion path.
+- [ ] Data surfaces cover loading / empty / error states (`ux-flows.md`), not only the happy default.
 
 **P2 — nice to have**
 
@@ -93,6 +110,18 @@ Every interactive element defines: default → hover → focus-visible → activ
 - [ ] Derived tones via `color-mix()` instead of extra numbered tokens.
 - [ ] Deck position persists across refresh; progress bar and counter always visible.
 - [ ] Sticky chrome (nav / sidebar) uses a restrained frosted treatment if any.
+- [ ] DESIGN.md dials visibly respected (density steps, motion budget).
+
+## Reviewing an existing artifact
+
+When asked to audit rather than build:
+
+1. Run the linter — human output for reading, `--json` for pasting into a report.
+2. Walk this file top to bottom against the artifact; note the section-level rhythm, not just mechanics.
+3. Report findings as a table — **severity · id · where · fix** — P0 first, before touching anything.
+4. Fix with surgical edits (never regenerate), re-run the lint, and show the before/after contrast line when it changed.
+
+A review without the linter output is an opinion; with it, it's a checklist.
 
 ## The soul test
 

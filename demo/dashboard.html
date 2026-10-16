@@ -1,0 +1,476 @@
+<!doctype html>
+<!--
+  Ferry — transfers dashboard.
+  Built with Design Studio from demo/design.md (Ferry brand contract).
+  Single file: all CSS in one <style>, no external assets, inline SVG only.
+
+  Accent budget (2 visible uses): the volume chart signal + transfer-confirmed
+  marks. Everything else stays in the foreground ramp.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ferry — transfers</title>
+  <style>
+    /* ── tokens — bind once, never outside this block ─────────────────── */
+    :root {
+      --bg:      oklch(98% 0.005 250);
+      --surface: oklch(100% 0 0);
+      --fg:      oklch(22% 0.02 240);
+      --muted:   oklch(50% 0.018 240);
+      --border:  oklch(90% 0.008 240);
+      --accent:  oklch(58% 0.16 145);
+
+      /* derived — do not change */
+      --accent-soft: color-mix(in oklch, var(--accent) 14%, transparent);
+      --fg-soft:     color-mix(in oklch, var(--fg) 6%, transparent);
+
+      --font-display: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
+      --font-body:    -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
+      --font-mono:    'JetBrains Mono', 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+
+      --fs-title: 22px;
+      --fs-h2: 18px;
+      --fs-body: 14px;
+      --fs-meta: 12.5px;
+      --fs-kpi: 30px;
+
+      --gap-xs: 8px; --gap-sm: 12px; --gap-md: 16px; --gap-lg: 24px; --gap-xl: 32px;
+
+      --radius: 10px;
+      --radius-lg: 16px;
+      --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    /* ── reset & base ─────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-body);
+      font-size: var(--fs-body);
+      line-height: 1.5;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; cursor: pointer; }
+    svg { display: block; }
+    p { text-wrap: pretty; }
+    h1, h2, h3 { text-wrap: balance; margin: 0; }
+    h1 { font-family: var(--font-display); font-size: var(--fs-title); font-weight: 600; letter-spacing: -0.01em; }
+    h2 { font-family: var(--font-display); font-size: var(--fs-h2); font-weight: 600; letter-spacing: -0.01em; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    .meta { font-family: var(--font-mono); font-size: var(--fs-meta); color: var(--muted); }
+    .num  { font-family: var(--font-mono); font-variant-numeric: tabular-nums; text-align: right; }
+
+    /* ── shell ────────────────────────────────────────────────────────── */
+    .shell { display: grid; grid-template-columns: 232px minmax(0, 1fr); min-height: 100vh; }
+
+    /* ── rail ─────────────────────────────────────────────────────────── */
+    .side {
+      position: sticky; top: 0; height: 100vh;
+      display: flex; flex-direction: column; gap: var(--gap-lg);
+      padding: 20px 14px;
+      border-right: 1px solid var(--border);
+    }
+    .brand {
+      display: flex; align-items: baseline; gap: 8px;
+      font-family: var(--font-display); font-size: 19px; font-weight: 600;
+      letter-spacing: -0.01em; padding-inline: 8px;
+    }
+    .brand .ver {
+      font-family: var(--font-mono); font-size: 11px; color: var(--muted);
+      letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .nav { display: flex; flex-direction: column; gap: 2px; }
+    .nav a {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 10px; border-radius: var(--radius);
+      color: var(--muted); font-size: 14px;
+      transition: background-color 140ms var(--ease-standard), color 140ms var(--ease-standard);
+    }
+    .nav a:hover { color: var(--fg); background: var(--fg-soft); }
+    .nav a.active { color: var(--fg); background: var(--fg-soft); }
+    .nav a svg { width: 17px; height: 17px; flex: none; }
+    .side-foot { margin-top: auto; padding-inline: 8px; }
+
+    /* ── topbar ───────────────────────────────────────────────────────── */
+    .topbar {
+      position: sticky; top: 0; z-index: 10;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: var(--gap-md); flex-wrap: wrap;
+      padding: 14px 28px;
+      background: color-mix(in oklch, var(--bg) 92%, transparent);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .topbar-actions { display: flex; align-items: center; gap: var(--gap-sm); }
+    .search {
+      display: flex; align-items: center; gap: 8px;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      background: var(--surface); color: var(--muted);
+      padding: 8px 10px;
+      transition: border-color 140ms var(--ease-standard);
+    }
+    .search:focus-within { border-color: var(--fg); }
+    .search input {
+      border: 0; outline: none; background: transparent;
+      font: inherit; font-size: 13px; color: var(--fg); width: 180px;
+    }
+    .search input::placeholder { color: var(--muted); }
+    .search svg { width: 15px; height: 15px; flex: none; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 18px; border-radius: var(--radius);
+      border: 1px solid transparent;
+      font-size: 14px; font-weight: 500;
+      transition: background-color 140ms var(--ease-standard), border-color 140ms var(--ease-standard);
+    }
+    .btn-secondary { background: transparent; color: var(--fg); border-color: var(--border); }
+    .btn-secondary:hover { border-color: var(--fg); }
+
+    /* ── content ──────────────────────────────────────────────────────── */
+    .content {
+      padding: 28px;
+      display: flex; flex-direction: column; gap: var(--gap-xl);
+      max-width: 1220px;
+    }
+
+    .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--gap-md); }
+    .kpi {
+      display: flex; flex-direction: column; gap: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+    }
+    .kpi-label {
+      font-family: var(--font-mono); font-size: 11px;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--muted);
+    }
+    .kpi-value {
+      font-size: var(--fs-kpi); font-weight: 600;
+      letter-spacing: -0.02em; font-variant-numeric: tabular-nums; line-height: 1.1;
+    }
+    .kpi-delta { font-family: var(--font-mono); font-size: var(--fs-meta); }
+    .kpi-delta .note { color: var(--muted); }
+
+    .split { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: var(--gap-md); align-items: start; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+    }
+    .card-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--gap-md); }
+    .chartfig { margin: 0; }
+    .chart { width: 100%; height: auto; margin-top: 10px; }
+    .chart .axis { font-family: var(--font-mono); font-size: 11px; fill: var(--muted); }
+    .chart .endlabel { font-family: var(--font-mono); font-size: 12px; fill: var(--fg); }
+    .chartfig figcaption { margin-top: 8px; }
+
+    .peers { list-style: none; margin: 16px 0 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+    .peer { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: baseline; }
+    .peer-name { font-family: var(--font-mono); font-size: 13px; }
+    .peer-bytes { font-family: var(--font-mono); font-size: var(--fs-meta); font-variant-numeric: tabular-nums; }
+    .peer-bar { grid-column: 1 / -1; height: 5px; border-radius: 3px; background: var(--fg-soft); overflow: hidden; }
+    .peer-bar i { display: block; height: 100%; border-radius: 3px; background: color-mix(in oklch, var(--fg) 32%, transparent); }
+    .peer:nth-child(1) .peer-bar i { width: 100%; }
+    .peer:nth-child(2) .peer-bar i { width: 83%; }
+    .peer:nth-child(3) .peer-bar i { width: 61%; }
+    .peer:nth-child(4) .peer-bar i { width: 36%; }
+
+    /* ── transfers table ──────────────────────────────────────────────── */
+    .panel-head {
+      display: flex; align-items: baseline; justify-content: space-between;
+      gap: var(--gap-md); flex-wrap: wrap; margin-bottom: 14px;
+    }
+    .link { font-size: 13px; text-decoration: underline; text-decoration-color: var(--border); text-underline-offset: 3px; }
+    .link:hover { text-decoration-color: var(--fg); }
+    .tablewrap {
+      overflow-x: auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+    }
+    table { width: 100%; border-collapse: collapse; min-width: 640px; font-size: 13px; }
+    thead th {
+      text-align: left; white-space: nowrap;
+      font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--muted);
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    thead th.num { text-align: right; }
+    thead .sort { color: var(--fg); }
+    tbody td { padding: 11px 16px; border-bottom: 1px solid var(--border); }
+    tbody tr:last-child td { border-bottom: 0; }
+    tbody tr { transition: background-color 120ms var(--ease-standard); }
+    tbody tr:hover { background: var(--fg-soft); }
+    .file { font-family: var(--font-mono); font-size: 12.5px; }
+
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: var(--font-mono); font-size: 11px;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      border: 1px solid var(--border); border-radius: 999px;
+      padding: 3px 9px; color: var(--fg);
+    }
+    .pill svg { width: 11px; height: 11px; flex: none; }
+    .pill .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+    .pill-sending { color: var(--muted); }
+    .pill-failed { background: var(--fg-soft); }
+
+    /* ── responsive ───────────────────────────────────────────────────── */
+    @media (max-width: 920px) {
+      .shell { grid-template-columns: 1fr; }
+      .side {
+        position: static; height: auto;
+        flex-direction: row; align-items: center;
+        gap: var(--gap-md);
+        padding: 10px 16px;
+        border-right: 0; border-bottom: 1px solid var(--border);
+        overflow-x: auto;
+      }
+      .brand .ver { display: none; }
+      .side-foot { display: none; }
+      .nav { flex-direction: row; gap: 4px; }
+      .nav a { white-space: nowrap; }
+      .topbar { padding: 12px 16px; }
+      .search input { width: 110px; }
+      .content { padding: 20px 16px; }
+      .split { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="side">
+      <div class="brand">Ferry <span class="ver">0.9.2</span></div>
+      <nav class="nav" aria-label="Primary">
+        <a href="#" class="active" aria-current="page">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 7h13M14 3l4 4-4 4"/><path d="M20 17H7M10 13l-4 4 4 4"/>
+          </svg>
+          <span>Transfers</span>
+        </a>
+        <a href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="6" r="2.5"/><circle cx="5" cy="18" r="2.5"/><circle cx="19" cy="18" r="2.5"/>
+            <path d="M10.7 8.1 6.3 15.9M13.3 8.1l4.4 7.8M7.5 18h9"/>
+          </svg>
+          <span>Peers</span>
+        </a>
+        <a href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="5" width="13" height="10" rx="1.5"/><path d="M9 20h4M11 15v5"/>
+            <rect x="17.5" y="9" width="4" height="8" rx="1"/>
+          </svg>
+          <span>Devices</span>
+        </a>
+        <a href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.5 2"/>
+          </svg>
+          <span>History</span>
+        </a>
+        <a href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/>
+            <path d="M8.3 11 15.7 6.9M8.3 13l7.4 4.1"/>
+          </svg>
+          <span>Network</span>
+        </a>
+        <a href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>
+          </svg>
+          <span>Settings</span>
+        </a>
+      </nav>
+      <div class="side-foot meta">relay off · local only</div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <h1>Transfers</h1>
+        <div class="topbar-actions">
+          <label class="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="6.5"/><path d="M15.8 15.8 21 21"/>
+            </svg>
+            <input type="search" aria-label="Search transfers" placeholder="Search transfers" />
+          </label>
+          <button class="btn btn-secondary" type="button">New transfer</button>
+        </div>
+      </header>
+
+      <main class="content">
+        <section class="kpis" data-design-id="kpis" aria-label="At a glance">
+          <div class="kpi">
+            <div class="kpi-label">Transferred · 7 days</div>
+            <div class="kpi-value">412 GB</div>
+            <div class="kpi-delta">↑ 18% <span class="note">vs last week</span></div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Files sent · 7 days</div>
+            <div class="kpi-value">1,284</div>
+            <div class="kpi-delta">↑ 6% <span class="note">vs last week</span></div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Median speed</div>
+            <div class="kpi-value">86 MB/s</div>
+            <div class="kpi-delta">↓ 4% <span class="note">vs last week</span></div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Failed · 7 days</div>
+            <div class="kpi-value">3</div>
+            <div class="kpi-delta">↓ 62% <span class="note">vs last week</span></div>
+          </div>
+        </section>
+
+        <div class="split">
+          <section class="card" data-design-id="volume" aria-label="Volume">
+            <div class="card-head">
+              <h2>Volume · last 30 days</h2>
+              <span class="meta">GB / day</span>
+            </div>
+            <figure class="chartfig">
+              <svg class="chart" viewBox="0 0 720 260" role="img"
+                   aria-label="Daily transfer volume over the last 30 days — 34 to 58 GB per day, no gaps.">
+                <g stroke="var(--border)" stroke-width="1">
+                  <line x1="56" y1="40" x2="700" y2="40"/>
+                  <line x1="56" y1="82.5" x2="700" y2="82.5"/>
+                  <line x1="56" y1="125" x2="700" y2="125"/>
+                  <line x1="56" y1="167.5" x2="700" y2="167.5"/>
+                </g>
+                <g class="axis" text-anchor="end">
+                  <text x="44" y="44">80</text>
+                  <text x="44" y="86.5">60</text>
+                  <text x="44" y="129">40</text>
+                  <text x="44" y="171.5">20</text>
+                </g>
+                <g class="axis" text-anchor="middle">
+                  <text x="56" y="234">Sep 18</text>
+                  <text x="232" y="234">Sep 25</text>
+                  <text x="407" y="234">Oct 2</text>
+                  <text x="583" y="234">Oct 9</text>
+                </g>
+                <text class="axis" x="700" y="234" text-anchor="end">Oct 16</text>
+                <polyline points="56,137.8 115,122.9 173,129.3 232,110.1 290,116.5 349,99.5 407,105.9 466,86.8 524,93.1 583,80.4 641,88.9 700,86.8"
+                          fill="none" stroke="var(--accent)" stroke-width="2"
+                          stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="700" cy="86.8" r="3" fill="var(--accent)"/>
+                <text class="endlabel" x="700" y="64" text-anchor="end">58 GB</text>
+              </svg>
+              <figcaption class="meta">Direct device-to-device · no relay hops</figcaption>
+            </figure>
+          </section>
+
+          <section class="card" data-design-id="peers" aria-label="Top peers">
+            <div class="card-head">
+              <h2>Top peers</h2>
+              <span class="meta">by volume</span>
+            </div>
+            <ul class="peers">
+              <li class="peer"><span class="peer-name">studio-imac</span><span class="peer-bytes">142 GB</span><span class="peer-bar"><i></i></span></li>
+              <li class="peer"><span class="peer-name">render-farm</span><span class="peer-bytes">118 GB</span><span class="peer-bar"><i></i></span></li>
+              <li class="peer"><span class="peer-name">home-nas</span><span class="peer-bytes">86 GB</span><span class="peer-bar"><i></i></span></li>
+              <li class="peer"><span class="peer-name">mbp-16</span><span class="peer-bytes">51 GB</span><span class="peer-bar"><i></i></span></li>
+            </ul>
+          </section>
+        </div>
+
+        <section data-design-id="transfers" aria-label="Recent transfers">
+          <div class="panel-head">
+            <div>
+              <h2>Recent transfers</h2>
+              <div class="meta">5 of 214 · updated 1 min ago</div>
+            </div>
+            <a class="link" href="#">View all</a>
+          </div>
+          <div class="tablewrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">File</th>
+                  <th scope="col">Peer</th>
+                  <th scope="col" class="num" aria-sort="descending">Size <span class="sort" aria-hidden="true">↓</span></th>
+                  <th scope="col">Status</th>
+                  <th scope="col">When</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="file">ep12-master.wav</td>
+                  <td>studio-imac</td>
+                  <td class="num">5.1 GB</td>
+                  <td>
+                    <span class="pill">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M4.5 12.5 10 18 19.5 6.5"/>
+                      </svg>
+                      Complete
+                    </span>
+                  </td>
+                  <td class="meta">2 min ago</td>
+                </tr>
+                <tr>
+                  <td class="file">q3-raw-footage.zip</td>
+                  <td>render-farm</td>
+                  <td class="num">24.6 GB</td>
+                  <td><span class="pill pill-sending"><span class="dot"></span>Sending · 62%</span></td>
+                  <td class="meta">6 min ago</td>
+                </tr>
+                <tr>
+                  <td class="file">contracts.pdf</td>
+                  <td>home-nas</td>
+                  <td class="num">240 MB</td>
+                  <td>
+                    <span class="pill">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M4.5 12.5 10 18 19.5 6.5"/>
+                      </svg>
+                      Complete
+                    </span>
+                  </td>
+                  <td class="meta">21 min ago</td>
+                </tr>
+                <tr>
+                  <td class="file">client-review.mp4</td>
+                  <td>home-nas</td>
+                  <td class="num">3.7 GB</td>
+                  <td><span class="pill pill-failed">Failed · checksum</span></td>
+                  <td class="meta">42 min ago</td>
+                </tr>
+                <tr>
+                  <td class="file">brand-assets.sketch</td>
+                  <td>mbp-16</td>
+                  <td class="num">1.4 GB</td>
+                  <td>
+                    <span class="pill">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M4.5 12.5 10 18 19.5 6.5"/>
+                      </svg>
+                      Complete
+                    </span>
+                  </td>
+                  <td class="meta">1 h ago</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+</body>
+</html>
