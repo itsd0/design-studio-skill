@@ -1,6 +1,7 @@
 ---
-name: Design Studio
+name: design-studio
 description: Build polished single-file HTML design artifacts — landing pages, web/app prototypes, dashboards, and slide decks — driven by a DESIGN.md brand contract, with anti-AI-slop quality gates and a self-lint script. Use when the user wants to design or prototype a page, UI, dashboard, or presentation/deck as HTML; turn a brief into a polished visual artifact; establish or apply a brand/design system; or review and refine an existing HTML artifact.
+license: MIT
 ---
 
 # Design Studio

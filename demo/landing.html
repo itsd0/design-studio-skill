@@ -1,0 +1,347 @@
+<!doctype html>
+<!--
+  Ferry — landing page.
+  Built with Design Studio from the tech-utility direction (see design.md).
+  Single file: all CSS in one <style>, no external assets, inline SVG only.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ferry — file transfer that stays on the network</title>
+  <style>
+    /* ── tokens — bind once, never outside this block ─────────────────── */
+    :root {
+      --bg:      oklch(98% 0.005 250);
+      --surface: oklch(100% 0 0);
+      --fg:      oklch(22% 0.02 240);
+      --muted:   oklch(50% 0.018 240);
+      --border:  oklch(90% 0.008 240);
+      --accent:  oklch(58% 0.16 145);
+
+      /* derived — do not change */
+      --accent-soft: color-mix(in oklch, var(--accent) 14%, transparent);
+      --fg-soft:     color-mix(in oklch, var(--fg) 6%, transparent);
+
+      --font-display: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
+      --font-body:    -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
+      --font-mono:    'JetBrains Mono', 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+
+      --fs-h1: clamp(44px, 6vw, 76px);
+      --fs-h2: clamp(32px, 4vw, 48px);
+      --fs-h3: 22px;
+      --fs-lead: 19px;
+      --fs-body: 16px;
+      --fs-meta: 13px;
+
+      --gap-xs: 8px;  --gap-sm: 12px; --gap-md: 20px;
+      --gap-lg: 32px; --gap-xl: 56px; --gap-2xl: 96px;
+      --container: 1120px;
+      --gutter: 32px;
+
+      --radius: 10px;
+      --radius-lg: 16px;
+    }
+
+    /* ── reset & base ─────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-body);
+      font-size: var(--fs-body);
+      line-height: 1.55;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+    img, svg { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; cursor: pointer; }
+    p { text-wrap: pretty; }
+    h1, h2, h3, h4 { text-wrap: balance; }
+
+    /* ── layout primitives ────────────────────────────────────────────── */
+    .container { max-width: var(--container); margin-inline: auto; padding-inline: var(--gutter); }
+    .section { padding-block: clamp(48px, 8vw, var(--gap-2xl)); }
+    .section + .section { border-top: 1px solid var(--border); }
+    .stack { display: flex; flex-direction: column; gap: var(--gap-md); }
+    .row { display: flex; align-items: center; gap: var(--gap-md); }
+    .row-between { display: flex; align-items: center; justify-content: space-between; gap: var(--gap-md); }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--gap-lg); }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap-lg); }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gap-md); }
+    .grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: var(--gap-xl); align-items: start; }
+    .grid-1-2 { display: grid; grid-template-columns: 1fr 2fr; gap: var(--gap-xl); align-items: start; }
+    @media (max-width: 920px) {
+      .grid-2, .grid-3, .grid-4, .grid-2-1, .grid-1-2 { grid-template-columns: 1fr; }
+    }
+
+    /* ── type ─────────────────────────────────────────────────────────── */
+    .h1, h1 { font-family: var(--font-display); font-size: var(--fs-h1); line-height: 1.04; letter-spacing: -0.02em; margin: 0; }
+    .h2, h2 { font-family: var(--font-display); font-size: var(--fs-h2); line-height: 1.1; letter-spacing: -0.015em; margin: 0; }
+    .h3, h3 { font-size: var(--fs-h3); font-weight: 600; line-height: 1.3; letter-spacing: -0.005em; margin: 0; }
+    .lead { font-size: var(--fs-lead); line-height: 1.55; color: var(--muted); max-width: 60ch; margin: 0; }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 0 0 var(--gap-md);
+    }
+    .meta { font-family: var(--font-mono); font-size: var(--fs-meta); color: var(--muted); }
+    .num  { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+    /* ── chrome: nav + footer ─────────────────────────────────────────── */
+    .topnav {
+      position: sticky; top: 0; z-index: 10;
+      background: color-mix(in oklch, var(--bg) 92%, transparent);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .topnav-inner { display: flex; align-items: center; justify-content: space-between; padding-block: 14px; }
+    .topnav .logo { font-family: var(--font-display); font-size: 19px; font-weight: 600; letter-spacing: -0.01em; }
+    .topnav nav { display: flex; gap: var(--gap-lg); }
+    .topnav nav a { font-size: 14px; color: var(--muted); }
+    .topnav nav a:hover { color: var(--fg); }
+    .pagefoot { padding-block: var(--gap-xl); color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); }
+    .pagefoot .row-between { flex-wrap: wrap; gap: var(--gap-md); }
+
+    /* ── buttons ──────────────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 20px;
+      border-radius: var(--radius);
+      border: 1px solid transparent;
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: -0.005em;
+      transition: transform 0.05s ease, background 0.15s ease, border-color 0.15s ease;
+    }
+    .btn:active { transform: translateY(1px); }
+    .btn-primary { background: var(--accent); color: var(--surface); border-color: var(--accent); }
+    .btn-primary:hover { background: color-mix(in oklch, var(--accent) 88%, black); }
+    .btn-secondary { background: transparent; color: var(--fg); border-color: var(--border); }
+    .btn-secondary:hover { border-color: var(--fg); }
+    .btn-ghost { background: transparent; color: var(--fg); border-color: transparent; padding-inline: 8px; }
+    .btn-ghost:hover { color: var(--accent); }
+    .btn-arrow::after { content: '\2192'; transition: transform 0.15s ease; }
+    .btn-arrow:hover::after { transform: translateX(2px); }
+
+    /* ── cards & surfaces ─────────────────────────────────────────────── */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px; }
+
+    /* ── feature cell (monoline mark + h3 + p) ────────────────────────── */
+    .feature .feature-mark {
+      width: 36px; height: 36px;
+      display: grid; place-items: center;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--accent);
+      margin-bottom: var(--gap-md);
+    }
+    .feature .feature-mark svg { width: 18px; height: 18px; }
+    .feature h3 { margin-bottom: 6px; }
+    .feature p  { margin: 0; color: var(--muted); font-size: 15px; }
+
+    /* ── tag ──────────────────────────────────────────────────────────── */
+    .tag {
+      display: inline-flex; align-items: center;
+      padding: 4px 10px;
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 12px;
+    }
+
+    /* ── table (data-style, no chrome) ────────────────────────────────── */
+    .ds-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .ds-table th, .ds-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+    .ds-table th { color: var(--muted); font-weight: 500; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; }
+    .ds-table tbody tr:hover { background: var(--fg-soft); }
+    .ds-table .num-col { font-family: var(--font-mono); font-variant-numeric: tabular-nums; text-align: right; }
+
+    /* ── terminal ─────────────────────────────────────────────────────── */
+    .term { margin: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+    .term-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 18px;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .term-body {
+      margin: 0;
+      padding: 20px 18px;
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      line-height: 1.9;
+      color: var(--fg);
+      white-space: pre-wrap;
+      overflow-x: auto;
+    }
+    .term-body .tp { color: var(--muted); }
+    .term-body .ok { color: var(--accent); }
+
+    /* ── hero variants ────────────────────────────────────────────────── */
+    .hero { padding-block: clamp(80px, 12vw, 160px); }
+    .hero-center { text-align: center; max-width: 720px; margin-inline: auto; }
+    .hero h1 { margin-bottom: var(--gap-md); }
+    .hero .lead { margin-bottom: var(--gap-lg); margin-inline: auto; }
+    .hero-cta { display: inline-flex; gap: var(--gap-sm); flex-wrap: wrap; align-items: center; }
+    .hero-center .hero-cta { justify-content: center; }
+  </style>
+</head>
+<body>
+  <header class="topnav" data-design-id="topnav">
+    <div class="container topnav-inner">
+      <span class="logo">Ferry</span>
+      <nav>
+        <a href="#features">How it works</a>
+        <a href="#cli">CLI</a>
+        <a href="#compare">Compare</a>
+      </nav>
+      <button class="btn btn-secondary">Download</button>
+    </div>
+  </header>
+
+  <main id="content">
+
+    <!-- 1 · hero -->
+    <section class="section hero" data-design-id="hero" id="features">
+      <div class="container hero-center">
+        <p class="eyebrow">Local-first file transfer</p>
+        <h1>Your files cross the room, not the internet.</h1>
+        <p class="lead">Ferry pairs two of your own machines and streams files directly between them — over Wi-Fi, Ethernet, or a cable. No accounts, no uploads, nothing stored in the middle.</p>
+        <div class="hero-cta">
+          <button class="btn btn-primary btn-arrow">Download for macOS</button>
+          <button class="btn btn-secondary">See how it works</button>
+        </div>
+        <p class="meta" style="margin-top: var(--gap-md)">macOS · Linux · Windows · no account required</p>
+      </div>
+    </section>
+
+    <!-- 2 · feature triplet -->
+    <section class="section" data-design-id="features">
+      <div class="container">
+        <p class="eyebrow">What it does</p>
+        <h2>Direct, resumable, and quiet.</h2>
+        <div class="grid-3" style="margin-top: var(--gap-lg)">
+          <div class="feature">
+            <span class="feature-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+            </span>
+            <h3>Nothing in the middle</h3>
+            <p>Files stream device to device. When Ferry says done, the bytes never left your network.</p>
+          </div>
+          <div class="feature">
+            <span class="feature-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m4 13.5 8 4.5 8-4.5"/></svg>
+            </span>
+            <h3>Resumes anywhere</h3>
+            <p>Pause, close the lid, unplug the drive. The next run picks up at the byte it stopped on, not the file.</p>
+          </div>
+          <div class="feature">
+            <span class="feature-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2.5-6 4 12L16 12h5"/></svg>
+            </span>
+            <h3>Pairs once, remembers</h3>
+            <p>Two devices exchange one short code and stay bonded until you revoke them.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 · terminal -->
+    <section class="section" data-design-id="cli">
+      <div class="container">
+        <p class="eyebrow">Terminal native</p>
+        <h2>One command. Both ends.</h2>
+        <div class="grid-2-1" style="margin-top: var(--gap-lg)">
+          <figure class="term" aria-label="Terminal session">
+            <div class="term-head"><span>ferry v0.4</span><span>studio-macbook</span></div>
+            <pre class="term-body"><span class="tp">$</span> ferry send ./footage --to studio-imac
+pairing with studio-imac <span class="ok">✓</span>
+184 files queued · streaming directly
+paused at 62% · resumed automatically
+done — verified, <span class="ok">nothing left the network</span></pre>
+          </figure>
+          <div class="stack">
+            <h3>Scriptable by default</h3>
+            <p class="lead" style="font-size: var(--fs-body)">Pipe stdin, target a device by name, or queue a folder for later. Every action in the menu bar has a command behind it.</p>
+            <div class="row" style="flex-wrap: wrap">
+              <span class="tag">ferry send</span>
+              <span class="tag">ferry receive</span>
+              <span class="tag">ferry watch</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 · comparison -->
+    <section class="section" data-design-id="compare" id="compare">
+      <div class="container">
+        <p class="eyebrow">Compared</p>
+        <h2>Against the usual route.</h2>
+        <table class="ds-table" style="margin-top: var(--gap-lg)">
+          <thead>
+            <tr>
+              <th>Capability</th>
+              <th>Ferry</th>
+              <th>Cloud drive</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Data path</td>
+              <td>Device to device on your network</td>
+              <td>Through a data center</td>
+            </tr>
+            <tr>
+              <td>Accounts</td>
+              <td>None — devices pair directly</td>
+              <td>One per person, at least</td>
+            </tr>
+            <tr>
+              <td>Interrupted transfers</td>
+              <td>Resume at the exact byte</td>
+              <td>Often restart from zero</td>
+            </tr>
+            <tr>
+              <td>Where the cloud wins</td>
+              <td>Same network only — relays are planned</td>
+              <td>Works from anywhere, on any network</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 5 · cta -->
+    <section class="section" data-design-id="cta">
+      <div class="container hero-center">
+        <p class="eyebrow">Start tonight</p>
+        <h2>Two machines, one command.</h2>
+        <p class="lead">Install Ferry on both ends, send something heavy, and watch the network instead of a progress bar.</p>
+        <div class="hero-cta">
+          <button class="btn btn-primary btn-arrow">Download Ferry</button>
+          <span class="meta">macOS · Linux · Windows</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="pagefoot" data-design-id="footer">
+    <div class="container row-between">
+      <span>© 2026 Ferry</span>
+      <span class="meta">hello@ferry.dev · local-first by design</span>
+    </div>
+  </footer>
+</body>
+</html>

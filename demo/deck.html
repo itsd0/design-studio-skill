@@ -1,0 +1,572 @@
+<!doctype html>
+<!--
+  Ferry — a five-minute walkthrough deck.
+  Built with Design Studio from the tech-utility direction (see the design.md
+  next to this file). Chrome, nav runtime and print CSS come from the deck
+  seed untouched — only content and tokens changed.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ferry — a five-minute walkthrough</title>
+  <style>
+    /* ── tokens ────────────────────────────────────────────────────────
+       Bind these to the active DESIGN.md or direction. Stop at the block.
+       A deck has TWO surfaces — .slide.light and .slide.dark — that swap
+       fg / bg without touching the accent. Use both. */
+    :root {
+      --bg:      oklch(98% 0.005 250);
+      --surface: oklch(100% 0 0);
+      --fg:      oklch(22% 0.02 240);
+      --muted:   oklch(50% 0.018 240);
+      --border:  oklch(90% 0.008 240);
+      --accent:  oklch(58% 0.16 145);
+
+      --accent-soft: color-mix(in oklch, var(--accent) 14%, transparent);
+
+      --font-display: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
+      --font-body:    -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
+      --font-mono:    'JetBrains Mono', 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+    }
+
+    /* ── reset & scroller ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    html {
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      overscroll-behavior-x: contain;
+      scrollbar-width: none;
+    }
+    html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-body);
+      font-size: 18px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+    }
+    p { text-wrap: pretty; }
+    h1, h2, h3 { text-wrap: balance; }
+
+    /* ── slide surface ────────────────────────────────────────────────── */
+    .slide {
+      flex: 0 0 100vw;
+      width: 100vw;
+      height: 100vh;
+      scroll-snap-align: start;
+      padding: clamp(48px, 7vw, 96px) clamp(48px, 8vw, 112px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .slide.light { background: var(--bg); color: var(--fg); }
+    .slide.dark  { background: var(--fg); color: var(--bg); }
+    .slide.dark .lead,
+    .slide.dark .meta  { color: color-mix(in oklch, var(--bg) 78%, transparent); }
+    .slide.dark .ph-img { border-color: color-mix(in oklch, var(--bg) 22%, transparent); }
+    .slide.hero { padding-block: clamp(64px, 9vw, 128px); }
+    .slide.center { align-items: center; text-align: center; }
+    .slide.center .lead { margin-inline: auto; }
+
+    /* ── eyebrow / kicker ─────────────────────────────────────────────── */
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 0 0 28px;
+    }
+
+    /* ── type ─────────────────────────────────────────────────────────── */
+    .h-hero {
+      font-family: var(--font-display);
+      font-size: clamp(56px, 8vw, 112px);
+      line-height: 1.02;
+      letter-spacing: -0.025em;
+      margin: 0 0 20px;
+      max-width: 18ch;
+    }
+    .h-xl {
+      font-family: var(--font-display);
+      font-size: clamp(40px, 5vw, 64px);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin: 0 0 20px;
+      max-width: 22ch;
+    }
+    .h-md {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 3vw, 36px);
+      line-height: 1.2;
+      letter-spacing: -0.015em;
+      margin: 0 0 16px;
+    }
+    .slide.center .h-hero,
+    .slide.center .h-xl { margin-inline: auto; }
+    .lead {
+      font-size: clamp(20px, 1.6vw, 24px);
+      line-height: 1.55;
+      color: var(--muted);
+      max-width: 56ch;
+      margin: 0;
+    }
+    .meta { font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
+
+    /* ── big-stat layout ──────────────────────────────────────────────── */
+    .stat-num {
+      font-family: var(--font-display);
+      font-size: clamp(140px, 22vw, 280px);
+      line-height: 0.9;
+      letter-spacing: -0.04em;
+      color: var(--accent);
+      font-weight: 600;
+      margin: 0 0 16px;
+    }
+    .stat-num .unit { font-size: 0.4em; opacity: 0.85; margin-left: 4px; }
+    .stat-caption {
+      font-size: clamp(20px, 1.7vw, 26px);
+      color: var(--muted);
+      max-width: 26ch;
+      margin: 0 auto;
+    }
+
+    /* ── big-quote layout (one quote per deck) ────────────────────────── */
+    .quote-mark {
+      font-family: var(--font-display);
+      font-size: clamp(140px, 16vw, 200px);
+      line-height: 0.6;
+      color: var(--accent);
+      opacity: 0.18;
+      margin: 0 0 -32px;
+    }
+    .quote-text {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 3vw, 44px);
+      line-height: 1.3;
+      letter-spacing: -0.01em;
+      max-width: 28ch;
+      margin: 0 auto 28px;
+    }
+    .quote-author { font-size: 14px; color: var(--muted); }
+
+    /* ── three-point layout ───────────────────────────────────────────── */
+    .pt-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      margin-top: 40px;
+      text-align: left;
+    }
+    .pt { border-top: 2px solid var(--accent); padding-top: 16px; }
+    .pt h3 { font-size: 19px; font-weight: 500; margin: 0 0 8px; letter-spacing: -0.005em; }
+    .pt p  { color: var(--muted); margin: 0; font-size: 16px; line-height: 1.5; }
+    .slide.dark .pt p { color: color-mix(in oklch, var(--bg) 72%, transparent); }
+
+    /* ── pipeline layout (numbered steps) ─────────────────────────────── */
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-top: 40px;
+      text-align: left;
+    }
+    .step .nb { font-family: var(--font-mono); font-size: 13px; color: var(--accent); letter-spacing: 0.06em; }
+    .step h3  { font-family: var(--font-display); font-size: 22px; font-weight: 500; margin: 6px 0; line-height: 1.2; }
+    .step p   { color: var(--muted); margin: 0; font-size: 14px; line-height: 1.5; }
+
+    /* ── before / after layout ────────────────────────────────────────── */
+    .ba-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; margin-top: 32px; text-align: left; }
+    .ba-label { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+    .ba-col h3 { font-family: var(--font-display); font-size: 32px; line-height: 1.15; margin: 0 0 16px; max-width: 16ch; }
+    .ba-col p  { color: var(--muted); font-size: 17px; line-height: 1.5; margin: 0; }
+
+    /* ── image placeholder ────────────────────────────────────────────── */
+    .ph-img {
+      background:
+        linear-gradient(135deg, var(--accent-soft), color-mix(in oklch, var(--fg) 6%, transparent)),
+        var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      aspect-ratio: 16 / 10;
+      display: grid; place-items: center;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+    }
+    .ph-img.wide { aspect-ratio: 16 / 9; }
+    .ph-img.tall { aspect-ratio: 3 / 4; }
+
+    /* ── small-screen reflow ──────────────────────────────────────────── */
+    @media (max-width: 920px) {
+      .pt-grid, .pipeline, .ba-grid { grid-template-columns: 1fr; gap: 20px; }
+      .slide { padding: 40px 28px; }
+    }
+
+    /* ── chrome (counter, dots, progress, hint) — fixed, never scrolls ── */
+    .deck-counter {
+      position: fixed;
+      bottom: 24px; right: 32px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--fg);
+      background: var(--surface);
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      letter-spacing: 0.04em;
+      z-index: 10;
+    }
+    .deck-hint {
+      position: fixed;
+      bottom: 24px; left: 32px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      z-index: 10;
+    }
+    .deck-dots {
+      position: fixed;
+      bottom: 27px; left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      z-index: 10;
+    }
+    .deck-dot {
+      width: 24px; height: 24px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+    }
+    .deck-dot::before {
+      content: '';
+      width: 10px; height: 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+    }
+    .deck-dot[aria-current="true"]::before { background: var(--accent); border-color: var(--accent); transform: scale(1.25); }
+    .deck-dot:focus-visible { outline: 2px solid var(--accent-soft); outline-offset: -2px; border-radius: 999px; }
+    .deck-progress {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      background: var(--accent);
+      width: 0;
+      z-index: 10;
+      transition: width 0.18s ease;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .deck-progress, .deck-dot::before { transition: none; }
+    }
+
+    /* ── print: every slide becomes a page, chrome hidden ─────────────── */
+    @media print {
+      @page { size: landscape; margin: 0; }
+      html, body { height: auto; overflow: visible; display: block; scroll-snap-type: none; }
+      .slide { width: 100%; height: auto; min-height: 96vh; break-after: page; scroll-snap-align: none; }
+      .slide.dark { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .deck-progress, .deck-counter, .deck-hint, .deck-dots { display: none !important; }
+    }
+  </style>
+</head>
+<!--
+  Add data-deck-protocol="1" to <html> only if the deck will be embedded
+  in a host that speaks the deck:slide-state bridge. Standalone decks skip it.
+-->
+<body>
+  <!--
+    Theme rhythm — 6 slides:
+      01 hero light center  Cover        04 light              Pipeline
+      02 light              Round trip   05 dark               Before / after
+      03 hero dark center   Statement    06 hero dark center   Ask
+  -->
+
+  <!-- 01 · cover — hero light -->
+  <section class="slide hero light center" data-screen-label="01 Cover">
+    <div class="eyebrow">Ferry · local-first file transfer</div>
+    <h1 class="h-hero">Your files cross the room, not the internet.</h1>
+    <p class="lead">A five-minute look at how Ferry moves data between your own machines.</p>
+  </section>
+
+  <!-- 02 · three points — light -->
+  <section class="slide light" data-screen-label="02 Three points">
+    <p class="eyebrow">The round trip</p>
+    <h2 class="h-xl">Everyday file sharing takes two hops where one would do.</h2>
+    <div class="pt-grid">
+      <div class="pt">
+        <h3>Upload first</h3>
+        <p>Files travel to a data center before they travel to the room next door.</p>
+      </div>
+      <div class="pt">
+        <h3>Kept in the middle</h3>
+        <p>Cloud copies outlive the transfer, and the sender can rarely say where they landed.</p>
+      </div>
+      <div class="pt">
+        <h3>Metered</h3>
+        <p>Storage and egress are billed per byte. The gigabit network in your room is not.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 · statement — hero dark -->
+  <section class="slide hero dark center" data-screen-label="03 The fix">
+    <p class="eyebrow">The fix</p>
+    <h2 class="h-xl">Direct transfer is a routing problem, not a storage problem.</h2>
+    <p class="lead">If two devices share a network, the fastest path between them is the one you already own.</p>
+  </section>
+
+  <!-- 04 · pipeline — light -->
+  <section class="slide light" data-screen-label="04 How it works">
+    <p class="eyebrow">How it works</p>
+    <h2 class="h-xl">Four steps, none of them a server.</h2>
+    <div class="pipeline">
+      <div class="step">
+        <div class="nb">01</div>
+        <h3>Pair</h3>
+        <p>Two devices exchange a short code and stay bonded until you revoke them.</p>
+      </div>
+      <div class="step">
+        <div class="nb">02</div>
+        <h3>Pick</h3>
+        <p>Drag files, pipe stdin, or name a path. Ferry queues them where they are.</p>
+      </div>
+      <div class="step">
+        <div class="nb">03</div>
+        <h3>Stream</h3>
+        <p>Bytes move directly over the network, resumable at the exact byte.</p>
+      </div>
+      <div class="step">
+        <div class="nb">04</div>
+        <h3>Verify</h3>
+        <p>Both ends hash what landed. The transfer is done when the hashes agree.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 · before / after — dark -->
+  <section class="slide dark" data-screen-label="05 The same job">
+    <p class="eyebrow">The same job</p>
+    <h2 class="h-xl">Moving a shoot's worth of footage to the next room.</h2>
+    <div class="ba-grid">
+      <div class="ba-col">
+        <p class="ba-label">The usual route</p>
+        <h3>Zip, upload, link, wait, re-download.</h3>
+        <p>Four apps and a cloud account for files that sat in the next room the whole time.</p>
+      </div>
+      <div class="ba-col">
+        <p class="ba-label">With Ferry</p>
+        <h3>One command, both ends awake.</h3>
+        <p>Streaming starts before the prompt returns, and nothing stays behind in the middle.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 · ask — hero dark -->
+  <section class="slide hero dark center" data-screen-label="06 Try it">
+    <div class="eyebrow">Try it</div>
+    <h2 class="h-hero">Send something heavy tonight.</h2>
+    <p class="lead">Install Ferry on your two slowest machines and race it against your cloud drive.</p>
+    <p class="meta" style="margin-top: 28px">ferry.dev · no account required</p>
+  </section>
+
+  <!-- chrome -->
+  <div class="deck-progress" id="deck-progress" aria-hidden="true"></div>
+  <div class="deck-counter" id="deck-counter">1 / 6</div>
+  <div class="deck-dots" id="deck-dots" aria-label="Slides"></div>
+  <div class="deck-hint">&larr; / &rarr; · scroll · swipe</div>
+
+  <script>
+    /*
+      Deck nav — five hard rules (do not simplify away):
+
+      1. Detect the real scroller — body OR documentElement, whichever
+         actually overflows.
+      2. Listen for scroll on BOTH window and document, capture phase.
+      3. Listen for keydown on BOTH window and document, capture phase.
+      4. Auto-focus body so arrow keys work without an upfront click.
+      5. Never use Element.scrollIntoView — it yanks the host page.
+
+      Gestures: wheel/trackpad deltas accumulate past a threshold, then
+      advance exactly one slide; a lock swallows the rest of the gesture so
+      momentum never overshoots. Touch falls through to native scroll-snap.
+    */
+    (function () {
+      var slides  = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+      if (!slides.length) return;
+      var counter  = document.getElementById('deck-counter');
+      var progress = document.getElementById('deck-progress');
+      var dotsBox  = document.getElementById('deck-dots');
+      var KEY      = 'deck-pos';
+      var WHEEL_THRESHOLD = 40;
+      var WHEEL_COOLDOWN  = 650;
+      var active = 0;
+      var navLockUntil = 0;
+      var wheelAcc = 0, wheelTimer = null, wheelLockUntil = 0;
+      var reduceMotion = window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var HOST_PROTOCOL = document.documentElement.hasAttribute('data-deck-protocol');
+
+      /* ── scroller detection ─────────────────────────────────────────── */
+      function scrollContainers() {
+        return [document.scrollingElement, document.documentElement, document.body]
+          .filter(Boolean)
+          .filter(function (el, idx, arr) { return arr.indexOf(el) === idx; });
+      }
+      function overflowX(el) {
+        if (!el) return 0;
+        return Math.max(0, (el.scrollWidth || 0) - (el.clientWidth || 0));
+      }
+      function scrollLeftOf(el) {
+        if (!el) return 0;
+        try { return Number(el.scrollLeft) || 0; } catch (_) { return 0; }
+      }
+      function activeScrollLeft() {
+        var candidates = scrollContainers(), best = 0;
+        for (var i = 0; i < candidates.length; i++) {
+          var left = scrollLeftOf(candidates[i]);
+          if (Math.abs(left) > Math.abs(best)) best = left;
+        }
+        return best;
+      }
+      function scrollToLeft(left, behavior) {
+        var candidates = scrollContainers();
+        for (var i = 0; i < candidates.length; i++) {
+          try { candidates[i].scrollLeft = left; } catch (_) {}
+          try { candidates[i].scrollTo({ left: left, behavior: behavior || 'smooth' }); } catch (_) {}
+        }
+      }
+
+      /* ── state ──────────────────────────────────────────────────────── */
+      function setActive(i) {
+        active = i;
+        slides.forEach(function (s, idx) {
+          s.classList.toggle('active', idx === i);
+          s.classList.toggle('is-active', idx === i);
+        });
+        if (counter)  counter.textContent  = (i + 1) + ' / ' + slides.length;
+        if (progress) progress.style.width = (((i + 1) / slides.length) * 100) + '%';
+        if (dotsBox) {
+          Array.prototype.forEach.call(dotsBox.children, function (d, idx) {
+            if (idx === i) d.setAttribute('aria-current', 'true');
+            else d.removeAttribute('aria-current');
+          });
+        }
+        try { localStorage.setItem(KEY, String(i)); } catch (_) {}
+        if (HOST_PROTOCOL) {
+          try { window.parent.postMessage({ type: 'deck:slide-state', active: i, count: slides.length }, '*'); } catch (_) {}
+        }
+      }
+      function go(i) {
+        var next = Math.max(0, Math.min(slides.length - 1, i));
+        navLockUntil = Date.now() + 700;
+        setActive(next);
+        scrollToLeft(next * window.innerWidth, reduceMotion ? 'auto' : 'smooth');
+      }
+      function syncFromScroll() {
+        var i = Math.round(activeScrollLeft() / window.innerWidth);
+        if (i === active) return;                 // already settled
+        if (Date.now() < navLockUntil) return;    // mid programmatic scroll
+        if (i >= 0 && i < slides.length) setActive(i);
+      }
+
+      /* ── keyboard ───────────────────────────────────────────────────── */
+      function onKey(e) {
+        if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+        var t = e.target;
+        if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+        if      (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); go(active + 1); }
+        else if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp'   || e.key === 'PageUp')                   { e.preventDefault(); go(active - 1); }
+        else if (e.key === 'Home')                                                                        { e.preventDefault(); go(0); }
+        else if (e.key === 'End')                                                                         { e.preventDefault(); go(slides.length - 1); }
+      }
+      window.addEventListener('keydown', onKey, true);
+      document.addEventListener('keydown', onKey, true);
+
+      /* ── wheel / trackpad: one gesture = one slide ──────────────────── */
+      function onWheel(e) {
+        if (e.ctrlKey) return;                    // pinch-zoom — leave native
+        var t = e.target;
+        if (t && t.closest && t.closest('input, textarea, select, [contenteditable]')) return;
+        if (Date.now() < wheelLockUntil) {        // inside an active gesture
+          wheelAcc = 0;
+          wheelLockUntil = Date.now() + 250;      // extend while events keep arriving
+          e.preventDefault();
+          return;
+        }
+        e.preventDefault();
+        var d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+        wheelAcc += d;
+        if (wheelTimer) clearTimeout(wheelTimer);
+        wheelTimer = setTimeout(function () { wheelAcc = 0; }, 160);
+        if (Math.abs(wheelAcc) >= WHEEL_THRESHOLD) {
+          var dir = wheelAcc > 0 ? 1 : -1;
+          wheelAcc = 0;
+          wheelLockUntil = Date.now() + WHEEL_COOLDOWN;
+          go(active + dir);
+        }
+      }
+      document.addEventListener('wheel', onWheel, { passive: false });
+      document.addEventListener('scroll', syncFromScroll, { passive: true, capture: true });
+      window.addEventListener('scroll', syncFromScroll, { passive: true });
+
+      /* ── auto-focus so keys work without a click ────────────────────── */
+      document.body.setAttribute('tabindex', '-1');
+      document.body.style.outline = 'none';
+      function focusDeck() { try { window.focus(); document.body.focus({ preventScroll: true }); } catch (_) {} }
+      document.addEventListener('mousedown', focusDeck);
+      window.addEventListener('load', focusDeck);
+      focusDeck();
+
+      /* ── dots ───────────────────────────────────────────────────────── */
+      if (dotsBox) {
+        slides.forEach(function (_, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'deck-dot';
+          b.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+          b.addEventListener('click', function () { go(i); });
+          dotsBox.appendChild(b);
+        });
+      }
+
+      /* ── resize: keep the current slide aligned ─────────────────────── */
+      var resizeTimer = null;
+      window.addEventListener('resize', function () {
+        if (resizeTimer) clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function () {
+          scrollToLeft(active * window.innerWidth, 'auto');
+        }, 150);
+      });
+
+      /* ── restore last-seen position ─────────────────────────────────── */
+      try {
+        var saved = parseInt(localStorage.getItem(KEY) || '0', 10);
+        if (!isNaN(saved) && saved >= 0 && saved < slides.length) {
+          setActive(saved);
+          scrollToLeft(saved * window.innerWidth, 'auto');
+        } else {
+          setActive(0);
+        }
+      } catch (_) { setActive(0); }
+    })();
+  </script>
+</body>
+</html>
