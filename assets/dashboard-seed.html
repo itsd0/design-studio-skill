@@ -21,28 +21,32 @@
   <title>[REPLACE] Dashboard · brand</title>
   <style>
     /* ── tokens ────────────────────────────────────────────────────────
-       Bind these to the active DESIGN.md or direction. Stop at the block. */
+       Bind these to the active DESIGN.md or direction. Stop at the block.
+       Default bound to dark-structural-grid (flagship AI/DevTool dark). */
     :root {
-      --bg:      #fafaf7;   /* page background — never #fff */
-      --surface: #ffffff;   /* cards, raised areas */
-      --fg:      #1a1916;   /* primary text — never #000 */
-      --muted:   #6b6964;   /* secondary text, captions */
-      --border:  #e8e5df;   /* hairlines, dividers */
-      --accent:  #c96442;   /* one accent — sidebar active + chart highlight */
-      --success: #1a7f4b;   /* status only, <5% of pixels */
-      --danger:  #b3261e;   /* status only, <5% of pixels */
+      --bg:        oklch(13% 0.006 255);   /* page background — never #000/#fff */
+      --surface:   oklch(16% 0.008 255);   /* cards, raised areas */
+      --surface-2: oklch(20% 0.010 255);   /* active pills, headers */
+      --fg:        oklch(96% 0.004 255);   /* primary text */
+      --muted:     oklch(68% 0.012 255);   /* secondary text, captions */
+      --border:    oklch(24% 0.010 255);   /* exposed 1px hairlines */
+      --accent:    oklch(80% 0.17 152);    /* one accent — sidebar active + chart highlight */
+      --accent-on: oklch(15% 0.02 152);    /* contrast ink on --accent fills */
+      --success:   oklch(78% 0.16 150);    /* status only, <5% of pixels */
+      --danger:    oklch(70% 0.18 25);     /* status only, <5% of pixels */
 
       /* derived — do not change */
       --accent-soft: color-mix(in oklch, var(--accent) 14%, transparent);
       --fg-soft:     color-mix(in oklch, var(--fg) 6%, transparent);
+      --specular:    inset 0 1px 0 color-mix(in oklch, var(--fg) 8%, transparent);
 
-      /* type — display = serif by default; bind to the brand when one exists */
-      --font-display: 'Iowan Old Style', 'Charter', Georgia, 'Times New Roman', serif;
-      --font-body:    -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-      --font-mono:    ui-monospace, 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+      /* type — bind to DESIGN.md or chosen direction in references/directions.md */
+      --font-display: -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Display', system-ui, sans-serif;
+      --font-body:    -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Text', system-ui, sans-serif;
+      --font-mono:    'JetBrains Mono', 'Geist Mono', 'IBM Plex Mono', ui-monospace, Menlo, monospace;
 
-      --fs-title: 22px;
-      --fs-h2: 19px;
+      --fs-title: 20px;
+      --fs-h2: 17px;
       --fs-body: 14px;
       --fs-meta: 12px;
       --fs-kpi: 32px;
@@ -50,8 +54,8 @@
       /* spacing — 4/8-point grid */
       --gap-xs: 8px; --gap-sm: 12px; --gap-md: 16px; --gap-lg: 24px; --gap-xl: 32px;
 
-      --radius: 10px;
-      --radius-lg: 14px;
+      --radius: 6px;
+      --radius-lg: 10px;
       --ease-standard: cubic-bezier(0.2, 0, 0, 1);
     }
 
@@ -153,14 +157,21 @@
       max-width: 1240px;
     }
 
-    /* KPI row */
-    .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: var(--gap-md); }
+    /* KPI row — gapless hairline telemetry strip */
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
     .kpi {
       display: flex; flex-direction: column; gap: 6px;
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 18px;
+      padding: 18px 20px;
+      box-shadow: var(--specular);
     }
     .kpi-label {
       font-family: var(--font-mono); font-size: 11px;
@@ -183,6 +194,7 @@
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
       padding: 18px 20px;
+      box-shadow: var(--specular);
     }
     .card-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--gap-md); }
     .chartfig { margin: 0; }

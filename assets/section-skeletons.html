@@ -1,96 +1,358 @@
 <!--
-  Section skeletons (Design Studio) — 10 paste-ready sections.
+  Section skeletons (Design Studio — 2025–2026 Flagship Edition) — 11 paste-ready sections.
 
   Paste sections into <main id="content"> of a file built from
   assets/prototype-seed.html. Every class used here ships in that seed —
   no extra CSS needed. Replace every [REPLACE] with brief-derived copy;
   delete sections your page doesn't need (4–6 sections per page is right).
 
-  Ordering guidance: lead with hero-center or hero-split; vary the middle
-  (no two stats rows / quote blocks / feature triplets in a row); end with
-  the CTA strip. Every top-level <section> keeps its data-design-id.
+  Flagship composition rules:
+  1. Lead with `hero-stage` (Hero + Multi-Pane Studio/Runtime Window) or `hero-split`.
+  2. Never ship plain text-only feature triplets — use `bento-telemetry`,
+     `bento-architecture`, and/or `indexed-showcase` so every feature has a
+     visual schematic or UI proof.
+  3. Keep `data-design-id` on every top-level <section>.
 -->
 
-<!-- ══ 1 · hero-center — the lead section, once per page ══════════════ -->
-<section class="section hero" data-design-id="hero">
-  <div class="container hero-center">
-    <p class="eyebrow">[REPLACE] Eyebrow · context</p>
-    <h1>[REPLACE] One sharp sentence about what this is.</h1>
-    <p class="lead">[REPLACE] One subhead — the concrete value, not a tagline.</p>
-    <div class="hero-cta">
-      <button class="btn btn-primary btn-arrow">[REPLACE] Primary CTA</button>
-      <button class="btn btn-secondary">[REPLACE] Secondary</button>
+<!-- ══ 1 · hero-stage — centered hero + multi-pane studio/IDE window ══ -->
+<section class="section hero hero-atmosphere bg-grid-matrix" data-design-id="hero">
+  <div class="container">
+    <div class="hero-center">
+      <p class="eyebrow">[REPLACE] Eyebrow · system category</p>
+      <h1><span class="tone-muted">[REPLACE] Engineered for</span> [REPLACE] Autonomous Execution.</h1>
+      <p class="lead">[REPLACE] One crisp subhead sentence explaining what the system runs, how it isolates state, and what ships to production.</p>
+      <div class="hero-cta">
+        <button class="btn btn-primary btn-arrow">[REPLACE] Start Building</button>
+        <button class="btn btn-secondary">[REPLACE] Read Architecture</button>
+      </div>
+    </div>
+
+    <div class="hero-stage">
+      <div class="app-window" role="region" aria-label="[REPLACE] Product workspace preview">
+        <div class="app-bar">
+          <div class="row" style="gap: 12px">
+            <span class="win-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span>[REPLACE] workspace-runtime</span>
+          </div>
+          <div class="win-tabs">
+            <span class="win-tab active">[REPLACE] # agent-trace.canvas</span>
+            <span class="win-tab">[REPLACE] metrics.json</span>
+          </div>
+          <span>[REPLACE] env: production · live</span>
+        </div>
+        <div class="app-panes">
+          <!-- Left pane: project / service tree -->
+          <div class="app-pane">
+            <span class="meta">[REPLACE] WORKSPACES</span>
+            <div class="stack" style="gap: 8px; margin-top: 4px">
+              <div style="padding: 8px 10px; background: var(--surface-2, var(--bg)); border: 1px solid var(--border); border-radius: var(--radius)">
+                <div style="font-weight: 500; font-size: 13px">[REPLACE] core-runtime</div>
+                <div class="meta" style="margin-top: 2px">[REPLACE] # 3 active sandboxes</div>
+              </div>
+              <div style="padding: 8px 10px; color: var(--muted); font-size: 13px">
+                <div>[REPLACE] auth-gateway</div>
+                <div class="meta" style="margin-top: 2px">[REPLACE] verified · 2m ago</div>
+              </div>
+            </div>
+          </div>
+          <!-- Middle pane: prompt / execution trace -->
+          <div class="app-pane">
+            <div style="padding: 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); font-size: 13px">
+              [REPLACE] Provision an isolated snapshot for PR #418, run the integration suite, and stream telemetry.
+            </div>
+            <p class="meta" style="margin: 4px 0 0; line-height: 1.55">
+              [REPLACE] Snapshot mounted from base image. Executing deterministic verification graph across 4 parallel workers.
+            </p>
+            <div class="cmd-pill" style="margin-top: auto">
+              <span class="meta">$</span>
+              <span>[REPLACE] runtime.spawn({ snapshot: "v33" })</span>
+              <span class="cursor" aria-hidden="true"></span>
+            </div>
+          </div>
+          <!-- Right pane: dot-matrix visual canvas -->
+          <div class="app-pane bg-dot-matrix" style="justify-content: center; align-items: center">
+            <div class="card" style="width: 100%; padding: 16px; background: var(--bg)">
+              <div class="row-between" style="margin-bottom: 10px">
+                <span class="meta">[REPLACE] EXECUTION GRAPH</span>
+                <span class="pill">[REPLACE] Verified</span>
+              </div>
+              <div class="dag-grid">
+                <span class="dag-node live">[REPLACE] FORK</span>
+                <span class="dag-node live">[REPLACE] BUILD</span>
+                <span class="dag-node live">[REPLACE] TEST</span>
+                <span class="dag-node">[REPLACE] MERGE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ══ 2 · hero-split — hero with a visual on the right ═══════════════ -->
+<!-- ══ 2 · hero-split — split hero with live terminal / telemetry stage ═ -->
 <section class="section hero" data-design-id="hero-split">
   <div class="container hero-split">
     <div>
       <p class="eyebrow">[REPLACE] Eyebrow · context</p>
-      <h1>[REPLACE] One sharp sentence about what this is.</h1>
-      <p class="lead">[REPLACE] One subhead — problem or promise, no adjectives.</p>
+      <h1>[REPLACE] Give your system <mark class="tone-block">[REPLACE] deterministic</mark> execution.</h1>
+      <p class="lead">[REPLACE] One subhead — concrete engineering capability, no filler adjectives.</p>
       <div class="hero-cta">
         <button class="btn btn-primary btn-arrow">[REPLACE] Primary CTA</button>
         <button class="btn btn-secondary">[REPLACE] Secondary</button>
       </div>
     </div>
-    <!-- Swap .ph-img for <img class="content-img"> once real art exists. -->
-    <div class="ph-img">[REPLACE] Screenshot · 16:10</div>
+    <figure class="term" aria-label="[REPLACE] Terminal session">
+      <div class="term-head">
+        <span class="win-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>[REPLACE] session · zsh</span>
+        <span>[REPLACE] v2.4</span>
+      </div>
+      <pre class="term-body"><span class="tp">$</span> [REPLACE] command --flag target
+<span class="ok">✓</span> [REPLACE] step one completed (42ms)
+<span class="ok">✓</span> [REPLACE] step two verified in isolated volume
+[REPLACE] streaming output · ready</pre>
+    </figure>
   </div>
 </section>
 
-<!-- ══ 3 · feature triplet — three columns, one idea each ═════════════ -->
-<section class="section" data-design-id="features">
+<!-- ══ 3 · bento-telemetry — 3-col gapless hairline schematic bento ════ -->
+<section class="section" data-design-id="bento-telemetry">
   <div class="container">
-    <p class="eyebrow">[REPLACE] Eyebrow</p>
-    <h2>[REPLACE] What it does, in one line.</h2>
-    <div class="grid-3" style="margin-top: var(--gap-lg)">
-      <div class="feature">
-        <span class="feature-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
-        </span>
-        <h3>[REPLACE] Outcome one</h3>
-        <p>[REPLACE] One sentence about the result the user gets — not the mechanism.</p>
+    <p class="eyebrow">[REPLACE] System Architecture</p>
+    <h2><span class="tone-muted">[REPLACE] Fast, Scalable, Stateful</span><br />[REPLACE] Infrastructure for Modern Workloads.</h2>
+
+    <div class="bento-hairline" style="margin-top: var(--gap-lg)">
+      <!-- Cell 1: Gauge meter + inline command pill -->
+      <article class="bento-cell">
+        <div class="bento-copy">
+          <h3 class="mono-title">[REPLACE] Sub-Second Cold Start</h3>
+          <p>[REPLACE] Concrete explanation of how instances boot from pre-warmed memory snapshots.</p>
+        </div>
+        <div class="bento-visual">
+          <svg viewBox="0 0 240 120" width="220" height="110" fill="none" aria-hidden="true">
+            <path d="M 24 104 A 96 96 0 0 1 216 104" stroke="var(--border)" stroke-width="3" stroke-linecap="round"/>
+            <path d="M 24 104 A 96 96 0 0 1 128 8" stroke="var(--accent)" stroke-width="3.5" stroke-linecap="round"/>
+            <line x1="120" y1="14" x2="120" y2="34" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/>
+            <text x="120" y="76" text-anchor="middle" fill="var(--fg)" font-family="var(--font-mono)" font-size="22" font-weight="600">[REPLACE] 90ms</text>
+          </svg>
+          <div class="cmd-pill" style="margin-top: 8px">
+            <span>[REPLACE] client.create()</span>
+            <span class="cursor" aria-hidden="true"></span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Cell 2: Isometric isolated wireframe cube -->
+      <article class="bento-cell">
+        <div class="bento-copy">
+          <h3 class="mono-title">[REPLACE] Hardware-Level Isolation</h3>
+          <p>[REPLACE] Execute untrusted or generated workloads with zero lateral risk to host nodes.</p>
+        </div>
+        <div class="bento-visual">
+          <svg viewBox="0 0 240 160" width="220" height="145" fill="none" aria-hidden="true">
+            <!-- Base grid pedestals -->
+            <polygon points="120,112 176,134 120,154 64,134" fill="var(--bg)" stroke="var(--border)" stroke-width="1.2"/>
+            <!-- Dashed projection lines -->
+            <line x1="64" y1="76" x2="64" y2="134" stroke="var(--border)" stroke-dasharray="3 3"/>
+            <line x1="176" y1="76" x2="176" y2="134" stroke="var(--border)" stroke-dasharray="3 3"/>
+            <line x1="120" y1="98" x2="120" y2="154" stroke="var(--border)" stroke-dasharray="3 3"/>
+            <!-- Isometric translucent prism -->
+            <polygon points="120,24 176,46 120,68 64,46" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/>
+            <polygon points="64,46 120,68 120,98 64,76" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/>
+            <polygon points="176,46 120,68 120,98 176,76" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/>
+          </svg>
+        </div>
+      </article>
+
+      <!-- Cell 3: Parallel DAG workflow tree -->
+      <article class="bento-cell">
+        <div class="bento-copy">
+          <h3 class="mono-title">[REPLACE] Massive Parallelization</h3>
+          <p>[REPLACE] Branch state across concurrent workers and merge verified outputs in real time.</p>
+        </div>
+        <div class="bento-visual" style="align-items: stretch; gap: 10px">
+          <div><span class="dag-badge">[REPLACE] SAVED</span></div>
+          <svg viewBox="0 0 240 28" width="100%" height="26" fill="none" aria-hidden="true">
+            <path d="M 28 2 C 28 16, 30 14, 30 26" stroke="var(--accent)" stroke-width="1.4"/>
+            <path d="M 28 2 C 28 16, 90 14, 90 26" stroke="var(--accent)" stroke-width="1.4"/>
+            <path d="M 28 2 C 28 16, 150 14, 150 26" stroke="var(--accent)" stroke-width="1.4"/>
+            <path d="M 28 2 C 28 16, 210 14, 210 26" stroke="var(--accent)" stroke-width="1.4"/>
+          </svg>
+          <div class="dag-grid">
+            <span class="dag-node live">[REPLACE] FORK</span>
+            <span class="dag-node live">[REPLACE] FORK</span>
+            <span class="dag-node live">[REPLACE] FORK</span>
+            <span class="dag-node live">[REPLACE] FORK</span>
+            <span class="dag-node">[REPLACE] BUILD</span>
+            <span class="dag-node">[REPLACE] BUILD</span>
+            <span class="dag-node">[REPLACE] BUILD</span>
+            <span class="dag-node">[REPLACE] BUILD</span>
+            <span class="dag-node">[REPLACE] EVAL</span>
+            <span class="dag-node">[REPLACE] EVAL</span>
+            <span class="dag-node">[REPLACE] EVAL</span>
+            <span class="dag-node">[REPLACE] EVAL</span>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 4 · bento-architecture — asymmetric 2-col + stacked right bento ═ -->
+<section class="section" data-design-id="bento-architecture">
+  <div class="container">
+    <p class="eyebrow">[REPLACE] Runtime Primitives</p>
+    <h2><span class="tone-muted">[REPLACE] More Than a Container.</span><br />[REPLACE] The Primitives Workloads Actually Need.</h2>
+
+    <div class="bento-hairline" style="margin-top: var(--gap-lg)">
+      <!-- Left cell: Snapshot version stack + tick ruler -->
+      <article class="bento-cell">
+        <div class="bento-visual" style="min-height: 230px; gap: 18px">
+          <div style="width: 82%; border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; background: var(--bg); box-shadow: 0 -8px 0 -4px var(--surface), 0 -8px 0 -3px var(--border)">
+            <div style="font-weight: 600; font-size: 14px">[REPLACE] Snapshot v33</div>
+            <div class="meta" style="margin-top: 6px">[REPLACE] RUNTIME 22.0 · VERIFIED</div>
+          </div>
+          <svg viewBox="0 0 220 28" width="200" height="26" fill="none" aria-hidden="true">
+            <g stroke="var(--border)" stroke-width="1.5">
+              <line x1="10" y1="6" x2="10" y2="22"/><line x1="30" y1="6" x2="30" y2="22"/>
+              <line x1="50" y1="6" x2="50" y2="22"/><line x1="70" y1="6" x2="70" y2="22"/>
+              <line x1="90" y1="6" x2="90" y2="22"/><line x1="130" y1="6" x2="130" y2="22"/>
+              <line x1="150" y1="6" x2="150" y2="22"/><line x1="170" y1="6" x2="170" y2="22"/>
+              <line x1="190" y1="6" x2="190" y2="22"/><line x1="210" y1="6" x2="210" y2="22"/>
+            </g>
+            <line x1="110" y1="2" x2="110" y2="26" stroke="var(--accent)" stroke-width="2"/>
+          </svg>
+        </div>
+        <div class="bento-copy">
+          <h3>[REPLACE] Instant State Snapshots</h3>
+          <p>[REPLACE] Save, restore, and branch any running state without re-running initialization.</p>
+        </div>
+      </article>
+
+      <!-- Middle cell: Wireframe globe + region nodes -->
+      <article class="bento-cell">
+        <div class="bento-visual" style="min-height: 230px">
+          <svg viewBox="0 0 220 180" width="210" height="170" fill="none" aria-hidden="true">
+            <circle cx="110" cy="95" r="72" stroke="var(--border)" stroke-width="1.2"/>
+            <ellipse cx="110" cy="95" rx="46" ry="72" stroke="var(--border)" stroke-width="1"/>
+            <ellipse cx="110" cy="95" rx="20" ry="72" stroke="var(--border)" stroke-width="1"/>
+            <ellipse cx="110" cy="95" rx="72" ry="32" stroke="var(--border)" stroke-width="1"/>
+            <circle cx="78" cy="70" r="3.5" fill="var(--accent)"/>
+            <circle cx="136" cy="88" r="4" fill="var(--accent)"/>
+            <circle cx="136" cy="88" r="11" stroke="var(--accent)" stroke-width="1.2" opacity="0.5"/>
+            <circle cx="96" cy="116" r="3.5" fill="var(--accent)"/>
+          </svg>
+        </div>
+        <div class="bento-copy">
+          <h3>[REPLACE] Multi-Region Placement</h3>
+          <p>[REPLACE] Schedule compute adjacent to your data and users for deterministic low latency.</p>
+        </div>
+      </article>
+
+      <!-- Right cell: Stacked primitive pair -->
+      <article class="bento-cell">
+        <div class="bento-visual" style="min-height: 110px">
+          <svg viewBox="0 0 180 80" width="160" height="72" fill="none" aria-hidden="true">
+            <polygon points="90,10 144,28 90,46 36,28" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.4"/>
+            <polygon points="90,26 144,44 90,62 36,44" stroke="var(--accent-soft)" stroke-width="1.2"/>
+            <polygon points="90,42 144,60 90,76 36,60" stroke="var(--border)" stroke-dasharray="3 3" stroke-width="1.2"/>
+          </svg>
+        </div>
+        <div class="bento-copy">
+          <h3>[REPLACE] Shared Volumes &amp; Persistence</h3>
+          <p>[REPLACE] Mount high-throughput volumes across sandboxes without breaking isolation boundaries.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 5 · indexed-showcase — numbered 01-04 tab matrix + spec stage ═══ -->
+<section class="section" data-design-id="indexed-showcase">
+  <div class="container">
+    <p class="eyebrow">[REPLACE] Deep Dive</p>
+    <h2>[REPLACE] Everything between the ask and the result, handled.</h2>
+
+    <div class="index-showcase" style="margin-top: var(--gap-lg)">
+      <!-- Left: 01-04 index table -->
+      <div class="index-list" role="tablist" aria-label="[REPLACE] Capability index">
+        <button class="index-item active" type="button" role="tab" aria-selected="true">
+          <span class="idx-num">01</span>
+          <span>[REPLACE] NO CONTEXT BLOAT</span>
+        </button>
+        <button class="index-item" type="button" role="tab" aria-selected="false">
+          <span class="idx-num">02</span>
+          <span>[REPLACE] SELF-HEALING EXECUTION</span>
+        </button>
+        <button class="index-item" type="button" role="tab" aria-selected="false">
+          <span class="idx-num">03</span>
+          <span>[REPLACE] SCOPED CREDENTIALS</span>
+        </button>
+        <button class="index-item" type="button" role="tab" aria-selected="false">
+          <span class="idx-num">04</span>
+          <span>[REPLACE] AUDIT TELEMETRY</span>
+        </button>
       </div>
-      <div class="feature">
-        <span class="feature-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m4 13.5 8 4.5 8-4.5"/></svg>
-        </span>
-        <h3>[REPLACE] Outcome two</h3>
-        <p>[REPLACE] One sentence about the result the user gets — not the mechanism.</p>
+
+      <!-- Center: Framed command / plan inspection stage -->
+      <div class="card" style="padding: 20px; background: var(--surface-2, var(--surface))">
+        <div class="app-window" style="background: var(--bg)">
+          <div class="app-bar">
+            <span>[REPLACE] query: triaging production errors</span>
+            <span class="meta">[REPLACE] 3 matched</span>
+          </div>
+          <div style="padding: 16px; display: flex; flex-direction: column; gap: 10px">
+            <div style="padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius); display: flex; justify-content: space-between; align-items: center">
+              <div>
+                <div class="num" style="font-size: 12.5px; font-weight: 600">[REPLACE] ACTION_FETCH_EVENTS</div>
+                <div class="meta">[REPLACE] Pull unresolved traces from production</div>
+              </div>
+              <span class="pill">[REPLACE] MATCH</span>
+            </div>
+            <div style="padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius); display: flex; justify-content: space-between; align-items: center">
+              <div>
+                <div class="num" style="font-size: 12.5px; font-weight: 600">[REPLACE] ACTION_OPEN_ISSUE</div>
+                <div class="meta">[REPLACE] Link stack trace and assign owner</div>
+              </div>
+              <span class="tag">[REPLACE] READY</span>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="feature">
-        <span class="feature-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2.5-6 4 12L16 12h5"/></svg>
-        </span>
-        <h3>[REPLACE] Outcome three</h3>
-        <p>[REPLACE] One sentence about the result the user gets — not the mechanism.</p>
+
+      <!-- Right: Numbered specification prose & vertical-bar list -->
+      <div>
+        <span class="tag" style="margin-bottom: 12px">01</span>
+        <h3>[REPLACE] The right actions, without the context bloat</h3>
+        <p style="color: var(--muted); font-size: 15px; margin: 10px 0 0">
+          [REPLACE] Explain how the system dynamically resolves only the required tools and schemas at runtime instead of flooding the context window.
+        </p>
+        <ul class="spec-list">
+          <li><strong>[REPLACE] Dynamic schema resolution</strong> [REPLACE] — loads only the parameters required for the active step.</li>
+          <li><strong>[REPLACE] Pre-execution plan verification</strong> [REPLACE] — validates required scopes before any call runs.</li>
+          <li><strong>[REPLACE] Automatic schema guardrails</strong> [REPLACE] — catches malformed payloads before upstream dispatch.</li>
+        </ul>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ══ 4 · stat row — 2–3 sourced numbers, no invented metrics ═══════
-     Numbers must come from the brief or a real source. If a number is
-     missing, ship the layout with an em dash and a labeled stub — never
-     guess. Drop the accent eyebrow here: the stat numerals are the
-     section's one accent moment. -->
+<!-- ══ 6 · stat row — gapless hairline stat strip, no invented metrics ═ -->
 <section class="section" data-design-id="stats">
   <div class="container">
     <p class="eyebrow">[REPLACE] Eyebrow</p>
-    <h2>[REPLACE] Traction, stated plainly.</h2>
-    <div class="grid-3" style="margin-top: var(--gap-lg)">
-      <div class="stat">
+    <h2>[REPLACE] Measured in production.</h2>
+    <div class="bento-hairline" style="margin-top: var(--gap-lg)">
+      <div class="bento-cell stat">
         <div class="stat-num">—</div>
         <div class="stat-label">[REPLACE] What this measures · source</div>
       </div>
-      <div class="stat">
+      <div class="bento-cell stat">
         <div class="stat-num">—</div>
         <div class="stat-label">[REPLACE] What this measures · source</div>
       </div>
-      <div class="stat">
+      <div class="bento-cell stat">
         <div class="stat-num">—</div>
         <div class="stat-label">[REPLACE] What this measures · source</div>
       </div>
@@ -98,7 +360,7 @@
   </div>
 </section>
 
-<!-- ══ 5 · quote — one per page, real attribution ═════════════════════ -->
+<!-- ══ 7 · quote — one per page, real attribution ═════════════════════ -->
 <section class="section" data-design-id="quote">
   <div class="container">
     <div class="quote-mark" aria-hidden="true">&ldquo;</div>
@@ -107,65 +369,11 @@
   </div>
 </section>
 
-<!-- ══ 6 · CTA strip — the decisive close ═════════════════════════════ -->
-<section class="section" data-design-id="cta">
-  <div class="container hero-center">
-    <p class="eyebrow">[REPLACE] Eyebrow</p>
-    <h2>[REPLACE] What happens when they act.</h2>
-    <p class="lead">[REPLACE] One line — the cost of waiting or the speed of starting.</p>
-    <div class="hero-cta">
-      <button class="btn btn-primary btn-arrow">[REPLACE] Primary CTA</button>
-      <span class="meta">[REPLACE] No account needed · 2 min setup</span>
-    </div>
-  </div>
-</section>
-
-<!-- ══ 7 · log list — changelog / posts / release notes ══════════════ -->
-<section class="section" data-design-id="changelog">
-  <div class="container">
-    <div class="row-between">
-      <div>
-        <p class="eyebrow">[REPLACE] Eyebrow</p>
-        <h2>[REPLACE] Latest changes.</h2>
-      </div>
-      <button class="btn btn-ghost">[REPLACE] All entries</button>
-    </div>
-    <div style="margin-top: var(--gap-lg)">
-      <article class="log-row">
-        <time class="meta">[REPLACE] 2026-04-12</time>
-        <div>
-          <h3>[REPLACE] Entry title — the change, not the ceremony.</h3>
-          <p>[REPLACE] One sentence on what changed for the user.</p>
-        </div>
-        <span class="pull meta">[REPLACE] v1.4</span>
-      </article>
-      <article class="log-row">
-        <time class="meta">[REPLACE] 2026-03-28</time>
-        <div>
-          <h3>[REPLACE] Entry title.</h3>
-          <p>[REPLACE] One sentence on what changed for the user.</p>
-        </div>
-        <span class="pull meta">[REPLACE] v1.3</span>
-      </article>
-      <article class="log-row">
-        <time class="meta">[REPLACE] 2026-03-10</time>
-        <div>
-          <h3>[REPLACE] Entry title.</h3>
-          <p>[REPLACE] One sentence on what changed for the user.</p>
-        </div>
-        <span class="pull meta">[REPLACE] v1.2</span>
-      </article>
-    </div>
-  </div>
-</section>
-
-<!-- ══ 8 · comparison table — against the status quo ═════════════════
-     Keep one honest row where the status quo wins — a table where you
-     win every cell reads as marketing and stops being read. -->
+<!-- ══ 8 · comparison table — exposed hairline matrix vs status quo ═══ -->
 <section class="section" data-design-id="compare">
   <div class="container">
-    <p class="eyebrow">[REPLACE] Eyebrow</p>
-    <h2>[REPLACE] Compared to what you do today.</h2>
+    <p class="eyebrow">[REPLACE] Compared</p>
+    <h2>[REPLACE] Compared to what you maintain today.</h2>
     <table class="ds-table" style="margin-top: var(--gap-lg)">
       <thead>
         <tr>
@@ -200,65 +408,98 @@
   </div>
 </section>
 
-<!-- ══ 9 · pricing — three tiers max; the recommendation is earned ═══
-     Prices are brief data, not invention — keep the em dash until real
-     numbers exist. The recommended tier is marked with a rule + label
-     (border + meta line), not a glow or a badge pile. -->
+<!-- ══ 9 · pricing — three tiers in a gapless hairline grid ═══════════ -->
 <section class="section" data-design-id="pricing">
   <div class="container">
-    <p class="eyebrow">[REPLACE] Eyebrow</p>
-    <h2>[REPLACE] Priced once, said clearly.</h2>
-    <div class="grid-3" style="margin-top: var(--gap-lg)">
-      <div class="card">
-        <h3>[REPLACE] Starter</h3>
-        <p class="meta" style="margin: 4px 0 0">[REPLACE] Who it's for · one line</p>
-        <div class="price">—<span class="per">/mo</span></div>
-        <ul class="tier-list">
-          <li>[REPLACE] What's included</li>
-          <li>[REPLACE] What's included</li>
-          <li>[REPLACE] The honest cap</li>
-        </ul>
+    <p class="eyebrow">[REPLACE] Pricing</p>
+    <h2>[REPLACE] Predictable compute and seat pricing.</h2>
+    <div class="bento-hairline" style="margin-top: var(--gap-lg)">
+      <div class="bento-cell">
+        <div>
+          <h3>[REPLACE] Hobby</h3>
+          <p class="meta" style="margin: 4px 0 0">[REPLACE] For prototyping &amp; local dev</p>
+          <div class="price">—<span class="per">/mo</span></div>
+          <ul class="tier-list">
+            <li>[REPLACE] What's included</li>
+            <li>[REPLACE] What's included</li>
+            <li>[REPLACE] The honest cap</li>
+          </ul>
+        </div>
         <button class="btn btn-secondary">[REPLACE] Start free</button>
       </div>
-      <div class="card card-emphasis">
-        <h3>[REPLACE] Steady</h3>
-        <p class="meta" style="margin: 4px 0 0">[REPLACE] Most common · who it's for</p>
-        <div class="price">—<span class="per">/mo</span></div>
-        <ul class="tier-list">
-          <li>[REPLACE] What's included</li>
-          <li>[REPLACE] What's included</li>
-          <li>[REPLACE] What's included</li>
-        </ul>
-        <button class="btn btn-primary">[REPLACE] Choose Steady</button>
+      <div class="bento-cell surface">
+        <div>
+          <div class="row-between">
+            <h3>[REPLACE] Pro</h3>
+            <span class="pill">[REPLACE] Most popular</span>
+          </div>
+          <p class="meta" style="margin: 4px 0 0">[REPLACE] Production workloads</p>
+          <div class="price">—<span class="per">/mo</span></div>
+          <ul class="tier-list">
+            <li>[REPLACE] What's included</li>
+            <li>[REPLACE] What's included</li>
+            <li>[REPLACE] What's included</li>
+          </ul>
+        </div>
+        <button class="btn btn-primary btn-arrow">[REPLACE] Deploy Pro</button>
       </div>
-      <div class="card">
-        <h3>[REPLACE] House</h3>
-        <p class="meta" style="margin: 4px 0 0">[REPLACE] For teams · one line</p>
-        <div class="price">—<span class="per">/mo</span></div>
-        <ul class="tier-list">
-          <li>[REPLACE] What's included</li>
-          <li>[REPLACE] What's included</li>
-          <li>[REPLACE] Support terms</li>
-        </ul>
-        <button class="btn btn-secondary">[REPLACE] Talk to us</button>
+      <div class="bento-cell">
+        <div>
+          <h3>[REPLACE] Enterprise</h3>
+          <p class="meta" style="margin: 4px 0 0">[REPLACE] Custom isolation &amp; BYOC</p>
+          <div class="price">—<span class="per">/mo</span></div>
+          <ul class="tier-list">
+            <li>[REPLACE] Dedicated VPC / on-prem runner</li>
+            <li>[REPLACE] Custom SLA &amp; audit logs</li>
+            <li>[REPLACE] Support terms</li>
+          </ul>
+        </div>
+        <button class="btn btn-secondary">[REPLACE] Talk to engineering</button>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ══ 10 · prose block — docs / long-form content ═══════════════════
-     68ch measure, muted body, one code sample. Headings stay in order
-     (h2 → h3); no naked URLs. -->
-<section class="section" data-design-id="prose">
+<!-- ══ 10 · log list — changelog / release notes ══════════════════════ -->
+<section class="section" data-design-id="changelog">
   <div class="container">
-    <p class="eyebrow">[REPLACE] Eyebrow</p>
-    <h2>[REPLACE] Section title — the question this answers.</h2>
-    <div class="prose" style="margin-top: var(--gap-lg)">
-      <p>[REPLACE] Lead paragraph — 2–3 sentences that answer the heading without ceremony.</p>
-      <p>[REPLACE] Supporting paragraph — one concrete detail: a number with a source, or a constraint stated honestly.</p>
-      <div class="code">[REPLACE] one-line example — command, config, or API call</div>
-      <h3>[REPLACE] Sub-point</h3>
-      <p>[REPLACE] Closing paragraph — what to do next, in one sentence.</p>
+    <div class="row-between">
+      <div>
+        <p class="eyebrow">[REPLACE] Changelog</p>
+        <h2>[REPLACE] Shipped recently.</h2>
+      </div>
+      <button class="btn btn-ghost">[REPLACE] All releases</button>
+    </div>
+    <div style="margin-top: var(--gap-lg)">
+      <article class="log-row">
+        <time class="meta">[REPLACE] 2026-10-12</time>
+        <div>
+          <h3>[REPLACE] Release title — the capability, not the ceremony.</h3>
+          <p>[REPLACE] One sentence on what changed for the developer.</p>
+        </div>
+        <span class="pull meta">[REPLACE] v2.4</span>
+      </article>
+      <article class="log-row">
+        <time class="meta">[REPLACE] 2026-09-28</time>
+        <div>
+          <h3>[REPLACE] Release title.</h3>
+          <p>[REPLACE] One sentence on what changed for the developer.</p>
+        </div>
+        <span class="pull meta">[REPLACE] v2.3</span>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 11 · CTA strip — the decisive close ════════════════════════════ -->
+<section class="section bg-grid-matrix" data-design-id="cta">
+  <div class="container hero-center">
+    <p class="eyebrow">[REPLACE] Ready to deploy</p>
+    <h2><span class="tone-muted">[REPLACE] From first command</span> [REPLACE] to production in minutes.</h2>
+    <p class="lead">[REPLACE] One line — the speed of starting and the deterministic guarantee.</p>
+    <div class="hero-cta">
+      <button class="btn btn-primary btn-arrow">[REPLACE] Primary CTA</button>
+      <button class="btn btn-secondary">[REPLACE] Book Architecture Review</button>
     </div>
   </div>
 </section>
