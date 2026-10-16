@@ -4,9 +4,11 @@
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-black.svg)](LICENSE)
 
-![Design Studio demo — a landing page built from the skill](docs/landing-hero.png)
+**Live Landing Page:** [itsd0.github.io/design-studio-skill](https://itsd0.github.io/design-studio-skill/) · **Demos:** [Landing](https://itsd0.github.io/design-studio-skill/demo/landing.html) · [Dashboard](https://itsd0.github.io/design-studio-skill/demo/dashboard.html) · [Slide Deck](https://itsd0.github.io/design-studio-skill/demo/deck.html)
 
-The method, in one line: capture the brief → fix the brand in a `DESIGN.md` contract → pick one of five art directions → plan before pixels → build from a seed → pass the anti-slop gates → deliver one `index.html` you can open, ship, print to PDF, or screenshot.
+![Design Studio — flagship landing page built with the skill](docs/landing-hero.png)
+
+The method, in one line: capture the brief → fix the brand in a `DESIGN.md` contract → pick one of eight flagship art directions → plan before pixels → build from an architectural seed → pass the anti-slop & WCAG contrast gates → deliver one `index.html` you can open, ship, print to PDF, or screenshot.
 
 ## Install
 
@@ -64,20 +66,27 @@ Three artifacts built from one brief, each a single self-contained file — [`de
 
 The deck is keyboard, wheel, and touch navigable — counter, progress bar, dots, print-to-PDF styles, and a self-contained navigation runtime included. All three demo files pass the linter with zero findings.
 
+## What's new in v1.2.0 (2025–2026 Flagship Architecture)
+
+- **8 curated flagship directions** — added dark-native engineering presets (`dark-structural-grid`, `neo-brutalist-terminal`, `atmospheric-craft-dark`) with obsidian canvases, exposed `1px` hairline grids, dual-tone headlines (`.tone-muted`, `.tone-block`), and `--accent-on` button ink safety.
+- **High-craft schematic primitives** — `.bento-hairline` (gapless `1px` cells), `.bento-visual` (inline SVG latency gauges, isometric volume cubes, `FORK → BUILD → EVAL` DAG trees, wireframe globes), `.app-window` (multi-pane studio/runtime workspace), and `.index-showcase` (numbered `01`–`04` tab matrices).
+- **Visual craft lint gate** — `scripts/lint.py` now enforces `missing-visual-craft` on multi-section landing pages and evaluates inline SVG schematics as unified accent moments.
+
 ## What's new in v1.1.0
 
 - **Linter v2** — computed WCAG contrast for the core token pairs, static accessibility checks (`lang`, `alt`, control labels, zoom, focus, heading structure), and `--json` output. New self-tests in `tests/` keep the shipped seeds and demos clean.
 - **Four new references** — [`motion.md`](references/motion.md) (durations, easing, reduced-motion), [`ux-flows.md`](references/ux-flows.md) (loading / empty / error states, microcopy), [`data-viz.md`](references/data-viz.md) (chart craft), [`ui-patterns.md`](references/ui-patterns.md) (component contracts).
-- **Three new seeds** — `dashboard-seed.html` (rail, KPI row, SVG chart, table), `mobile-seed.html` (device frame), and `ui-patterns.html` (paste-ready component states); the section library grew to 10 blocks with pricing and prose.
+- **Three new seeds** — `dashboard-seed.html` (rail, KPI row, SVG chart, table), `mobile-seed.html` (device frame), and `ui-patterns.html` (paste-ready component states); the section library grew to 11 blocks with schematic bentos, pricing, and prose.
 - **Workflow upgrades** — experience dials (density / expressiveness / motion) captured at brief time, a review mode for audits, and a verify-with-screenshot step.
 
 ## What's inside
 
 | Path | Purpose |
 |---|---|
+| `index.html` | Official Design Studio flagship landing page (live on GitHub Pages) |
 | `SKILL.md` | The workflow the agent follows + non-negotiables |
 | `references/design-md.md` | Brand contract: section order, standard token names, experience dials |
-| `references/directions.md` | 5 curated visual directions (palettes, fonts) |
+| `references/directions.md` | 8 curated visual directions (2025–2026 flagship dark + light palettes, fonts) |
 | `references/artifact-contract.md` | Output rules: layout, imagery, dark mode, dashboards, mobile, exports |
 | `references/deck-contract.md` | Deck mode: slide themes, rhythm, navigation runtime |
 | `references/quality-gates.md` | Anti-slop + craft rules, WCAG 2.2 checklist, P0/P1/P2 gates |
@@ -86,11 +95,11 @@ The deck is keyboard, wheel, and touch navigable — counter, progress bar, dots
 | `references/data-viz.md` | Chart selection, axis and label craft, inline-SVG conventions |
 | `references/ui-patterns.md` | Overlay ladder, component contracts, state machine |
 | `assets/design-md.template.md` | Starter brand contract |
-| `assets/prototype-seed.html` | Page/app seed: tokens + class system + pricing/prose blocks |
-| `assets/dashboard-seed.html` | Dashboard seed: rail, topbar, KPI row, SVG chart, table |
+| `assets/prototype-seed.html` | Page/app seed: tokens + hairline bento + studio window + pricing/prose blocks |
+| `assets/dashboard-seed.html` | Dashboard seed: rail, topbar, hairline KPI row, SVG chart, table |
 | `assets/mobile-seed.html` | Mobile seed: device frame, status bar, tab bar |
 | `assets/ui-patterns.html` | Paste-ready component states (buttons → table toolbar) |
-| `assets/section-skeletons.html` | 10 paste-ready sections (hero, features, stats, quote, pricing, prose, CTA…) |
+| `assets/section-skeletons.html` | 11 paste-ready sections (hero-stage, schematic bentos, indexed showcase, pricing, CTA…) |
 | `assets/deck-seed.html` | Deck seed: themes, chrome, nav runtime, print CSS |
 | `scripts/lint.py` | Anti-slop + a11y + contrast linter (fails on P0, advises on P1/P2) |
 | `tests/run_tests.py` | Self-tests: rule fixtures + shipped artifacts stay clean |

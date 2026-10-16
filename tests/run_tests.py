@@ -76,7 +76,7 @@ def run_fixtures() -> int:
 def run_shipped() -> int:
     failures = 0
     print("· shipped artifacts (zero P0 required)")
-    files = sorted((ROOT / "assets").glob("*.html")) + sorted((ROOT / "demo").glob("*.html"))
+    files = [ROOT / "index.html"] + sorted((ROOT / "assets").glob("*.html")) + sorted((ROOT / "demo").glob("*.html"))
     for path in files:
         findings = lint(path.read_text(encoding="utf-8"))
         p0 = [f for f in findings if f.severity == "P0"]
@@ -90,7 +90,7 @@ def run_shipped() -> int:
 
 def main() -> int:
     failures = run_fixtures() + run_shipped()
-    total = len(CASES) + len(list((ROOT / 'assets').glob('*.html'))) + len(list((ROOT / 'demo').glob('*.html')))
+    total = len(CASES) + 1 + len(list((ROOT / 'assets').glob('*.html'))) + len(list((ROOT / 'demo').glob('*.html')))
     print(f"\n{total - failures}/{total} passed")
     return 1 if failures else 0
 
