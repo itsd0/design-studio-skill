@@ -1,6 +1,6 @@
 ---
 name: design-studio
-description: Build polished single-file HTML design artifacts — landing pages, web/app prototypes, dashboards, and slide decks — driven by a DESIGN.md brand contract, with anti-AI-slop quality gates, computed WCAG contrast, and a self-lint script. Use when the user wants to design or prototype a page, UI, dashboard, or presentation/deck as HTML; turn a brief into a polished visual artifact; establish or apply a brand/design system; or review and refine an existing HTML artifact.
+description: Build polished single-file HTML design artifacts — landing pages, web/app prototypes, dashboards, slide decks, and AI-agent screens (thread, run-detail, approval, activity) — driven by a DESIGN.md brand contract, with anti-AI-slop quality gates, computed WCAG contrast, and a self-lint script. Use when the user wants to design or prototype a page, UI, dashboard, agent thread/run/approval/activity screen, or presentation/deck as HTML; turn a brief into a polished visual artifact; establish or apply a brand/design system; or review and refine an existing HTML artifact.
 license: MIT
 ---
 
@@ -30,7 +30,7 @@ Turn a brief into **single-file HTML artifacts** driven by a **DESIGN.md brand c
 
 ### 1 · Brief
 
-Capture: product, audience, goal, artifact kind (landing / prototype / dashboard / deck / mobile), must-keep facts (real numbers, names, copy) — **and the three experience dials**: density (airy · regular · compact), expressiveness (restrained · assured · bold), motion (still · standard · lively). Ask **only** for missing essentials, in one round. Facts you cannot know become labeled placeholders (`[REPLACE · label]`) — never invent statistics or quotes.
+Capture: product, audience, goal, artifact kind (landing / prototype / dashboard / deck / mobile / agent), must-keep facts (real numbers, names, copy) — **and the three experience dials**: density (airy · regular · compact), expressiveness (restrained · assured · bold), motion (still · standard · lively). Ask **only** for missing essentials, in one round. Facts you cannot know become labeled placeholders (`[REPLACE · label]`) — never invent statistics or quotes. For `agent` artifacts also capture: the agent's real domain, its real tool names (e.g. `SENTRY_LIST_ISSUES`), and which actions are destructive (need approval).
 
 ### 2 · Direction & design system
 
@@ -43,12 +43,13 @@ Capture: product, audience, goal, artifact kind (landing / prototype / dashboard
 - **Landing / prototype**: choose 4–6 sections with flagship visual rhythm (`hero-stage` with `.app-window` studio/runtime preview → `bento-telemetry` gapless hairline schematics → `bento-architecture` *or* `indexed-showcase` `01`–`04` tab matrix → `compare` hairline table *or* `pricing` → `cta`). State the section list to the user before writing HTML.
 - **Deck**: pick the slide count by format (5–10 min talk ≈ 6 slides; 15 min ≈ 8–10; 20–30 min ≈ 12–18) and sketch the theme rhythm — `01 hero light · 02 light · 03 hero dark …`. No 3+ same-theme slides in a row; for 8+ slides include at least one `hero dark` and one `hero light`.
 - **Dashboard**: classify the monitored domain, then define specific KPI names and plausible values — no "Metric A / Metric B".
+- **Agent**: pick one screen type — `thread` (chat + inline tool calls), `run-detail` (step timeline/DAG + logs + eval), `approval` (plan preview, approve/reject/edit), `activity` (live feed of agent actions across runs). Define the agent's real domain, its real tool names, and which actions are destructive.
 - **Mobile**: one screen = one job. Pick the screen (feed, detail, onboarding, profile, checkout) and the single decision it supports.
 
 ### 4 · Build
 
-- Start from the seed for the artifact kind: `assets/prototype-seed.html` (pages), `assets/dashboard-seed.html`, `assets/mobile-seed.html`, `assets/deck-seed.html` — copy it to `index.html` (or the slug the user expects).
-- For app/UI states beyond the seeds, paste from `assets/ui-patterns.html` (buttons, fields, modal, toast, empty, skeleton, tabs, menu, table toolbar); paste page sections from `assets/section-skeletons.html` (`hero-stage`, `bento-telemetry`, `bento-architecture`, `indexed-showcase`, `compare`, `pricing`, `cta`). Customize every `.bento-visual` SVG schematic, `.app-window` pane, and `.dag-grid` to match the brief's exact domain — zero filler.
+- Start from the seed for the artifact kind: `assets/prototype-seed.html` (pages), `assets/dashboard-seed.html`, `assets/agent-seed.html` (agent thread/run/approval/activity), `assets/mobile-seed.html`, `assets/deck-seed.html` — copy it to `index.html` (or the slug the user expects).
+- For app/UI states beyond the seeds, paste from `assets/ui-patterns.html` (buttons, fields, modal, toast, empty, skeleton, tabs, menu, table toolbar) and `assets/agent-ux-patterns.html` (tool-call card, streaming message, plan approval, guardrail warning, activity feed, run DAG, eval receipt); paste page sections from `assets/section-skeletons.html` (`hero-stage`, `bento-telemetry`, `bento-architecture`, `indexed-showcase`, `compare`, `pricing`, `cta`). Customize every `.bento-visual` SVG schematic, `.app-window` pane, and `.dag-grid` to match the brief's exact domain — zero filler. For `agent` artifacts follow `references/agent-ux.md` contracts: every tool call carries status + latency, destructive actions sit inside approval controls, streaming regions carry `aria-live`.
 - Imagery: use real assets when obtainable (fetch the correct real image, copy it into the project, set intrinsic `width`/`height` on `<img class="content-img">`). Otherwise keep an **intentionally labeled** placeholder and disclose the limitation. Never hotlink; never invent a stand-in for a real person, product, or landmark.
 - Motion follows `references/motion.md`: transform/opacity only, exits faster than enters, and any artifact that animates ships the reduced-motion path.
 - Stateful and data surfaces cover the five states per `references/ux-flows.md`; charts follow `references/data-viz.md`.
@@ -89,10 +90,13 @@ When the user asks to review or audit an existing artifact rather than build one
 | `references/ux-flows.md` | Five data states, empty/error/loading formulas, microcopy, navigation models |
 | `references/data-viz.md` | Chart selection, axis/label craft, KPI formula, inline-SVG conventions |
 | `references/ui-patterns.md` | Overlay ladder, component contracts, the state machine |
+| `references/agent-ux.md` | Agent screens: tool-call card, streaming, plan approval, guardrails, activity feed, run DAG, eval receipt |
 | `assets/design-md.template.md` | Starter brand contract |
 | `assets/prototype-seed.html` | Page/app seed: tokens, class system, pricing + prose blocks |
 | `assets/dashboard-seed.html` | Dashboard seed: rail, topbar, KPI row, SVG chart, table |
 | `assets/mobile-seed.html` | Mobile seed: device frame, status bar, tab bar |
+| `assets/agent-seed.html` | Agent seed: runs sidebar, thread/run pane, inspector |
+| `assets/agent-ux-patterns.html` | Paste-ready agent patterns (tool call → eval receipt) |
 | `assets/ui-patterns.html` | Paste-ready component states (buttons through table toolbar) |
 | `assets/section-skeletons.html` | 10 paste-ready sections (hero → pricing → prose) |
 | `assets/deck-seed.html` | Deck seed (visual system + navigation runtime) |

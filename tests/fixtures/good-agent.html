@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Good agent fixture</title>
+  <style>
+    :root {
+      --bg: #fafaf7; --surface: #ffffff; --fg: #1a1916;
+      --muted: #6b6964; --border: #e8e5df; --accent: #c96442;
+    }
+    body { margin: 0; background: var(--bg); color: var(--fg); font-family: system-ui, sans-serif; }
+    .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  </style>
+</head>
+<body data-artifact="agent">
+  <main>
+    <h1>Run detail</h1>
+    <div data-tool-call="SENTRY_LIST_ISSUES" data-status="success" data-latency="412ms">
+      <p>Success · 412ms — 3 errors matched.</p>
+    </div>
+    <p aria-live="polite">Working — drafting the summary…</p>
+    <div data-approval="restart-plan">
+      <button type="button" data-destructive="restart-node">Restart node</button>
+      <button type="button">Approve plan</button>
+      <button type="button">Reject</button>
+    </div>
+  </main>
+</body>
+</html>

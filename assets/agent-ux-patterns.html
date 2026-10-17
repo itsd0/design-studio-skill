@@ -1,0 +1,237 @@
+<!doctype html>
+<!--
+  [REPLACE] Agent UX patterns gallery — Design Studio
+  Paste-ready agent patterns. The contracts live in references/agent-ux.md.
+  Static by design: states are rendered so they can be lifted verbatim.
+
+  Bind the tokens to the active DESIGN.md. Keep the agent contracts intact:
+  every [data-tool-call] carries data-status + data-latency and a visible
+  status + latency; every [data-destructive] sits inside [data-approval];
+  streaming / status regions carry aria-live="polite".
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>[REPLACE] Agent patterns · brand</title>
+  <style>
+    :root {
+      --bg:        oklch(13% 0.006 255);
+      --surface:   oklch(16% 0.008 255);
+      --surface-2: oklch(20% 0.010 255);
+      --fg:        oklch(96% 0.004 255);
+      --muted:     oklch(68% 0.012 255);
+      --border:    oklch(24% 0.010 255);
+      --accent:    oklch(80% 0.17 152);
+      --accent-on: oklch(15% 0.02 152);
+      --success:   oklch(78% 0.16 150);
+      --danger:    oklch(70% 0.18 25);
+
+      --accent-soft: color-mix(in oklch, var(--accent) 14%, transparent);
+      --fg-soft:     color-mix(in oklch, var(--fg) 6%, transparent);
+      --specular:    inset 0 1px 0 color-mix(in oklch, var(--fg) 8%, transparent);
+
+      --font-display: -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Display', system-ui, sans-serif;
+      --font-body:    -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Text', system-ui, sans-serif;
+      --font-mono:    'JetBrains Mono', 'Geist Mono', 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+
+      --fs-h1: clamp(34px, 5vw, 48px);
+      --fs-h2: 22px;
+      --fs-body: 15px;
+      --fs-meta: 12.5px;
+
+      --gap-xs: 8px; --gap-sm: 12px; --gap-md: 16px; --gap-lg: 24px; --gap-xl: 40px;
+
+      --radius: 6px;
+      --radius-lg: 10px;
+      --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--fg);
+      font-family: var(--font-body); font-size: var(--fs-body); line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+    h1, h2, h3 { text-wrap: balance; margin: 0; }
+    h1 { font-family: var(--font-display); font-size: var(--fs-h1); font-weight: 600; letter-spacing: -0.02em; line-height: 1.05; }
+    h2 { font-family: var(--font-display); font-size: var(--fs-h2); font-weight: 600; letter-spacing: -0.01em; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .wrap { max-width: 880px; margin: 0 auto; padding: 56px 24px 112px; }
+    .lead { color: var(--muted); max-width: 62ch; margin: 14px 0 0; }
+    .meta { font-family: var(--font-mono); font-size: var(--fs-meta); color: var(--muted); }
+    .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+    .pattern { margin-top: 56px; }
+    .pattern-note { color: var(--muted); font-size: 14px; max-width: 62ch; margin: 8px 0 18px; }
+    .demo {
+      display: flex; flex-direction: column; gap: var(--gap-sm);
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 22px; box-shadow: var(--specular);
+    }
+    .demo-label {
+      font-family: var(--font-mono); font-size: 11px;
+      letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+    }
+
+    .tool-call {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 14px 16px;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .tool-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--gap-sm); flex-wrap: wrap; }
+    .tool-name { font-family: var(--font-mono); font-size: 13px; font-weight: 600; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+      border: 1px solid var(--border); border-radius: 999px; padding: 3px 9px; color: var(--muted);
+    }
+    .pill .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+    .pill-ok { color: var(--success); border-color: color-mix(in oklch, var(--success) 35%, var(--border)); }
+    .pill-err { color: var(--danger); border-color: color-mix(in oklch, var(--danger) 35%, var(--border)); }
+    .tool-args { font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); }
+    .tool-args summary { cursor: pointer; color: var(--fg); }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 9px 16px; border-radius: var(--radius); border: 1px solid transparent;
+      font: inherit; font-size: 14px; font-weight: 500;
+    }
+    .btn-primary { background: var(--accent); color: var(--accent-on); border-color: var(--accent); font-weight: 600; }
+    .btn-primary:hover { background: color-mix(in oklch, var(--accent) 88%, var(--fg)); }
+    .btn-secondary { background: transparent; color: var(--fg); border-color: var(--border); }
+    .btn-secondary:hover { border-color: var(--fg); }
+    .approval-bar { display: flex; gap: 8px; flex-wrap: wrap; }
+    .flag { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--danger); }
+    .guardrail { border: 1px solid var(--border); border-left: 2px solid var(--danger); border-radius: var(--radius); padding: 12px 14px; }
+    .feed { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+    .feed li { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--border); padding-bottom: 10px; font-size: 13.5px; }
+    .dag { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+    .dag span {
+      padding: 6px 8px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg);
+      font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase;
+      text-align: center; color: var(--muted);
+    }
+    .dag span.live { border-color: color-mix(in oklch, var(--accent) 55%, var(--border)); color: var(--fg); background: var(--surface-2); }
+    .skel { height: 12px; border-radius: 6px; background: var(--fg-soft); }
+    @media (prefers-reduced-motion: no-preference) {
+      .working { animation: pulse 1.6s ease-in-out infinite; }
+      @keyframes pulse { 50% { opacity: 0.55; } }
+    }
+  </style>
+</head>
+<body data-artifact="agent">
+  <div class="wrap">
+    <p class="meta">[REPLACE] Agent UX patterns · brand</p>
+    <h1>Every agent state, rendered once.</h1>
+    <p class="lead">Lift a block verbatim into <code>assets/agent-seed.html</code>. Every tool call carries status + latency; destructive actions sit inside approval controls; streaming regions carry <code>aria-live</code>.</p>
+
+    <!-- 1 · tool-call states -->
+    <section class="pattern" data-design-id="pattern-tool-call">
+      <h2>Tool-call card — all five states</h2>
+      <p class="pattern-note">Status + latency are always visible text, never color alone.</p>
+      <div class="demo">
+        <span class="demo-label">Running</span>
+        <div class="tool-call" data-tool-call="SENTRY_LIST_ISSUES" data-status="running" data-latency="—">
+          <div class="tool-head"><span class="tool-name">SENTRY_LIST_ISSUES</span><span class="pill"><span class="dot"></span>Running · —</span></div>
+          <p class="meta" aria-live="polite">Working — fetching unresolved errors…</p>
+        </div>
+        <span class="demo-label">Success</span>
+        <div class="tool-call" data-tool-call="SENTRY_LIST_ISSUES" data-status="success" data-latency="412ms">
+          <div class="tool-head"><span class="tool-name">SENTRY_LIST_ISSUES</span><span class="pill pill-ok"><span class="dot"></span>Success · 412ms</span></div>
+          <details class="tool-args"><summary>Args</summary><code>[REPLACE · project, limit]</code></details>
+        </div>
+        <span class="demo-label">Queued / Error / Cancelled</span>
+        <div class="tool-call" data-tool-call="LINEAR_CREATE_ISSUE" data-status="queued" data-latency="—">
+          <div class="tool-head"><span class="tool-name">LINEAR_CREATE_ISSUE</span><span class="pill"><span class="dot"></span>Queued · —</span></div>
+        </div>
+        <div class="tool-call" data-tool-call="GMAIL_SEND_EMAIL" data-status="error" data-latency="188ms">
+          <div class="tool-head"><span class="tool-name">GMAIL_SEND_EMAIL</span><span class="pill pill-err"><span class="dot"></span>Error · 188ms</span></div>
+          <p class="meta">[REPLACE] Recipient rejected — fix the address and retry.</p>
+        </div>
+        <div class="tool-call" data-tool-call="DEPLOY_PREVIEW" data-status="cancelled" data-latency="96ms">
+          <div class="tool-head"><span class="tool-name">DEPLOY_PREVIEW</span><span class="pill"><span class="dot"></span>Cancelled · 96ms</span></div>
+          <p class="meta">Cancelled by reviewer before dispatch.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 · streaming + interrupted -->
+    <section class="pattern" data-design-id="pattern-streaming">
+      <h2>Streaming message + interrupted</h2>
+      <div class="demo">
+        <div aria-live="polite">
+          <p class="meta">Working — drafting the triage summary…</p>
+          <div class="skel working" style="width: 75%"></div>
+        </div>
+        <div>
+          <p class="meta" aria-live="polite">Interrupted — partial output preserved.</p>
+          <div class="approval-bar">
+            <button class="btn btn-secondary" type="button">Resume</button>
+            <button class="btn btn-secondary" type="button">Discard</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 · plan approval with destructive step -->
+    <section class="pattern" data-design-id="pattern-approval">
+      <h2>Plan approval — destructive flagged</h2>
+      <div class="demo">
+        <div data-approval="restart-plan">
+          <ol style="list-style: none; margin: 0 0 12px; padding: 0; display: flex; flex-direction: column; gap: 8px;">
+            <li style="padding-left: 16px; border-left: 2px solid var(--border);">Fetch open error events</li>
+            <li style="padding-left: 16px; border-left: 2px solid var(--danger);" data-destructive="restart-node">Restart [REPLACE · node] <span class="flag">Destructive — needs approval</span></li>
+          </ol>
+          <div class="approval-bar">
+            <button class="btn btn-primary" type="button">Approve plan</button>
+            <button class="btn btn-secondary" type="button">Edit</button>
+            <button class="btn btn-secondary" type="button">Reject</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 · guardrail + permission denied -->
+    <section class="pattern" data-design-id="pattern-guardrail">
+      <h2>Guardrail + permission denied</h2>
+      <div class="demo">
+        <div class="guardrail">
+          <p class="meta" style="color: var(--fg); margin: 0 0 4px;">Blocked by policy [REPLACE · policy name]</p>
+          <p class="meta" style="margin: 0;">[REPLACE] What was blocked and what to do next · <a href="#">View policy</a></p>
+        </div>
+        <div class="guardrail">
+          <p class="meta" style="color: var(--fg); margin: 0 0 4px;">Permission denied — production credentials</p>
+          <p class="meta" style="margin: 0;">Request access from [REPLACE · owner] or run in dry-run mode.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 · activity feed -->
+    <section class="pattern" data-design-id="pattern-activity">
+      <h2>Live activity feed</h2>
+      <div class="demo">
+        <ul class="feed" aria-live="polite">
+          <li><span>Deployed frontend and database</span><span class="meta">Auto-approved · <a href="#">View logs</a></span></li>
+          <li><span>Restarted [REPLACE · node]</span><span class="meta">Needs review · <a href="#">View logs</a></span></li>
+        </ul>
+        <p class="meta">Empty: no runs yet — start your first run. Loading: skeleton rows. Error: could not reach the runner — retry.</p>
+      </div>
+    </section>
+
+    <!-- 6 · run DAG + eval receipt -->
+    <section class="pattern" data-design-id="pattern-dag-eval">
+      <h2>Run DAG + eval receipt</h2>
+      <div class="demo">
+        <div class="dag" aria-label="Run steps">
+          <span class="live">Saved</span><span class="live">Fork</span><span class="live">Prompt</span><span>Build</span><span>Eval</span>
+        </div>
+        <div class="tool-call" data-tool-call="EVAL_SUITE" data-status="success" data-latency="8.2s">
+          <div class="tool-head"><span class="tool-name">EVAL_SUITE</span><span class="pill pill-ok"><span class="dot"></span>Success · 8.2s</span></div>
+          <p class="meta">[REPLACE] 4/4 checks passed · — tokens · — cost · <a href="#">Re-run eval</a></p>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

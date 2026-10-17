@@ -48,6 +48,16 @@ CASES = [
     ("bad-contrast.html", ["contrast-text"], []),
     ("bad-deck.html", ["slide-theme-missing", "slide-rhythm"], []),
     ("bad-dashboard.html", ["dashboard-missing-craft"], ["missing-visual-craft"]),
+    (
+        "bad-agent.html",
+        ["tool-call-missing-status", "destructive-without-approval", "stream-missing-aria-live"],
+        [],
+    ),
+    (
+        "good-agent.html",
+        [],
+        ["tool-call-missing-status", "destructive-without-approval", "stream-missing-aria-live"],
+    ),
 ]
 
 
@@ -64,6 +74,10 @@ def run_fixtures() -> int:
             p0 = [f.id for f in findings if f.severity == "P0"]
             if p0:
                 missing.extend(f"no-P0 (found {', '.join(p0)})")
+        if name == "good-agent.html":
+            p0 = [f.id for f in findings if f.severity == "P0"]
+            if p0:
+                missing.append(f"no-P0 (found {', '.join(p0)})")
         ok = not missing and not extra
         print(f"  {'ok  ' if ok else 'FAIL'} {name}")
         if missing:

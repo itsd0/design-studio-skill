@@ -855,12 +855,12 @@
         <div class="row-between" style="flex-wrap: wrap; gap: var(--gap-md)">
           <div>
             <p class="eyebrow">Shipped Examples</p>
-            <h2>Three live artifacts built from one <code>DESIGN.md</code>.</h2>
+            <h2>Four live artifacts built from one <code>DESIGN.md</code>.</h2>
           </div>
           <a class="btn btn-secondary btn-arrow" href="https://github.com/itsd0/design-studio-skill/tree/main/demo" target="_blank" rel="noopener noreferrer">Browse demo/ on GitHub</a>
         </div>
 
-        <div class="bento-hairline" style="margin-top: var(--gap-lg)">
+        <div class="bento-hairline cols-2" style="margin-top: var(--gap-lg)">
           <article class="bento-cell">
             <div class="bento-copy">
               <div class="row-between" style="margin-bottom: 8px">
@@ -886,6 +886,20 @@
             </div>
             <div style="margin-top: auto">
               <a class="btn btn-secondary btn-sm btn-arrow" href="demo/dashboard.html">Open Live Dashboard Demo</a>
+            </div>
+          </article>
+
+          <article class="bento-cell">
+            <div class="bento-copy">
+              <div class="row-between" style="margin-bottom: 8px">
+                <span class="tag">demo/agent.html</span>
+                <span class="meta">0 P0 · 0 P1</span>
+              </div>
+              <h3>Ferry — Incident-Triage Agent Run</h3>
+              <p>Run timeline DAG, tool-call cards with status + latency, guardrail warning, plan approval with destructive-step flag, and live activity feed.</p>
+            </div>
+            <div style="margin-top: auto">
+              <a class="btn btn-secondary btn-sm btn-arrow" href="demo/agent.html">Open Live Agent Demo</a>
             </div>
           </article>
 
@@ -1078,12 +1092,13 @@
         },
         {
           num: '04',
-          cmd: 'open demo/landing.html demo/dashboard.html demo/deck.html',
-          meta: '3 live demos',
-          title: 'Dashboards, mobile frames, and keynote decks included',
-          desc: 'Beyond landing pages, Design Studio builds data-dense observability consoles with hand-rolled SVG charts, iOS/Android mobile prototypes, and keyboard-navigable slide decks.',
+          cmd: 'open demo/landing.html demo/dashboard.html demo/agent.html demo/deck.html',
+          meta: '4 live demos',
+          title: 'Dashboards, agent screens, mobile frames, and keynote decks included',
+          desc: 'Beyond landing pages, Design Studio builds data-dense observability consoles with hand-rolled SVG charts, agent run/approval/activity screens with plan guardrails, iOS/Android mobile prototypes, and keyboard-navigable slide decks.',
           rows: [
             ['DASHBOARD_CONSOLE', '248px sticky rail + gapless KPI strip + inline SVG polyline chart', 'READY'],
+            ['AGENT_RUN_APPROVAL', 'Tool-call cards + plan approval + guardrails + eval receipt', 'READY'],
             ['SLIDE_DECK_RUNTIME', 'Alternating hero dark / light slides, arrow/touch nav, PDF print CSS', 'READY'],
             ['MOBILE_DEVICE_FRAME', 'Status bar, sensor cutout, 44px touch targets, bottom tab bar', 'READY']
           ],

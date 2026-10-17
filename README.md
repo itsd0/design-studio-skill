@@ -4,7 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-black.svg)](LICENSE)
 
-**Live Landing Page:** [itsd0.github.io/design-studio-skill](https://itsd0.github.io/design-studio-skill/) · **Demos:** [Landing](https://itsd0.github.io/design-studio-skill/demo/landing.html) · [Dashboard](https://itsd0.github.io/design-studio-skill/demo/dashboard.html) · [Slide Deck](https://itsd0.github.io/design-studio-skill/demo/deck.html)
+**Live Landing Page:** [itsd0.github.io/design-studio-skill](https://itsd0.github.io/design-studio-skill/) · **Demos:** [Landing](https://itsd0.github.io/design-studio-skill/demo/landing.html) · [Dashboard](https://itsd0.github.io/design-studio-skill/demo/dashboard.html) · [Agent run](https://itsd0.github.io/design-studio-skill/demo/agent.html) · [Slide Deck](https://itsd0.github.io/design-studio-skill/demo/deck.html)
 
 ![Design Studio — flagship landing page built with the skill](docs/landing-hero.png)
 
@@ -46,6 +46,7 @@ Just ask:
 
 - "Design a landing page for a local-first file transfer tool."
 - "Prototype a dashboard for a homelab."
+- "Design an approval screen for an incident-triage agent."
 - "Build a six-slide pitch deck as a single HTML file."
 - "Review this index.html against the quality gates and fix what fails."
 
@@ -53,9 +54,11 @@ The agent writes a real `index.html`, runs the linter, and iterates until it pas
 
 ## Demo
 
-Three artifacts built from one brief, each a single self-contained file — [`demo/landing.html`](demo/landing.html), [`demo/dashboard.html`](demo/dashboard.html), and [`demo/deck.html`](demo/deck.html) — plus the brand contract they were built from, [`demo/design.md`](demo/design.md):
+Three artifacts built from one brief, each a single self-contained file — [`demo/landing.html`](demo/landing.html), [`demo/dashboard.html`](demo/dashboard.html), and [`demo/deck.html`](demo/deck.html) — plus an agent run-detail demo, [`demo/agent.html`](demo/agent.html), and the brand contract they were built from, [`demo/design.md`](demo/design.md):
 
 ![The demo dashboard — Ferry transfers](docs/dashboard.png)
+
+![The demo agent run — incident triage with plan approval](docs/agent.png)
 
 ![The demo landing page, full length](docs/landing-full.png)
 
@@ -65,6 +68,13 @@ Three artifacts built from one brief, each a single self-contained file — [`de
 </p>
 
 The deck is keyboard, wheel, and touch navigable — counter, progress bar, dots, print-to-PDF styles, and a self-contained navigation runtime included. All three demo files pass the linter with zero findings.
+
+## What's new in v1.3.0 (Agent-UX artifact kind)
+
+- **New `agent` artifact kind** — `thread`, `run-detail`, `approval`, `activity` screens for AI-agent products (`SKILL.md` Brief/Plan/Build + `references/agent-ux.md` contracts).
+- **Agent seeds & patterns** — `assets/agent-seed.html` (runs sidebar + thread pane + inspector, 920px breakpoint) and `assets/agent-ux-patterns.html` (tool-call card, streaming, plan approval, guardrails, activity feed, run DAG, eval receipt, all states).
+- **Agent lint gates** — `scripts/lint.py` enforces `tool-call-missing-status` (P0), `destructive-without-approval` (P0), and `stream-missing-aria-live` (P1) on pages with `data-artifact="agent"`.
+- **Live demo** — [`demo/agent.html`](demo/agent.html): incident-triage run with step timeline, tool calls, guardrail, plan approval, and activity feed.
 
 ## What's new in v1.2.0 (2025–2026 Flagship Architecture)
 
@@ -94,10 +104,13 @@ The deck is keyboard, wheel, and touch navigable — counter, progress bar, dots
 | `references/ux-flows.md` | Loading / empty / error states, microcopy, navigation models |
 | `references/data-viz.md` | Chart selection, axis and label craft, inline-SVG conventions |
 | `references/ui-patterns.md` | Overlay ladder, component contracts, state machine |
+| `references/agent-ux.md` | Agent screens: tool-call card, streaming, plan approval, guardrails, activity feed, run DAG, eval receipt |
 | `assets/design-md.template.md` | Starter brand contract |
 | `assets/prototype-seed.html` | Page/app seed: tokens + hairline bento + studio window + pricing/prose blocks |
 | `assets/dashboard-seed.html` | Dashboard seed: rail, topbar, hairline KPI row, SVG chart, table |
 | `assets/mobile-seed.html` | Mobile seed: device frame, status bar, tab bar |
+| `assets/agent-seed.html` | Agent seed: runs sidebar, thread/run pane, inspector |
+| `assets/agent-ux-patterns.html` | Paste-ready agent patterns (tool call → eval receipt) |
 | `assets/ui-patterns.html` | Paste-ready component states (buttons → table toolbar) |
 | `assets/section-skeletons.html` | 11 paste-ready sections (hero-stage, schematic bentos, indexed showcase, pricing, CTA…) |
 | `assets/deck-seed.html` | Deck seed: themes, chrome, nav runtime, print CSS |

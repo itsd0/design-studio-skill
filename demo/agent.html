@@ -1,0 +1,220 @@
+<!doctype html>
+<!--
+  Ferry — incident-triage agent run (run-detail + approval demo).
+  Built with Design Studio from demo/design.md (dark-structural-grid direction).
+  Single file: all CSS in one <style>, no external assets, inline SVG only.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ferry — incident-triage run #418</title>
+  <style>
+    :root {
+      --bg:        oklch(13% 0.006 255);
+      --surface:   oklch(16% 0.008 255);
+      --surface-2: oklch(20% 0.010 255);
+      --fg:        oklch(96% 0.004 255);
+      --muted:     oklch(68% 0.012 255);
+      --border:    oklch(24% 0.010 255);
+      --accent:    oklch(80% 0.17 152);
+      --accent-on: oklch(15% 0.02 152);
+      --success:   oklch(78% 0.16 150);
+      --danger:    oklch(70% 0.18 25);
+
+      --accent-soft: color-mix(in oklch, var(--accent) 14%, transparent);
+      --fg-soft:     color-mix(in oklch, var(--fg) 6%, transparent);
+      --specular:    inset 0 1px 0 color-mix(in oklch, var(--fg) 8%, transparent);
+
+      --font-display: -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Display', system-ui, sans-serif;
+      --font-body:    -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Text', system-ui, sans-serif;
+      --font-mono:    'JetBrains Mono', 'Geist Mono', 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+
+      --fs-title: 20px;
+      --fs-h2: 16px;
+      --fs-body: 14px;
+      --fs-meta: 12px;
+
+      --gap-xs: 8px; --gap-sm: 12px; --gap-md: 16px; --gap-lg: 24px; --gap-xl: 32px;
+
+      --radius: 6px;
+      --radius-lg: 10px;
+      --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--fg);
+      font-family: var(--font-body); font-size: var(--fs-body); line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; }
+    button { font: inherit; cursor: pointer; }
+    h1, h2, h3 { margin: 0; text-wrap: balance; }
+    h1 { font-family: var(--font-display); font-size: var(--fs-title); font-weight: 600; letter-spacing: -0.01em; }
+    h2 { font-family: var(--font-display); font-size: var(--fs-h2); font-weight: 600; letter-spacing: -0.01em; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .meta { font-family: var(--font-mono); font-size: var(--fs-meta); color: var(--muted); }
+    .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+    .agent-shell { display: grid; grid-template-columns: 240px minmax(0, 1fr) 300px; min-height: 100vh; }
+    .runs { border-right: 1px solid var(--border); padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
+    .runs h2 { font-size: 12px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); padding-inline: 8px; margin-bottom: 8px; }
+    .run-link { display: block; padding: 9px 10px; border-radius: var(--radius); color: var(--muted); font-size: 13.5px; text-decoration: none; border: 1px solid transparent; }
+    .run-link:hover { color: var(--fg); background: var(--fg-soft); }
+    .run-link.active { color: var(--fg); background: var(--surface); border-color: var(--border); }
+
+    .run-main { padding: 24px 28px; display: flex; flex-direction: column; gap: var(--gap-lg); max-width: 780px; }
+    .run-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--gap-md); flex-wrap: wrap; }
+    .inspector { border-left: 1px solid var(--border); padding: 20px 16px; display: flex; flex-direction: column; gap: var(--gap-md); }
+
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 16px; box-shadow: var(--specular);
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .tool-call {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 14px 16px; box-shadow: var(--specular);
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .tool-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--gap-sm); flex-wrap: wrap; }
+    .tool-name { font-family: var(--font-mono); font-size: 13px; font-weight: 600; }
+    .tool-purpose { color: var(--muted); font-size: 13px; margin: 0; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+      border: 1px solid var(--border); border-radius: 999px; padding: 3px 9px; color: var(--muted);
+    }
+    .pill .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+    .pill-ok { color: var(--success); border-color: color-mix(in oklch, var(--success) 35%, var(--border)); }
+    .tool-args { font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); }
+    .tool-args summary { cursor: pointer; color: var(--fg); }
+
+    .dag { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+    .dag span {
+      padding: 6px 8px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg);
+      font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase;
+      text-align: center; color: var(--muted);
+    }
+    .dag span.live { border-color: color-mix(in oklch, var(--accent) 55%, var(--border)); color: var(--fg); background: var(--surface-2); }
+
+    .plan-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .plan-steps li { padding-left: 16px; border-left: 2px solid var(--border); font-size: 13.5px; }
+    .plan-steps li.destructive { border-left-color: var(--danger); }
+    .flag { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--danger); }
+    .approval-bar { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 9px 16px; border-radius: var(--radius); border: 1px solid transparent;
+      font-size: 13.5px; font-weight: 500;
+    }
+    .btn-primary { background: var(--accent); color: var(--accent-on); border-color: var(--accent); font-weight: 600; }
+    .btn-primary:hover { background: color-mix(in oklch, var(--accent) 88%, var(--fg)); }
+    .btn-secondary { background: transparent; color: var(--fg); border-color: var(--border); }
+    .btn-secondary:hover { border-color: var(--fg); }
+
+    .guardrail { border: 1px solid var(--border); border-left: 2px solid var(--danger); border-radius: var(--radius); padding: 12px 14px; }
+    .feed { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+    .feed li { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--border); padding-bottom: 10px; font-size: 13.5px; }
+
+    @media (max-width: 920px) {
+      .agent-shell { grid-template-columns: 1fr; }
+      .runs { flex-direction: row; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--border); }
+      .inspector { border-left: 0; border-top: 1px solid var(--border); }
+      .run-main { padding: 20px 16px; }
+      .dag { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+  </style>
+</head>
+<body data-artifact="agent">
+  <div class="agent-shell">
+    <aside class="runs" aria-label="Runs">
+      <h2>Runs</h2>
+      <a class="run-link active" href="#" aria-current="page">triage-prod-errors · #418</a>
+      <a class="run-link" href="#">nightly-eval-suite</a>
+      <a class="run-link" href="#">upgrade-dryrun</a>
+    </aside>
+
+    <main class="run-main" aria-label="Run detail">
+      <div class="run-head" data-design-id="run-head">
+        <div>
+          <h1>triage-prod-errors · run #418</h1>
+          <p class="meta">Incident-triage agent · started 14:02 · Ferry peer fabric</p>
+        </div>
+        <span class="pill pill-ok"><span class="dot"></span>Awaiting approval</span>
+      </div>
+
+      <section class="card" data-design-id="run-timeline" aria-label="Run timeline">
+        <h2>Timeline</h2>
+        <div class="dag" aria-label="Run steps">
+          <span class="live">Saved</span><span class="live">Fork</span><span class="live">Prompt</span><span>Build</span><span>Eval</span>
+        </div>
+        <p class="meta" aria-live="polite">Step 3 of 5 — plan ready for review.</p>
+      </section>
+
+      <section data-design-id="run-thread" aria-label="Thread">
+        <div class="tool-call" data-tool-call="SENTRY_LIST_ISSUES" data-status="success" data-latency="412ms">
+          <div class="tool-head">
+            <span class="tool-name">SENTRY_LIST_ISSUES</span>
+            <span class="pill pill-ok"><span class="dot"></span>Success · 412ms</span>
+          </div>
+          <p class="tool-purpose">List unresolved production errors — 3 matched, 1 P0.</p>
+          <details class="tool-args">
+            <summary>Args</summary>
+            <code>project=ferry-prod · limit=25</code>
+          </details>
+        </div>
+        <div class="tool-call" data-tool-call="SENTRY_GET_EVENT" data-status="success" data-latency="188ms">
+          <div class="tool-head">
+            <span class="tool-name">SENTRY_GET_EVENT</span>
+            <span class="pill pill-ok"><span class="dot"></span>Success · 188ms</span>
+          </div>
+          <p class="tool-purpose">Fetch stack trace for the P0 checkout panic.</p>
+        </div>
+      </section>
+
+      <section class="card" data-design-id="run-approval" aria-label="Plan approval">
+        <div data-approval="triage-plan">
+          <h2>Plan — needs approval</h2>
+          <ol class="plan-steps">
+            <li>Open Linear issue for the P0 checkout panic with stack trace</li>
+            <li class="destructive" data-destructive="restart-checkout">Restart <span class="num">checkout-api-02</span> <span class="flag">Destructive — needs approval</span></li>
+          </ol>
+          <div class="guardrail" style="margin-top: 12px;">
+            <p class="meta" style="color: var(--fg); margin: 0 0 4px;">Policy: production restarts need human approval</p>
+            <p class="meta" style="margin: 0;">Unattended restarts are blocked during peak hours — approve below or schedule. <a href="#">View policy</a></p>
+          </div>
+          <div class="approval-bar" style="margin-top: 12px;">
+            <button class="btn btn-primary" type="button">Approve plan</button>
+            <button class="btn btn-secondary" type="button">Edit</button>
+            <button class="btn btn-secondary" type="button">Reject</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" data-design-id="run-eval" aria-label="Eval receipt">
+        <div class="tool-call" data-tool-call="EVAL_SUITE" data-status="queued" data-latency="—" style="border: 0; padding: 0; box-shadow: none; background: transparent;">
+          <div class="tool-head">
+            <span class="tool-name">EVAL_SUITE</span>
+            <span class="pill"><span class="dot"></span>Queued · —</span>
+          </div>
+          <p class="tool-purpose">Runs after approval — 4 checks · cost and duration reported on completion.</p>
+        </div>
+      </section>
+    </main>
+
+    <aside class="inspector" aria-label="Activity">
+      <div class="card" data-design-id="run-activity">
+        <h2>Agent activity</h2>
+        <ul class="feed" aria-live="polite">
+          <li><span>Fetched 25 open error events</span><span class="meta">Auto-approved</span></li>
+          <li><span>Opened Linear issue FER-2091</span><span class="meta">Auto-approved</span></li>
+          <li><span>Restart checkout-api-02</span><span class="meta">Needs review · <a href="#">View logs</a></span></li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+</body>
+</html>

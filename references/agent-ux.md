@@ -1,0 +1,68 @@
+# Agent UX — pattern catalog for AI-agent product screens
+
+Contracts for the `agent` artifact kind (`thread` · `run-detail` · `approval` · `activity`). Every pattern binds the active `:root` tokens verbatim, uses `var(--font-mono)` for tool names, latency, and status, and ships its empty / loading / error / interrupted / permission-denied states per `references/ux-flows.md`. Placeholders stay labeled (`[REPLACE · label]`) — never invent tool names, costs, or eval scores.
+
+## 1 · Tool-call card `[data-tool-call]`
+
+Required attributes: `data-status="queued|running|success|error|cancelled"` and `data-latency` (e.g. `data-latency="412ms"`). Required visible parts:
+
+- Tool name in mono (`SENTRY_LIST_ISSUES`), one-line purpose below it.
+- Status pill + latency (`412ms`) on the same row — status is text, never color alone.
+- Args collapsible (`<details>`): real-looking args only, or `[REPLACE · args]`.
+- Output preview (truncated log, table, or diff) with a "View full output" affordance.
+
+States: `running` shows a reduced-motion-safe working indicator; `error` shows cause + retry; `cancelled` shows who cancelled; denied tools use the permission-denied block instead.
+
+## 2 · Streaming message + thinking indicator
+
+- Assistant message streams into a `aria-live="polite"` region; a separate `aria-live="polite"` status line announces `queued → running → success/error`.
+- Thinking/working indicator: text label ("Working…") + skeleton matching the card shape. No emoji spinners.
+- `prefers-reduced-motion`: no pulsing — static "Working…" text only.
+- Interrupted: preserve partial output, show "Interrupted — resume or discard" with both buttons.
+
+## 3 · Plan preview + approval `[data-approval]`
+
+- Numbered steps (`01`–`04`) with verb + object + target ("Restart `render-node-04`").
+- Destructive steps carry `data-destructive` and a visible flag ("Destructive — needs approval").
+- Controls: Approve / Reject / Edit — all real `<button>`s, keyboard reachable, focus starts on the safe action. Approval control carries `data-approval` (or `data-approval-for="id"`).
+- Edit returns to thread with the plan quoted; Reject asks for a one-line reason (optional) and stops the run.
+
+## 4 · Guardrail / policy warning
+
+- One block per policy hit: what was blocked, which policy, what to do next.
+- Never a toast when it needs a decision — inline banner or plan-step flag.
+- Link to the policy or log, never a bare "Blocked".
+
+## 5 · Live activity feed
+
+- Rows: agent avatar/initial, action verb, object, status, relative time, "View logs" link.
+- `Auto-approved` vs `Needs review` is text, not hue alone.
+- Live region `aria-live="polite"`; paused state when the user scrolls back ("3 new — jump to latest").
+
+## 6 · Run DAG / timeline
+
+- Nodes `SAVED → FORK → PROMPT → BUILD → EVAL` (domain-specific verbs allowed) with per-node `data-status`.
+- Failed node shows error + retry; parallel lanes show lane labels.
+- Never invent durations — missing values render as `—` or `[REPLACE · p95]`.
+
+## 7 · Eval receipt
+
+- Checks passed/failed list, tokens, cost, duration — each with its comparison or source. Unknowns are `—`, never guessed.
+- Failed checks link to the failing step; "Re-run eval" is a button.
+
+## 8 · Screen compositions
+
+| Screen | Layout (from `assets/agent-seed.html`) |
+|---|---|
+| `thread` | Main thread pane (messages + inline tool-call cards) + right inspector (selected tool I/O) |
+| `run-detail` | Step DAG/timeline top, logs middle, eval receipt bottom |
+| `approval` | Plan preview centered, Approve/Reject/Edit bar sticky, guardrail block above destructive steps |
+| `activity` | Full-width live feed + filter (all / needs-review / errors) |
+
+## 9 · Accessibility
+
+- Streaming and status regions: `aria-live="polite"`.
+- Approve/Reject/Edit: real buttons, Tab/Enter/Esc operable, visible `:focus-visible` ring.
+- Focus management: opening approval moves focus to the dialog heading; closing returns focus to the invoking control.
+- Status never conveyed by color alone — every dot carries a text label.
+- Touch targets ≥ 44px; usable at 200% zoom; `prefers-reduced-motion` path ships with every animated pattern.

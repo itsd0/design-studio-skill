@@ -372,10 +372,14 @@ def lint(raw_html: str) -> list[Finding]:
             ))
 
     # ── P1-6: dashboard lacking KPI row + data visualization ──────────
-    is_dashboard = bool(re.search(
-        r'class="[^"]*\b(shell|topbar|kpis|\bkpi\b)[^"]*"|data-design-id\s*=\s*["\']kpis["\']',
-        html, re.I,
-    ))
+    # Token-exact class matching: "agent-shell" must NOT count as "shell".
+    class_tokens: set[str] = set()
+    for cm in re.finditer(r"""\bclass\s*=\s*["']([^"']*)["']""", html, re.I):
+        class_tokens.update(cm.group(1).split())
+    is_dashboard = bool(
+        class_tokens & {"shell", "side", "topbar", "kpis", "kpi"}
+        or re.search(r'data-design-id\s*=\s*["\']kpis["\']', html, re.I)
+    )
     if is_dashboard and not slide_matches:
         has_kpi = bool(re.search(
             r'class="[^"]*\bkpis?\b[^"]*"|data-design-id\s*=\s*["\']kpis["\']',
@@ -398,6 +402,86 @@ def lint(raw_html: str) -> list[Finding]:
     out.extend(check_a11y(html))
     contrast_findings, _ = check_contrast(html)
     out.extend(contrast_findings)
+
+    # ── Agent screens (only when data-artifact="agent") ────────────────
+    if re.search(r'data-artifact\s*=\s*["\']agent["\']', html, re.I):
+        out.extend(check_agent(html))
+
+    return out
+
+
+# ── agent-screen checks (references/agent-ux.md) ──────────────────────────
+
+AGENT_STATUSES = {"queued", "running", "success", "error", "cancelled"}
+CLOSERS_RE = r"</(?:div|section|article|form|aside|main)\b[^>]*>"
+
+
+def check_agent(html: str) -> list[Finding]:
+    """P0/P1 contracts for agent thread/run/approval/activity screens."""
+    out: list[Finding] = []
+    body = re.sub(r"<!--[\s\S]*?-->", "", html)
+
+    # ── P0: every [data-tool-call] needs data-status + data-latency ────
+    for m in re.finditer(r"<[^>]+\bdata-tool-call\s*=\s*[\"']([^\"']+)[\"'][^>]*>", body, re.I):
+        tag, name = m.group(0), m.group(1)
+        status = re.search(r"""\bdata-status\s*=\s*["']([^"']+)["']""", tag, re.I)
+        latency = re.search(r"""\bdata-latency\s*=\s*["']([^"']*)["']""", tag, re.I)
+        problems = []
+        if not status or status.group(1).lower() not in AGENT_STATUSES:
+            problems.append("data-status (queued/running/success/error/cancelled)")
+        if latency is None or not latency.group(1).strip():
+            problems.append("data-latency")
+        if problems:
+            out.append(Finding(
+                "P0", "tool-call-missing-status",
+                f'Tool call "{name}" is missing {" and ".join(problems)}.',
+                'Add data-status="queued|running|success|error|cancelled" and data-latency="412ms" (use "—" when not started) plus a visible status + latency pill.',
+                clip(tag),
+            ))
+
+    # ── P0: every [data-destructive] needs an approval control ─────────
+    approvals = {
+        m.group(1) for m in
+        re.finditer(r"""\bdata-approval\s*=\s*["']([^"']+)["']""", body, re.I)
+    }
+    approval_opens = [m.start() for m in re.finditer(r"<[^>]+\bdata-approval(?:\s*=|\s|>|/>)", body, re.I)]
+    for m in re.finditer(r"<[^>]+\bdata-destructive(?:\s*=\s*[\"'][^\"']*[\"'])?[^>]*>", body, re.I):
+        tag = m.group(0)
+        ref = re.search(r"""\bdata-approval-for\s*=\s*["']([^"']+)["']""", tag, re.I)
+        inside = any(
+            open_pos < m.start() and not re.search(CLOSERS_RE, body[open_pos:m.start()], re.I)
+            for open_pos in approval_opens
+        )
+        if (ref and ref.group(1) in approvals) or inside:
+            continue
+        out.append(Finding(
+            "P0", "destructive-without-approval",
+            "A destructive action has no approval control — irreversible actions need Approve/Reject/Edit.",
+            'Place it inside a [data-approval] block, or point it at one with data-approval-for="plan-id" matching a data-approval="plan-id".',
+            clip(tag),
+        ))
+
+    # ── P1: streaming / working regions need aria-live ─────────────────
+    # aria-live on an ancestor (e.g. the wrapping status <div>) counts.
+    for m in re.finditer(
+        r"<(p|div|span|section)([^>]*)>([^<]*?(?:Working|working|Streaming|streaming)[^<]*)</\1>",
+        body,
+    ):
+        if re.search(r"""\baria-live\s*=""", m.group(2), re.I):
+            continue
+        ancestor_live = False
+        for am in re.finditer(r"<(?:div|section)[^>]*\baria-live\s*=[^>]*>", body[:m.start()], re.I):
+            if not re.search(CLOSERS_RE, body[am.end():m.end()], re.I):
+                ancestor_live = True
+                break
+        if not ancestor_live:
+            out.append(Finding(
+                "P1", "stream-missing-aria-live",
+                "A streaming/working region lacks aria-live — screen readers never hear status changes.",
+                'Add aria-live="polite" to the streaming message or status line.',
+                clip(m.group(0)),
+            ))
+            break
 
     return out
 

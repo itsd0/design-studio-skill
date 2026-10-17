@@ -24,6 +24,16 @@ Where Design Studio is, and where it's heading. Directions, not promises.
 
 - Expanded `references/directions.md` from five (v1.0.0) to **8 curated visual directions** — added dark-native `dark-structural-grid`, `neo-brutalist-terminal`, `atmospheric-craft-dark` with `--accent-on` + `--surface-2`
 
+### v1.2.1 — bug fixes
+
+- `SKILL.md` resource map says 8 directions; flagship rules yield to an existing `DESIGN.md`
+- New P1 `dashboard-missing-craft` lint check + fixture
+
+### v1.3.0 — Agent-UX artifact kind
+
+- New `agent` kind (`thread` / `run-detail` / `approval` / `activity`) with `references/agent-ux.md` contracts
+- New `assets/agent-seed.html` + `assets/agent-ux-patterns.html`; agent lint gates (`tool-call-missing-status`, `destructive-without-approval`, `stream-missing-aria-live`); `demo/agent.html` incident-triage demo
+
 ## Next
 
 - **Direction palettes v2** — extend each direction with a dark tier and accent alternates
