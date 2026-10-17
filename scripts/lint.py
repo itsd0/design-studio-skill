@@ -345,6 +345,17 @@ def lint(raw_html: str) -> list[Finding]:
                 ))
                 break
 
+    # ── P1-7: single-1fr grid inside a max-width media query ─────────
+    # `1fr` minimums to min-content and overflows fixed viewports — use minmax(0,1fr).
+    for start, end in _media_spans(html):
+        if re.search(r"grid-template-columns\s*:\s*1fr\s*[;}]", html[start:end], re.I):
+            out.append(Finding(
+                "P1", "mobile-grid-1fr",
+                "grid-template-columns: 1fr inside a max-width media query — 1fr minimums to min-content and can overflow narrow viewports.",
+                "Use grid-template-columns: minmax(0, 1fr) and add min-width: 0 to the grid children.",
+            ))
+            break
+
     # ── P2-1: missing comment-mode anchor on <section> ────────────────
     sections = re.findall(r"<section\b[^>]*>", html, re.I)
     tagged = [
@@ -419,6 +430,21 @@ OUTPUT_RE = r"<(?:details|pre)\b[^>]*>|<code\b[^>]*>|\bdata-output\b|class\s*=\s
 
 def _norm_token(s: str) -> str:
     return re.sub(r"[^a-z0-9]", "", (s or "").lower())
+
+
+def _media_spans(body: str) -> list[tuple[int, int]]:
+    """(start, end) spans of @media blocks that carry a max-width query."""
+    spans: list[tuple[int, int]] = []
+    for m in re.finditer(r"@media[^{]*max-width[^{]*\{", body, re.I):
+        depth, pos = 1, m.end()
+        while depth and pos < len(body):
+            if body[pos] == "{":
+                depth += 1
+            elif body[pos] == "}":
+                depth -= 1
+            pos += 1
+        spans.append((m.start(), pos))
+    return spans
 
 
 def _element_span(body: str, open_start: int) -> tuple[int, int]:

@@ -48,6 +48,7 @@ CASES = [
     ("bad-contrast.html", ["contrast-text"], []),
     ("bad-deck.html", ["slide-theme-missing", "slide-rhythm"], []),
     ("bad-dashboard.html", ["dashboard-missing-craft"], ["missing-visual-craft"]),
+    ("bad-mobile-grid.html", ["mobile-grid-1fr"], []),
     (
         "bad-agent.html",
         ["tool-call-missing-status", "destructive-without-approval", "stream-missing-aria-live",

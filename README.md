@@ -69,6 +69,12 @@ Three artifacts built from one brief, each a single self-contained file — [`de
 
 The deck is keyboard, wheel, and touch navigable — counter, progress bar, dots, print-to-PDF styles, and a self-contained navigation runtime included. All three demo files pass the linter with zero findings.
 
+## What's new in v1.3.2 (Agent-UX hotfix)
+
+- **No mobile overflow** — `minmax(0, 1fr)` collapse plus `min-width: 0` on grid children everywhere; long identifiers wrap on mobile. New P1 `mobile-grid-1fr` lint gate with fixture.
+- **Readable inspector** — activity meta stacks under each title, so status, timestamp, and "View logs" never clip at 1440px.
+- **Ordered run detail** — Thread view moved after the eval receipt, so approval precedes the conversation recap.
+
 ## What's new in v1.3.1 (Agent-UX quality pass)
 
 - **Run controls** — every run view carries Stop/Cancel plus elapsed time, tokens, and cost (`[data-run]` + `[data-run-control="stop"]`; P0 `run-missing-stop`).

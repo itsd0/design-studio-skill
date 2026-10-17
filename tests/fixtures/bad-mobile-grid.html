@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bad mobile grid fixture</title>
+  <style>
+    :root {
+      --bg: #fafaf7; --surface: #ffffff; --fg: #1a1916;
+      --muted: #6b6964; --border: #e8e5df; --accent: #c96442;
+    }
+    body { margin: 0; background: var(--bg); color: var(--fg); font-family: system-ui, sans-serif; }
+    .shell { display: grid; grid-template-columns: 240px minmax(0, 1fr); }
+    .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    @media (max-width: 920px) {
+      .shell { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section data-design-id="intro">
+      <h1>One claim, stated plainly.</h1>
+      <p>A short paragraph with no filler and no invented numbers.</p>
+    </section>
+  </main>
+</body>
+</html>

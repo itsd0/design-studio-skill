@@ -39,6 +39,10 @@ Where Design Studio is, and where it's heading. Directions, not promises.
 - Run header with Stop/Cancel + elapsed/tokens/cost; named destructive approvals; timeline done/current/pending states with connectors; muted success pills; Args + output on every active tool call; numbered full-border plan steps; icon/timestamp activity feed; sticky mobile approval bar; thread view in `demo/agent.html`
 - New lint gates: `run-missing-stop` (P0), `destructive-approve-unnamed` (P0), `tool-call-missing-output` (P1), agent `accent-overuse` (P1)
 
+### v1.3.2 — Agent-UX hotfix
+
+- `minmax(0, 1fr)` collapse + `min-width: 0` children + mobile code-wrap (verified `scrollWidth === clientWidth` at 390px); stacked activity meta; Thread view after eval; new P1 `mobile-grid-1fr` lint gate + fixture
+
 ## Next
 
 - **Direction palettes v2** — extend each direction with a dark tier and accent alternates

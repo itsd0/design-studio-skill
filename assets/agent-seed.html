@@ -191,12 +191,14 @@
     }
 
     @media (max-width: 920px) {
-      .agent-shell { grid-template-columns: 1fr; }
+      .agent-shell { grid-template-columns: minmax(0, 1fr); }
       .runs { flex-direction: row; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--border); }
       .inspector { border-left: 0; border-top: 1px solid var(--border); }
       .thread { padding: 20px 16px; }
       .run-head { flex-direction: column; align-items: stretch; }
       .run-head .btn { align-self: flex-start; }
+      .agent-shell > *, .thread, .card, .tool-call, .approval, .plan-steps li { min-width: 0; }
+      .tool-name, .plan-steps code { white-space: normal; overflow-wrap: anywhere; }
       .approval-bar {
         position: sticky; bottom: 0; z-index: 5;
         background: var(--surface);

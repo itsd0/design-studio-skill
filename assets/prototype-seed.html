@@ -165,7 +165,7 @@
     @media (max-width: 920px) {
       .grid-2, .grid-3, .grid-4, .grid-2-1, .grid-1-2,
       .bento-hairline, .bento-hairline.cols-2, .bento-hairline.cols-2-1, .bento-hairline.cols-1-2 {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
       }
       .bento-cell.span-2 { grid-column: span 1; }
     }
@@ -308,7 +308,7 @@
     .hero-center .hero-cta { justify-content: center; }
     .hero-split { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap-2xl); align-items: center; }
     .hero-split .lead { margin-inline: 0; }
-    @media (max-width: 920px) { .hero-split { grid-template-columns: 1fr; } }
+    @media (max-width: 920px) { .hero-split { grid-template-columns: minmax(0, 1fr); } }
 
     .hero-stage { margin-top: clamp(40px, 5vw, 64px); }
     .app-window {
@@ -367,7 +367,7 @@
       font-size: 13.5px;
     }
     @media (max-width: 920px) {
-      .app-panes, .app-panes.cols-2 { grid-template-columns: 1fr; }
+      .app-panes, .app-panes.cols-2 { grid-template-columns: minmax(0, 1fr); }
     }
 
     /* ── numbered index showcase (Composio 01-04 pattern) ─────────────── */
@@ -434,7 +434,7 @@
     }
     .spec-list li strong { color: var(--fg); font-weight: 500; }
     @media (max-width: 920px) {
-      .index-showcase { grid-template-columns: 1fr; }
+      .index-showcase { grid-template-columns: minmax(0, 1fr); }
     }
 
     /* ── schematic & telemetry micro-components (Daytona DAG / CLI pills) */
@@ -640,7 +640,7 @@
     .log-row h3 { font-size: 18px; }
     .log-row p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
     .log-row .pull { text-align: right; }
-    @media (max-width: 920px) { .log-row { grid-template-columns: 1fr; gap: var(--gap-xs); } }
+    @media (max-width: 920px) { .log-row { grid-template-columns: minmax(0, 1fr); gap: var(--gap-xs); } }
 
     /* ── pricing ──────────────────────────────────────────────────────── */
     .card-emphasis { border-color: var(--fg); }
