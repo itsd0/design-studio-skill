@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    name: tests + lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Rule fixtures + shipped-artifact regression + schema pin
+        run: python3 tests/run_tests.py
+      - name: Lint every shipped HTML (zero P0/P1)
+        run: |
+          files="index.html $(ls assets/*.html demo/*.html)"
+          # shellcheck disable=SC2086
+          python3 scripts/lint.py $files | tee lint.out
+          p1=$(grep -cE '^\s+\[P1\]' lint.out || true)
+          if grep -qE 'FAIL \(fix P0' lint.out || [ "$p1" != "0" ]; then
+            echo "lint gate failed"; exit 1
+          fi
+
+  pages-smoke:
+    name: pages smoke
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    needs: test
+    steps:
+      - name: Wait for Pages build
+        run: sleep 90
+      - name: Probe live URLs
+        run: |
+          for p in "" demo/landing.html demo/dashboard.html demo/agent.html demo/deck.html; do
+            curl -fsS -o /dev/null "https://itsd0.github.io/design-studio-skill/$p" \
+              || { echo "smoke failed: /$p"; exit 1; }
+          done
+          echo "pages smoke OK"

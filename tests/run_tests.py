@@ -106,9 +106,31 @@ def run_shipped() -> int:
     return failures
 
 
+FINDING_KEYS = {"severity", "id", "message", "fix", "snippet"}
+
+
+def run_schema() -> int:
+    """Pin docs/lint-schema-v1.md: every finding carries exactly the v1 keys."""
+    print("· json schema v1")
+    html = (FIXTURES / "bad-slop.html").read_text(encoding="utf-8")
+    findings = lint(html)
+    if not findings:
+        print("  FAIL schema (fixture produced no findings)")
+        return 1
+    bad = [
+        f"{f.id}:{sorted(vars(f).keys())}"
+        for f in findings if set(vars(f).keys()) != FINDING_KEYS
+    ]
+    ok = not bad
+    print(f"  {'ok  ' if ok else 'FAIL'} finding keys == {sorted(FINDING_KEYS)}")
+    for b in bad:
+        print(f"       {b}")
+    return 0 if ok else 1
+
+
 def main() -> int:
-    failures = run_fixtures() + run_shipped()
-    total = len(CASES) + 1 + len(list((ROOT / 'assets').glob('*.html'))) + len(list((ROOT / 'demo').glob('*.html')))
+    failures = run_fixtures() + run_shipped() + run_schema()
+    total = len(CASES) + 2 + len(list((ROOT / 'assets').glob('*.html'))) + len(list((ROOT / 'demo').glob('*.html')))
     print(f"\n{total - failures}/{total} passed")
     return 1 if failures else 0
 

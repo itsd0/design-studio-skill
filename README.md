@@ -3,6 +3,7 @@
 **A design skill for coding agents.** Hand it a brief; get back a polished, self-contained HTML artifact — a landing page, app prototype, dashboard, or slide deck — that opens in any browser with no build step and no runtime dependencies.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-black.svg)](LICENSE)
+[![CI](https://github.com/itsd0/design-studio-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/itsd0/design-studio-skill/actions/workflows/ci.yml)
 
 **Live Landing Page:** [itsd0.github.io/design-studio-skill](https://itsd0.github.io/design-studio-skill/) · **Demos:** [Landing](https://itsd0.github.io/design-studio-skill/demo/landing.html) · [Dashboard](https://itsd0.github.io/design-studio-skill/demo/dashboard.html) · [Agent run](https://itsd0.github.io/design-studio-skill/demo/agent.html) · [Slide Deck](https://itsd0.github.io/design-studio-skill/demo/deck.html)
 
@@ -19,6 +20,14 @@ Design Studio is a standard [Agent Skills](https://agentskills.io) skill — one
 ```bash
 npx skills add itsd0/design-studio-skill -g
 ```
+
+**Pinned, verified (recommended for teams):**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/itsd0/design-studio-skill/main/install.sh | VERSION=v1.4.0 sh
+```
+
+Pinned installs verify the tarball against the release's `SHA256SUMS`. See [`SECURITY.md`](SECURITY.md) and [`CHANGELOG.md`](CHANGELOG.md).
 
 **OpenCode — plain git:**
 
@@ -128,9 +137,12 @@ The deck is keyboard, wheel, and touch navigable — counter, progress bar, dots
 | `assets/section-skeletons.html` | 11 paste-ready sections (hero-stage, schematic bentos, indexed showcase, pricing, CTA…) |
 | `assets/deck-seed.html` | Deck seed: themes, chrome, nav runtime, print CSS |
 | `scripts/lint.py` | Anti-slop + a11y + contrast linter (fails on P0, advises on P1/P2) |
+| `docs/lint-schema-v1.md` | Frozen `--json` contract (additive-only) for CI integrations |
 | `tests/run_tests.py` | Self-tests: rule fixtures + shipped artifacts stay clean |
 | `demo/` | Finished example artifacts + the DESIGN.md behind them |
-| `install.sh` | One-line installer |
+| `install.sh` | One-line installer (`VERSION=` pin + `SHA256SUMS` verify) |
+| `CHANGELOG.md` | Release history (Keep a Changelog) |
+| `SECURITY.md` | Supported versions + private-report channel |
 
 ## The linter
 

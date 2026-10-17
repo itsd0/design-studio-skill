@@ -1,0 +1,37 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract changelog section
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          VER="${TAG#v}"
+          awk -v ver="## \\[$VER\\]" '
+            $0 ~ ver { grab=1; next }
+            grab && /^## \[/ { exit }
+            grab { print }
+          ' CHANGELOG.md | sed -e :a -e '/./,$!d' > notes.md
+          [ -s notes.md ] || echo "Release $TAG." > notes.md
+          cat notes.md
+      - name: Build tarball + SHA256SUMS
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          curl -fsSL "https://codeload.github.com/${{ github.repository }}/tar.gz/$TAG" -o skill.tar.gz
+          sha256sum skill.tar.gz | sed 's/  skill.tar.gz/  skill.tar.gz/' > SHA256SUMS
+          cat SHA256SUMS
+      - name: Create release + upload checksums
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          gh release create "$TAG" --title "$TAG" --notes-file notes.md ./SHA256SUMS
