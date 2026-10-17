@@ -371,6 +371,29 @@ def lint(raw_html: str) -> list[Finding]:
                 "Anchor the hero with a multi-pane .app-window or telemetry stage, and use .bento-hairline with .bento-visual SVG schematics or .index-showcase for features instead of plain-text icon grids.",
             ))
 
+    # ── P1-6: dashboard lacking KPI row + data visualization ──────────
+    is_dashboard = bool(re.search(
+        r'class="[^"]*\b(shell|topbar|kpis|\bkpi\b)[^"]*"|data-design-id\s*=\s*["\']kpis["\']',
+        html, re.I,
+    ))
+    if is_dashboard and not slide_matches:
+        has_kpi = bool(re.search(
+            r'class="[^"]*\bkpis?\b[^"]*"|data-design-id\s*=\s*["\']kpis["\']',
+            html, re.I,
+        ))
+        has_viz = bool(re.search(r"<svg\b", html, re.I)) or bool(re.search(r"<table\b", html, re.I))
+        if not (has_kpi and has_viz):
+            missing = []
+            if not has_kpi:
+                missing.append("KPI row (.kpis/.kpi)")
+            if not has_viz:
+                missing.append("inline SVG chart or data table")
+            out.append(Finding(
+                "P1", "dashboard-missing-craft",
+                f"Dashboard lacks {', '.join(missing)} — dashboards need a KPI strip plus at least one chart or table.",
+                "Add a gapless .kpis strip (label + mono tabular-nums value + delta) and a primary inline-SVG chart or dense data table per references/artifact-contract.md.",
+            ))
+
     # ── P0/P1: accessibility statics + computed contrast ──────────────
     out.extend(check_a11y(html))
     contrast_findings, _ = check_contrast(html)

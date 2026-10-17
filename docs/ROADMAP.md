@@ -20,6 +20,10 @@ Where Design Studio is, and where it's heading. Directions, not promises.
 - **Workflow** — experience dials (density / expressiveness / motion), review mode for audits, screenshot verification
 - **Self-tests** — rule fixtures plus shipped-artifact regression checks
 
+### v1.2.0 — flagship architecture (8 directions)
+
+- Expanded `references/directions.md` from five (v1.0.0) to **8 curated visual directions** — added dark-native `dark-structural-grid`, `neo-brutalist-terminal`, `atmospheric-craft-dark` with `--accent-on` + `--surface-2`
+
 ## Next
 
 - **Direction palettes v2** — extend each direction with a dark tier and accent alternates

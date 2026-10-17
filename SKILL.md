@@ -13,7 +13,7 @@ Turn a brief into **single-file HTML artifacts** driven by a **DESIGN.md brand c
 1. **One self-contained file.** `index.html` — all CSS in a single `<style>` block, no external CSS/JS, inline SVG for charts, system-first fonts. Real images are copied into the project and referenced relatively.
 2. **One token block.** Palette and type live in a single `:root` with standard names (`--bg`, `--surface`, `--surface-2`, `--fg`, `--muted`, `--border`, `--accent`, `--accent-on`, `--font-display`, `--font-body`, `--font-mono`). No raw hex outside it; derive tones with `color-mix()`.
 3. **DESIGN.md is the brand contract.** Read it before writing HTML. Never invent tokens — if a value is missing, use the closest existing token.
-4. **2025–2026 Flagship Visual Architecture.** Never ship a bare text-only hero or "3 small icons over paragraphs" feature sections. Every product/landing page must include a **Hero Product Stage** (`.app-window` multi-pane studio/IDE frame, `.term` session, or live telemetry schematic) and **Schematic Bento / Indexed Feature Sections** (`.bento-hairline` with `.bento-visual` SVG diagrams: gauges, isometric layers, `FORK → BUILD → EVAL` DAG pipelines, wireframe globes, and `.index-showcase` `01`–`04` tabs).
+4. **2025–2026 Flagship Visual Architecture (when brand allows).** An existing `DESIGN.md` always wins over this rule — adapt flagship patterns to the brand's tokens, or skip them if the brand forbids them. When no `DESIGN.md`/brand exists, or when the brand allows it: never ship a bare text-only hero or "3 small icons over paragraphs" feature sections. Every product/landing page must include a **Hero Product Stage** (`.app-window` multi-pane studio/IDE frame, `.term` session, or live telemetry schematic) and **Schematic Bento / Indexed Feature Sections** (`.bento-hairline` with `.bento-visual` SVG diagrams: gauges, isometric layers, `FORK → BUILD → EVAL` DAG pipelines, wireframe globes, and `.index-showcase` `01`–`04` tabs).
 5. **Accent budget: at most 2 visible uses per screen.** Links demote to `--fg` when a CTA shares the screen. Always bind `--accent-on` so primary buttons have crisp WCAG contrast.
 6. **No AI-slop tropes**: no purple/indigo defaults, no two-stop "trust" gradients, no emoji-as-icons, no rounded card with a colored left border, no invented metrics, no filler copy. Full list in `references/quality-gates.md`.
 7. **Anchor every section.** `data-design-id="kebab-slug"` on each top-level `<section>`; decks use `data-screen-label="01 Cover"`.
@@ -81,7 +81,7 @@ When the user asks to review or audit an existing artifact rather than build one
 | Path | Use |
 |---|---|
 | `references/design-md.md` | DESIGN.md contract, standard token names, experience dials, brand authoring |
-| `references/directions.md` | 5 curated visual directions with palettes and fonts |
+| `references/directions.md` | 8 curated visual directions with palettes and fonts |
 | `references/artifact-contract.md` | Output rules: layout, imagery, dark mode, dashboards, mobile, exports |
 | `references/deck-contract.md` | Deck mode: slides, theme rhythm, navigation runtime |
 | `references/quality-gates.md` | Anti-slop + craft rules, WCAG checklist, P0/P1/P2 gates, review protocol |

@@ -34,7 +34,9 @@ Default rhythms — pick one, then state the section list before writing HTML:
 | Marketing / Editorial | `hero-split` → `log list` → `quote` → `compare` → `cta` |
 | Pricing | `hero-center` → `pricing` (gapless hairline 3-tier matrix) → `compare` → `cta` |
 
-### High-Craft Architecture Rules (Non-Negotiable):
+### High-Craft Architecture Rules (apply when brand allows):
+
+Precedence: an existing `DESIGN.md` always wins over these rules. Apply rules 1–6 only when no `DESIGN.md`/brand exists, or when the brand allows them — adapt all patterns to the brand's tokens, never override the brand.
 
 1. **Hero Product Stage Required:** Never ship a bare text-only hero floating in empty space for a software product. Anchor the hero with a concrete product proof:
    - A multi-pane `.app-window` (left project tree, middle agent/prompt trace, right dot-matrix canvas preview), OR

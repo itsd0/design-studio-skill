@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bad dashboard fixture</title>
+  <style>
+    :root {
+      --bg: #fafaf7; --surface: #ffffff; --fg: #1a1916;
+      --muted: #6b6964; --border: #e8e5df; --accent: #c96442;
+    }
+    body { margin: 0; background: var(--bg); color: var(--fg); font-family: system-ui, sans-serif; }
+    .shell { display: grid; grid-template-columns: 232px minmax(0, 1fr); min-height: 100vh; }
+    .side { border-right: 1px solid var(--border); padding: 20px 14px; }
+    .topbar { border-bottom: 1px solid var(--border); padding: 14px 28px; }
+    .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="side">Brand</aside>
+    <div>
+      <header class="topbar"><h1>Transfers</h1></header>
+      <main>
+        <p>A dashboard shell with no KPI strip and no chart or table — only prose.</p>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

@@ -47,6 +47,7 @@ CASES = [
     ),
     ("bad-contrast.html", ["contrast-text"], []),
     ("bad-deck.html", ["slide-theme-missing", "slide-rhythm"], []),
+    ("bad-dashboard.html", ["dashboard-missing-craft"], ["missing-visual-craft"]),
 ]
 
 
