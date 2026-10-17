@@ -69,6 +69,13 @@ Three artifacts built from one brief, each a single self-contained file — [`de
 
 The deck is keyboard, wheel, and touch navigable — counter, progress bar, dots, print-to-PDF styles, and a self-contained navigation runtime included. All three demo files pass the linter with zero findings.
 
+## What's new in v1.3.1 (Agent-UX quality pass)
+
+- **Run controls** — every run view carries Stop/Cancel plus elapsed time, tokens, and cost (`[data-run]` + `[data-run-control="stop"]`; P0 `run-missing-stop`).
+- **Named destructive approvals** — the approve button names its target (`Approve & restart checkout-api-02`), uses a neutral danger-tinted treatment instead of green, and keeps Reject equally weighted (P0 `destructive-approve-unnamed`).
+- **Timeline states** — done `✓` muted, current accent + `aria-current="step"`, pending muted, connector lines, horizontal-scroll on mobile.
+- **Craft details** — muted success pills (accent ≤ 2 uses; P1 `accent-overuse`), Args + output preview on every active tool call (P1 `tool-call-missing-output`), numbered full-border plan steps, icon + timestamp activity feed, sticky mobile approval bar, wider 1440px columns, thread view in `demo/agent.html`.
+
 ## What's new in v1.3.0 (Agent-UX artifact kind)
 
 - **New `agent` artifact kind** — `thread`, `run-detail`, `approval`, `activity` screens for AI-agent products (`SKILL.md` Brief/Plan/Build + `references/agent-ux.md` contracts).

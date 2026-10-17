@@ -35,6 +35,7 @@
 
       /* derived — do not change */
       --accent-soft: color-mix(in oklch, var(--accent) 14%, transparent);
+      --success-muted: color-mix(in oklch, var(--success) 55%, var(--muted));
       --fg-soft:     color-mix(in oklch, var(--fg) 6%, transparent);
       --specular:    inset 0 1px 0 color-mix(in oklch, var(--fg) 8%, transparent);
 
@@ -76,7 +77,7 @@
     .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 
     /* ── shell: runs sidebar / thread pane / inspector ───────────────── */
-    .agent-shell { display: grid; grid-template-columns: 240px minmax(0, 1fr) 300px; min-height: 100vh; }
+    .agent-shell { display: grid; grid-template-columns: 260px minmax(0, 1fr) 340px; min-height: 100vh; }
     .runs {
       border-right: 1px solid var(--border);
       padding: 16px 12px;
@@ -84,14 +85,19 @@
     }
     .runs h2 { font-size: 12px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); padding-inline: 8px; margin-bottom: 8px; }
     .run-link {
-      display: block; padding: 9px 10px; border-radius: var(--radius);
+      display: flex; align-items: center; gap: 8px; padding: 9px 10px; border-radius: var(--radius);
       color: var(--muted); font-size: 13.5px; text-decoration: none;
       border: 1px solid transparent;
     }
     .run-link:hover { color: var(--fg); background: var(--fg-soft); }
     .run-link.active { color: var(--fg); background: var(--surface); border-color: var(--border); }
+    .run-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); flex: none; }
+    .run-link.active .run-dot { background: var(--accent); }
+    .run-time { margin-left: auto; font-family: var(--font-mono); font-size: 12px; color: var(--muted); white-space: nowrap; }
 
-    .thread { padding: 24px 28px; display: flex; flex-direction: column; gap: var(--gap-md); max-width: 760px; }
+    .thread { padding: 24px 28px; display: flex; flex-direction: column; gap: var(--gap-md); max-width: 860px; }
+    .run-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--gap-md); flex-wrap: wrap; }
+    .run-usage { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
     .inspector {
       border-left: 1px solid var(--border);
       padding: 20px 16px;
@@ -118,15 +124,21 @@
       display: flex; flex-direction: column; gap: 8px;
     }
     .tool-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--gap-sm); flex-wrap: wrap; }
-    .tool-name { font-family: var(--font-mono); font-size: 13px; font-weight: 600; }
+    .tool-name { font-family: var(--font-mono); font-size: 13px; font-weight: 600; white-space: nowrap; }
     .tool-purpose { color: var(--muted); font-size: 13px; margin: 0; }
+    .tool-output {
+      margin: 0; padding: 10px 12px;
+      background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
+      font-family: var(--font-mono); font-size: 12.5px; line-height: 1.7; color: var(--fg);
+      overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere;
+    }
     .pill {
       display: inline-flex; align-items: center; gap: 6px;
-      font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+      font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase;
       border: 1px solid var(--border); border-radius: 999px; padding: 3px 9px; color: var(--muted);
     }
     .pill .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
-    .pill-ok { color: var(--success); border-color: color-mix(in oklch, var(--success) 35%, var(--border)); }
+    .pill-ok { color: var(--success-muted); border-color: color-mix(in oklch, var(--success-muted) 40%, var(--border)); }
     .tool-args { font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); }
     .tool-args summary { cursor: pointer; color: var(--fg); }
 
@@ -136,20 +148,41 @@
       border-radius: var(--radius-lg); padding: 16px;
       display: flex; flex-direction: column; gap: 12px;
     }
-    .plan-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; counter-reset: plan; }
-    .plan-steps li { padding-left: 16px; border-left: 2px solid var(--border); font-size: 13.5px; }
-    .plan-steps li.destructive { border-left-color: var(--danger); }
-    .flag { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--danger); }
+    .plan-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; counter-reset: plan-step; }
+    .plan-steps li {
+      position: relative;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      background: var(--bg);
+      padding: 10px 12px 10px 48px; font-size: 13.5px;
+    }
+    .plan-steps li::before {
+      counter-increment: plan-step; content: counter(plan-step, decimal-leading-zero);
+      position: absolute; left: 12px; top: 10px;
+      font-family: var(--font-mono); font-size: 12px; color: var(--muted);
+    }
+    .plan-steps li.destructive {
+      border-color: color-mix(in oklch, var(--danger) 45%, var(--border));
+      background: color-mix(in oklch, var(--danger) 8%, transparent);
+    }
+    .flag {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--danger);
+    }
+    .flag svg { width: 13px; height: 13px; flex: none; }
     .approval-bar { display: flex; gap: 8px; flex-wrap: wrap; }
     .btn {
       display: inline-flex; align-items: center; gap: 8px;
       padding: 9px 16px; border-radius: var(--radius); border: 1px solid transparent;
       font-size: 13.5px; font-weight: 500;
     }
-    .btn-primary { background: var(--accent); color: var(--accent-on); border-color: var(--accent); font-weight: 600; }
-    .btn-primary:hover { background: color-mix(in oklch, var(--accent) 88%, var(--fg)); }
     .btn-secondary { background: transparent; color: var(--fg); border-color: var(--border); }
     .btn-secondary:hover { border-color: var(--fg); }
+    .btn-destructive {
+      background: var(--surface-2); color: var(--fg); font-weight: 600;
+      border-color: color-mix(in oklch, var(--danger) 50%, var(--border));
+    }
+    .btn-destructive:hover { border-color: var(--danger); }
 
     /* ── inspector cards ──────────────────────────────────────────────── */
     .card {
@@ -162,6 +195,14 @@
       .runs { flex-direction: row; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--border); }
       .inspector { border-left: 0; border-top: 1px solid var(--border); }
       .thread { padding: 20px 16px; }
+      .run-head { flex-direction: column; align-items: stretch; }
+      .run-head .btn { align-self: flex-start; }
+      .approval-bar {
+        position: sticky; bottom: 0; z-index: 5;
+        background: var(--surface);
+        border-top: 1px solid var(--border);
+        padding-block: 12px; margin-inline: -16px; padding-inline: 16px;
+      }
     }
   </style>
 </head>
@@ -169,13 +210,19 @@
   <div class="agent-shell">
     <aside class="runs" aria-label="Runs">
       <h2>Runs</h2>
-      <a class="run-link active" href="#" aria-current="page">[REPLACE] triage-prod-errors</a>
-      <a class="run-link" href="#">[REPLACE] nightly-eval-suite</a>
-      <a class="run-link" href="#">[REPLACE] dependency-upgrade-dryrun</a>
+      <a class="run-link active" href="#" aria-current="page"><span class="run-dot" aria-hidden="true"></span><span>[REPLACE] triage-prod-errors</span><span class="run-time">2m ago</span></a>
+      <a class="run-link" href="#"><span class="run-dot" aria-hidden="true"></span><span>[REPLACE] nightly-eval-suite</span><span class="run-time">1d ago</span></a>
+      <a class="run-link" href="#"><span class="run-dot" aria-hidden="true"></span><span>[REPLACE] dependency-upgrade-dryrun</span><span class="run-time">3d ago</span></a>
     </aside>
 
     <main class="thread" aria-label="Agent thread">
-      <h1>[REPLACE] Incident-triage agent</h1>
+      <div class="run-head" data-run="thread-run">
+        <div>
+          <h1>[REPLACE] Incident-triage agent</h1>
+          <p class="meta run-usage"><span>Elapsed [REPLACE · mm:ss]</span><span>·</span><span>[REPLACE · tokens] tokens</span><span>·</span><span>[REPLACE · cost]</span></p>
+        </div>
+        <button class="btn btn-secondary" type="button" data-run-control="stop">Stop run</button>
+      </div>
       <div class="msg">
         <div class="msg-user">[REPLACE] Triage the latest production errors and open issues for P0s.</div>
       </div>
@@ -191,15 +238,16 @@
             <summary>Args</summary>
             <code>[REPLACE · project, limit]</code>
           </details>
+          <pre class="tool-output">[REPLACE · output excerpt — 3 matched]</pre>
         </div>
         <div class="approval" data-approval="restart-plan">
           <h2>Plan — needs approval</h2>
           <ol class="plan-steps">
             <li>Fetch open error events</li>
-            <li class="destructive" data-destructive="restart-render-node">Restart <span class="num">[REPLACE] render-node-04</span> <span class="flag">Destructive — needs approval</span></li>
+            <li class="destructive" data-destructive="render-node-04">Restart <span class="num">[REPLACE] render-node-04</span> <span class="flag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2.5 20h19L12 3Z"/><line x1="12" y1="10" x2="12" y2="14"/><circle cx="12" cy="17" r="0.5" fill="currentColor"/></svg>Destructive — needs approval</span></li>
           </ol>
           <div class="approval-bar">
-            <button class="btn btn-primary" type="button">Approve plan</button>
+            <button class="btn btn-destructive" type="button" aria-label="Approve and restart render-node-04">Approve &amp; restart [REPLACE] render-node-04</button>
             <button class="btn btn-secondary" type="button">Edit</button>
             <button class="btn btn-secondary" type="button">Reject</button>
           </div>

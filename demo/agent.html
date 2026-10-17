@@ -25,6 +25,7 @@
       --accent-soft: color-mix(in oklch, var(--accent) 14%, transparent);
       --fg-soft:     color-mix(in oklch, var(--fg) 6%, transparent);
       --specular:    inset 0 1px 0 color-mix(in oklch, var(--fg) 8%, transparent);
+      --success-muted: color-mix(in oklch, var(--success) 55%, var(--muted));
 
       --font-display: -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Display', system-ui, sans-serif;
       --font-body:    -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Text', system-ui, sans-serif;
@@ -58,15 +59,19 @@
     .meta { font-family: var(--font-mono); font-size: var(--fs-meta); color: var(--muted); }
     .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 
-    .agent-shell { display: grid; grid-template-columns: 240px minmax(0, 1fr) 300px; min-height: 100vh; }
+    .agent-shell { display: grid; grid-template-columns: 260px minmax(0, 1fr) 340px; min-height: 100vh; }
     .runs { border-right: 1px solid var(--border); padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
     .runs h2 { font-size: 12px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); padding-inline: 8px; margin-bottom: 8px; }
-    .run-link { display: block; padding: 9px 10px; border-radius: var(--radius); color: var(--muted); font-size: 13.5px; text-decoration: none; border: 1px solid transparent; }
+    .run-link { display: flex; align-items: center; gap: 8px; padding: 9px 10px; border-radius: var(--radius); color: var(--muted); font-size: 13.5px; text-decoration: none; border: 1px solid transparent; }
     .run-link:hover { color: var(--fg); background: var(--fg-soft); }
     .run-link.active { color: var(--fg); background: var(--surface); border-color: var(--border); }
+    .run-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); flex: none; }
+    .run-link.active .run-dot { background: var(--accent); }
+    .run-time { margin-left: auto; font-family: var(--font-mono); font-size: 12px; color: var(--muted); white-space: nowrap; }
 
-    .run-main { padding: 24px 28px; display: flex; flex-direction: column; gap: var(--gap-lg); max-width: 780px; }
-    .run-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--gap-md); flex-wrap: wrap; }
+    .run-main { padding: 24px 28px; display: flex; flex-direction: column; gap: var(--gap-lg); max-width: 860px; }
+    .run-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--gap-md); flex-wrap: wrap; }
+    .run-usage { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 6px 0 0; }
     .inspector { border-left: 1px solid var(--border); padding: 20px 16px; display: flex; flex-direction: column; gap: var(--gap-md); }
 
     .card {
@@ -80,51 +85,113 @@
       display: flex; flex-direction: column; gap: 8px;
     }
     .tool-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--gap-sm); flex-wrap: wrap; }
-    .tool-name { font-family: var(--font-mono); font-size: 13px; font-weight: 600; }
+    .tool-name { font-family: var(--font-mono); font-size: 13px; font-weight: 600; white-space: nowrap; }
     .tool-purpose { color: var(--muted); font-size: 13px; margin: 0; }
+    .tool-output {
+      margin: 0; padding: 10px 12px;
+      background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
+      font-family: var(--font-mono); font-size: 12.5px; line-height: 1.7; color: var(--fg);
+      overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere;
+    }
+    #run-thread { display: flex; flex-direction: column; gap: 12px; }
+    #thread-view { display: flex; flex-direction: column; gap: 12px; }
+    .msg-user {
+      align-self: flex-end; max-width: 70%;
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 10px 14px;
+    }
     .pill {
       display: inline-flex; align-items: center; gap: 6px;
-      font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+      font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase;
       border: 1px solid var(--border); border-radius: 999px; padding: 3px 9px; color: var(--muted);
     }
     .pill .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
-    .pill-ok { color: var(--success); border-color: color-mix(in oklch, var(--success) 35%, var(--border)); }
+    .pill-ok { color: var(--success-muted); border-color: color-mix(in oklch, var(--success-muted) 40%, var(--border)); }
     .tool-args { font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); }
     .tool-args summary { cursor: pointer; color: var(--fg); }
 
     .dag { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
     .dag span {
+      position: relative;
       padding: 6px 8px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg);
-      font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase;
+      font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase;
       text-align: center; color: var(--muted);
     }
-    .dag span.live { border-color: color-mix(in oklch, var(--accent) 55%, var(--border)); color: var(--fg); background: var(--surface-2); }
+    .dag span + span::before {
+      content: ""; position: absolute; left: -7px; top: 50%;
+      width: 6px; height: 1px; background: var(--border);
+    }
+    .dag span.done { color: var(--muted); }
+    .dag span.current {
+      border-color: color-mix(in oklch, var(--accent) 55%, var(--border));
+      color: var(--fg); background: var(--surface-2);
+    }
 
-    .plan-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
-    .plan-steps li { padding-left: 16px; border-left: 2px solid var(--border); font-size: 13.5px; }
-    .plan-steps li.destructive { border-left-color: var(--danger); }
-    .flag { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--danger); }
+    .plan-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; counter-reset: plan-step; }
+    .plan-steps li {
+      position: relative;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      background: var(--bg);
+      padding: 10px 12px 10px 48px; font-size: 13.5px;
+    }
+    .plan-steps li::before {
+      counter-increment: plan-step; content: counter(plan-step, decimal-leading-zero);
+      position: absolute; left: 12px; top: 10px;
+      font-family: var(--font-mono); font-size: 12px; color: var(--muted);
+    }
+    .plan-steps li.destructive {
+      border-color: color-mix(in oklch, var(--danger) 45%, var(--border));
+      background: color-mix(in oklch, var(--danger) 8%, transparent);
+    }
+    .plan-steps code, .feed code { white-space: nowrap; }
+    .flag {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--danger);
+    }
+    .flag svg { width: 13px; height: 13px; flex: none; }
     .approval-bar { display: flex; gap: 8px; flex-wrap: wrap; }
     .btn {
       display: inline-flex; align-items: center; gap: 8px;
       padding: 9px 16px; border-radius: var(--radius); border: 1px solid transparent;
       font-size: 13.5px; font-weight: 500;
     }
-    .btn-primary { background: var(--accent); color: var(--accent-on); border-color: var(--accent); font-weight: 600; }
-    .btn-primary:hover { background: color-mix(in oklch, var(--accent) 88%, var(--fg)); }
     .btn-secondary { background: transparent; color: var(--fg); border-color: var(--border); }
     .btn-secondary:hover { border-color: var(--fg); }
+    .btn-destructive {
+      background: var(--surface-2); color: var(--fg); font-weight: 600;
+      border-color: color-mix(in oklch, var(--danger) 50%, var(--border));
+    }
+    .btn-destructive:hover { border-color: var(--danger); }
 
-    .guardrail { border: 1px solid var(--border); border-left: 2px solid var(--danger); border-radius: var(--radius); padding: 12px 14px; }
+    .guardrail {
+      border: 1px solid color-mix(in oklch, var(--danger) 40%, var(--border));
+      background: color-mix(in oklch, var(--danger) 7%, transparent);
+      border-radius: var(--radius); padding: 12px 14px;
+    }
+    .guardrail-head { display: flex; align-items: center; gap: 8px; margin: 0 0 4px; color: var(--fg); }
+    .guardrail-head svg { width: 14px; height: 14px; flex: none; color: var(--danger); }
     .feed { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
-    .feed li { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--border); padding-bottom: 10px; font-size: 13.5px; }
+    .feed li { display: flex; align-items: baseline; gap: 10px; border-bottom: 1px solid var(--border); padding-bottom: 10px; font-size: 13.5px; }
+    .feed li > svg { width: 15px; height: 15px; flex: none; align-self: center; }
+    .feed .feed-status { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; text-align: right; }
+    .feed time { white-space: nowrap; }
 
     @media (max-width: 920px) {
       .agent-shell { grid-template-columns: 1fr; }
       .runs { flex-direction: row; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--border); }
       .inspector { border-left: 0; border-top: 1px solid var(--border); }
       .run-main { padding: 20px 16px; }
-      .dag { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .run-head { flex-direction: column; align-items: stretch; }
+      .run-head .btn { align-self: flex-start; }
+      .dag { display: flex; overflow-x: auto; padding-bottom: 4px; }
+      .dag span { flex: 0 0 auto; min-width: 96px; }
+      .approval-bar {
+        position: sticky; bottom: 0; z-index: 5;
+        background: var(--surface);
+        border-top: 1px solid var(--border);
+        padding-block: 12px;
+      }
     }
   </style>
 </head>
@@ -132,29 +199,29 @@
   <div class="agent-shell">
     <aside class="runs" aria-label="Runs">
       <h2>Runs</h2>
-      <a class="run-link active" href="#" aria-current="page">triage-prod-errors · #418</a>
-      <a class="run-link" href="#">nightly-eval-suite</a>
-      <a class="run-link" href="#">upgrade-dryrun</a>
+      <a class="run-link active" href="#" aria-current="page"><span class="run-dot" aria-hidden="true"></span><span>triage-prod-errors · #418</span><span class="run-time">2m ago</span></a>
+      <a class="run-link" href="#"><span class="run-dot" aria-hidden="true"></span><span>nightly-eval-suite</span><span class="run-time">1d ago</span></a>
+      <a class="run-link" href="#"><span class="run-dot" aria-hidden="true"></span><span>upgrade-dryrun</span><span class="run-time">3d ago</span></a>
     </aside>
 
-    <main class="run-main" aria-label="Run detail">
+    <main class="run-main" aria-label="Run detail" data-run="triage-run">
       <div class="run-head" data-design-id="run-head">
         <div>
           <h1>triage-prod-errors · run #418</h1>
-          <p class="meta">Incident-triage agent · started 14:02 · Ferry peer fabric</p>
+          <p class="meta run-usage"><span>Elapsed 04:37</span><span>·</span><span>28.4K tokens</span><span>·</span><span>[REPLACE · spend]</span></p>
         </div>
-        <span class="pill pill-ok"><span class="dot"></span>Awaiting approval</span>
+        <button class="btn btn-secondary" type="button" data-run-control="stop">Stop run</button>
       </div>
 
       <section class="card" data-design-id="run-timeline" aria-label="Run timeline">
         <h2>Timeline</h2>
         <div class="dag" aria-label="Run steps">
-          <span class="live">Saved</span><span class="live">Fork</span><span class="live">Prompt</span><span>Build</span><span>Eval</span>
+          <span class="done">✓ Saved</span><span class="done">✓ Fork</span><span class="current" aria-current="step">Prompt</span><span>Build</span><span>Eval</span>
         </div>
         <p class="meta" aria-live="polite">Step 3 of 5 — plan ready for review.</p>
       </section>
 
-      <section data-design-id="run-thread" aria-label="Thread">
+      <section id="run-thread" data-design-id="run-thread" aria-label="Thread">
         <div class="tool-call" data-tool-call="SENTRY_LIST_ISSUES" data-status="success" data-latency="412ms">
           <div class="tool-head">
             <span class="tool-name">SENTRY_LIST_ISSUES</span>
@@ -165,6 +232,7 @@
             <summary>Args</summary>
             <code>project=ferry-prod · limit=25</code>
           </details>
+          <pre class="tool-output">3 matched · 1 P0 (checkout panic) · 2 P2</pre>
         </div>
         <div class="tool-call" data-tool-call="SENTRY_GET_EVENT" data-status="success" data-latency="188ms">
           <div class="tool-head">
@@ -172,6 +240,11 @@
             <span class="pill pill-ok"><span class="dot"></span>Success · 188ms</span>
           </div>
           <p class="tool-purpose">Fetch stack trace for the P0 checkout panic.</p>
+          <details class="tool-args">
+            <summary>Args</summary>
+            <code>event=9f3c1a · project=ferry-prod</code>
+          </details>
+          <pre class="tool-output">panic: nil map read · checkout.go:214 · 42 frames</pre>
         </div>
       </section>
 
@@ -180,18 +253,38 @@
           <h2>Plan — needs approval</h2>
           <ol class="plan-steps">
             <li>Open Linear issue for the P0 checkout panic with stack trace</li>
-            <li class="destructive" data-destructive="restart-checkout">Restart <span class="num">checkout-api-02</span> <span class="flag">Destructive — needs approval</span></li>
+            <li class="destructive" data-destructive="checkout-api-02">Restart <code>checkout-api-02</code> <span class="flag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2.5 20h19L12 3Z"/><line x1="12" y1="10" x2="12" y2="14"/><circle cx="12" cy="17" r="0.5" fill="currentColor"/></svg>Destructive — needs approval</span></li>
           </ol>
           <div class="guardrail" style="margin-top: 12px;">
-            <p class="meta" style="color: var(--fg); margin: 0 0 4px;">Policy: production restarts need human approval</p>
+            <p class="guardrail-head meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2.5 20h19L12 3Z"/><line x1="12" y1="10" x2="12" y2="14"/><circle cx="12" cy="17" r="0.5" fill="currentColor"/></svg>Policy: production restarts need human approval</p>
             <p class="meta" style="margin: 0;">Unattended restarts are blocked during peak hours — approve below or schedule. <a href="#">View policy</a></p>
           </div>
           <div class="approval-bar" style="margin-top: 12px;">
-            <button class="btn btn-primary" type="button">Approve plan</button>
+            <button class="btn btn-destructive" type="button" aria-label="Approve and restart checkout-api-02">Approve &amp; restart <code>checkout-api-02</code></button>
             <button class="btn btn-secondary" type="button">Edit</button>
             <button class="btn btn-secondary" type="button">Reject</button>
           </div>
         </div>
+      </section>
+
+      <section id="thread-view" data-design-id="thread-view" aria-label="Thread view">
+        <div class="card">
+          <h2>Thread</h2>
+          <p class="meta">Chat with inline tool calls — the same run as a conversation.</p>
+        </div>
+        <div class="msg-user">Triage the latest production errors and open issues for P0s.</div>
+        <div class="tool-call" data-tool-call="SENTRY_LIST_ISSUES" data-status="success" data-latency="412ms">
+          <div class="tool-head">
+            <span class="tool-name">SENTRY_LIST_ISSUES</span>
+            <span class="pill pill-ok"><span class="dot"></span>Success · 412ms</span>
+          </div>
+          <details class="tool-args">
+            <summary>Args</summary>
+            <code>project=ferry-prod · limit=25</code>
+          </details>
+          <pre class="tool-output">3 matched · 1 P0 (checkout panic) · 2 P2</pre>
+        </div>
+        <p class="meta" aria-live="polite">Working — drafting the triage summary…</p>
       </section>
 
       <section class="card" data-design-id="run-eval" aria-label="Eval receipt">
@@ -209,9 +302,21 @@
       <div class="card" data-design-id="run-activity">
         <h2>Agent activity</h2>
         <ul class="feed" aria-live="polite">
-          <li><span>Fetched 25 open error events</span><span class="meta">Auto-approved</span></li>
-          <li><span>Opened Linear issue FER-2091</span><span class="meta">Auto-approved</span></li>
-          <li><span>Restart checkout-api-02</span><span class="meta">Needs review · <a href="#">View logs</a></span></li>
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5.5"/></svg>
+            <span>Fetched 25 open error events</span>
+            <span class="feed-status meta">Auto-approved · <time>2m ago</time></span>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5.5"/></svg>
+            <span>Opened Linear issue <code>FER-2091</code></span>
+            <span class="feed-status meta">Auto-approved · <time>1m ago</time></span>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="12" y1="7" x2="12" y2="13"/><circle cx="12" cy="16.5" r="0.5" fill="currentColor"/></svg>
+            <span>Restart <code>checkout-api-02</code></span>
+            <span class="feed-status meta">Needs review · <time>just now</time> · <a href="#">View logs</a></span>
+          </li>
         </ul>
       </div>
     </aside>

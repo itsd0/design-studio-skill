@@ -50,13 +50,15 @@ CASES = [
     ("bad-dashboard.html", ["dashboard-missing-craft"], ["missing-visual-craft"]),
     (
         "bad-agent.html",
-        ["tool-call-missing-status", "destructive-without-approval", "stream-missing-aria-live"],
+        ["tool-call-missing-status", "destructive-without-approval", "stream-missing-aria-live",
+         "run-missing-stop", "destructive-approve-unnamed", "tool-call-missing-output", "accent-overuse"],
         [],
     ),
     (
         "good-agent.html",
         [],
-        ["tool-call-missing-status", "destructive-without-approval", "stream-missing-aria-live"],
+        ["tool-call-missing-status", "destructive-without-approval", "stream-missing-aria-live",
+         "run-missing-stop", "destructive-approve-unnamed", "tool-call-missing-output", "accent-overuse"],
     ),
 ]
 
@@ -73,7 +75,7 @@ def run_fixtures() -> int:
         if name == "good.html":
             p0 = [f.id for f in findings if f.severity == "P0"]
             if p0:
-                missing.extend(f"no-P0 (found {', '.join(p0)})")
+                missing.append(f"no-P0 (found {', '.join(p0)})")
         if name == "good-agent.html":
             p0 = [f.id for f in findings if f.severity == "P0"]
             if p0:

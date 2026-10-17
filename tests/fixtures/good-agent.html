@@ -14,17 +14,19 @@
   </style>
 </head>
 <body data-artifact="agent">
-  <main>
+  <div data-run="good-run">
     <h1>Run detail</h1>
+    <button type="button" data-run-control="stop">Stop run</button>
     <div data-tool-call="SENTRY_LIST_ISSUES" data-status="success" data-latency="412ms">
       <p>Success · 412ms — 3 errors matched.</p>
+      <details><summary>Output</summary><code>3 errors matched</code></details>
     </div>
     <p aria-live="polite">Working — drafting the summary…</p>
     <div data-approval="restart-plan">
       <button type="button" data-destructive="restart-node">Restart node</button>
-      <button type="button">Approve plan</button>
+      <button type="button" aria-label="Approve and restart node">Approve and restart node</button>
       <button type="button">Reject</button>
     </div>
-  </main>
+  </div>
 </body>
 </html>

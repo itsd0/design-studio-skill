@@ -30,6 +30,7 @@
       --accent-soft: color-mix(in oklch, var(--accent) 14%, transparent);
       --fg-soft:     color-mix(in oklch, var(--fg) 6%, transparent);
       --specular:    inset 0 1px 0 color-mix(in oklch, var(--fg) 8%, transparent);
+      --success-muted: color-mix(in oklch, var(--success) 55%, var(--muted));
 
       --font-display: -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Display', system-ui, sans-serif;
       --font-body:    -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Text', system-ui, sans-serif;
@@ -70,7 +71,7 @@
       border-radius: var(--radius-lg); padding: 22px; box-shadow: var(--specular);
     }
     .demo-label {
-      font-family: var(--font-mono); font-size: 11px;
+      font-family: var(--font-mono); font-size: 12px;
       letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
     }
 
@@ -80,40 +81,101 @@
       display: flex; flex-direction: column; gap: 8px;
     }
     .tool-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--gap-sm); flex-wrap: wrap; }
-    .tool-name { font-family: var(--font-mono); font-size: 13px; font-weight: 600; }
+    .tool-name { font-family: var(--font-mono); font-size: 13px; font-weight: 600; white-space: nowrap; }
+    .tool-output {
+      margin: 0; padding: 10px 12px;
+      background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
+      font-family: var(--font-mono); font-size: 12.5px; line-height: 1.7; color: var(--fg);
+      overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere;
+    }
     .pill {
       display: inline-flex; align-items: center; gap: 6px;
-      font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+      font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase;
       border: 1px solid var(--border); border-radius: 999px; padding: 3px 9px; color: var(--muted);
     }
     .pill .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
-    .pill-ok { color: var(--success); border-color: color-mix(in oklch, var(--success) 35%, var(--border)); }
+    .pill-ok { color: var(--success-muted); border-color: color-mix(in oklch, var(--success-muted) 40%, var(--border)); }
     .pill-err { color: var(--danger); border-color: color-mix(in oklch, var(--danger) 35%, var(--border)); }
     .tool-args { font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); }
     .tool-args summary { cursor: pointer; color: var(--fg); }
+    .tool-call + .tool-call { margin-top: var(--gap-sm); }
 
     .btn {
       display: inline-flex; align-items: center; gap: 8px;
       padding: 9px 16px; border-radius: var(--radius); border: 1px solid transparent;
       font: inherit; font-size: 14px; font-weight: 500;
     }
-    .btn-primary { background: var(--accent); color: var(--accent-on); border-color: var(--accent); font-weight: 600; }
-    .btn-primary:hover { background: color-mix(in oklch, var(--accent) 88%, var(--fg)); }
     .btn-secondary { background: transparent; color: var(--fg); border-color: var(--border); }
     .btn-secondary:hover { border-color: var(--fg); }
+    .btn-destructive {
+      background: var(--surface-2); color: var(--fg); font-weight: 600;
+      border-color: color-mix(in oklch, var(--danger) 50%, var(--border));
+    }
+    .btn-destructive:hover { border-color: var(--danger); }
     .approval-bar { display: flex; gap: 8px; flex-wrap: wrap; }
-    .flag { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--danger); }
-    .guardrail { border: 1px solid var(--border); border-left: 2px solid var(--danger); border-radius: var(--radius); padding: 12px 14px; }
+    .plan-steps { list-style: none; margin: 0 0 12px; padding: 0; display: flex; flex-direction: column; gap: 8px; counter-reset: plan-step; }
+    .plan-steps li {
+      position: relative;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      background: var(--bg);
+      padding: 10px 12px 10px 48px; font-size: 14px;
+    }
+    .plan-steps li::before {
+      counter-increment: plan-step; content: counter(plan-step, decimal-leading-zero);
+      position: absolute; left: 12px; top: 10px;
+      font-family: var(--font-mono); font-size: 12px; color: var(--muted);
+    }
+    .plan-steps li.destructive {
+      border-color: color-mix(in oklch, var(--danger) 45%, var(--border));
+      background: color-mix(in oklch, var(--danger) 8%, transparent);
+    }
+    .flag {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--danger);
+    }
+    .flag svg { width: 13px; height: 13px; flex: none; }
+    .guardrail {
+      border: 1px solid color-mix(in oklch, var(--danger) 40%, var(--border));
+      background: color-mix(in oklch, var(--danger) 7%, transparent);
+      border-radius: var(--radius); padding: 12px 14px;
+    }
+    .guardrail-head { display: flex; align-items: center; gap: 8px; margin: 0 0 4px; color: var(--fg); }
+    .guardrail-head svg { width: 14px; height: 14px; flex: none; color: var(--danger); }
     .feed { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
-    .feed li { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--border); padding-bottom: 10px; font-size: 13.5px; }
+    .feed li { display: flex; align-items: baseline; gap: 10px; border-bottom: 1px solid var(--border); padding-bottom: 10px; font-size: 13.5px; }
+    .feed li > svg { width: 15px; height: 15px; flex: none; align-self: center; }
+    .feed .feed-status { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; text-align: right; }
+    .feed .feed-status svg { width: 13px; height: 13px; flex: none; }
+    .feed code { white-space: nowrap; }
+    .feed time { white-space: nowrap; }
     .dag { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
     .dag span {
+      position: relative;
       padding: 6px 8px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg);
-      font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase;
+      font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase;
       text-align: center; color: var(--muted);
     }
-    .dag span.live { border-color: color-mix(in oklch, var(--accent) 55%, var(--border)); color: var(--fg); background: var(--surface-2); }
+    .dag span + span::before {
+      content: ""; position: absolute; left: -7px; top: 50%;
+      width: 6px; height: 1px; background: var(--border);
+    }
+    .dag span.done { color: var(--muted); }
+    .dag span.current {
+      border-color: color-mix(in oklch, var(--accent) 55%, var(--border));
+      color: var(--fg); background: var(--surface-2);
+    }
     .skel { height: 12px; border-radius: 6px; background: var(--fg-soft); }
+    @media (max-width: 920px) {
+      .dag { display: flex; overflow-x: auto; padding-bottom: 4px; }
+      .dag span { flex: 0 0 auto; min-width: 96px; }
+      .approval-bar {
+        position: sticky; bottom: 0; z-index: 5;
+        background: var(--surface);
+        border-top: 1px solid var(--border);
+        padding-block: 12px;
+      }
+    }
     @media (prefers-reduced-motion: no-preference) {
       .working { animation: pulse 1.6s ease-in-out infinite; }
       @keyframes pulse { 50% { opacity: 0.55; } }
@@ -135,11 +197,14 @@
         <div class="tool-call" data-tool-call="SENTRY_LIST_ISSUES" data-status="running" data-latency="—">
           <div class="tool-head"><span class="tool-name">SENTRY_LIST_ISSUES</span><span class="pill"><span class="dot"></span>Running · —</span></div>
           <p class="meta" aria-live="polite">Working — fetching unresolved errors…</p>
+          <details class="tool-args"><summary>Args</summary><code>[REPLACE · project, limit]</code></details>
+          <pre class="tool-output">[REPLACE · partial output — 14 events so far…]</pre>
         </div>
         <span class="demo-label">Success</span>
         <div class="tool-call" data-tool-call="SENTRY_LIST_ISSUES" data-status="success" data-latency="412ms">
           <div class="tool-head"><span class="tool-name">SENTRY_LIST_ISSUES</span><span class="pill pill-ok"><span class="dot"></span>Success · 412ms</span></div>
           <details class="tool-args"><summary>Args</summary><code>[REPLACE · project, limit]</code></details>
+          <pre class="tool-output">[REPLACE · output excerpt — 3 matched, 1 P0]</pre>
         </div>
         <span class="demo-label">Queued / Error / Cancelled</span>
         <div class="tool-call" data-tool-call="LINEAR_CREATE_ISSUE" data-status="queued" data-latency="—">
@@ -147,7 +212,8 @@
         </div>
         <div class="tool-call" data-tool-call="GMAIL_SEND_EMAIL" data-status="error" data-latency="188ms">
           <div class="tool-head"><span class="tool-name">GMAIL_SEND_EMAIL</span><span class="pill pill-err"><span class="dot"></span>Error · 188ms</span></div>
-          <p class="meta">[REPLACE] Recipient rejected — fix the address and retry.</p>
+          <details class="tool-args"><summary>Args</summary><code>[REPLACE · to, subject]</code></details>
+          <pre class="tool-output">[REPLACE] Recipient rejected — fix the address and retry.</pre>
         </div>
         <div class="tool-call" data-tool-call="DEPLOY_PREVIEW" data-status="cancelled" data-latency="96ms">
           <div class="tool-head"><span class="tool-name">DEPLOY_PREVIEW</span><span class="pill"><span class="dot"></span>Cancelled · 96ms</span></div>
@@ -177,14 +243,15 @@
     <!-- 3 · plan approval with destructive step -->
     <section class="pattern" data-design-id="pattern-approval">
       <h2>Plan approval — destructive flagged</h2>
+      <p class="pattern-note">Steps are numbered; destructive steps get a tinted hairline card plus an icon label — never a colored left border. The approve button names the target.</p>
       <div class="demo">
         <div data-approval="restart-plan">
-          <ol style="list-style: none; margin: 0 0 12px; padding: 0; display: flex; flex-direction: column; gap: 8px;">
-            <li style="padding-left: 16px; border-left: 2px solid var(--border);">Fetch open error events</li>
-            <li style="padding-left: 16px; border-left: 2px solid var(--danger);" data-destructive="restart-node">Restart [REPLACE · node] <span class="flag">Destructive — needs approval</span></li>
+          <ol class="plan-steps">
+            <li>Fetch open error events</li>
+            <li class="destructive" data-destructive="node">Restart [REPLACE · node] <span class="flag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2.5 20h19L12 3Z"/><line x1="12" y1="10" x2="12" y2="14"/><circle cx="12" cy="17" r="0.5" fill="currentColor"/></svg>Destructive — needs approval</span></li>
           </ol>
           <div class="approval-bar">
-            <button class="btn btn-primary" type="button">Approve plan</button>
+            <button class="btn btn-destructive" type="button" aria-label="Approve and restart node">Approve &amp; restart [REPLACE · node]</button>
             <button class="btn btn-secondary" type="button">Edit</button>
             <button class="btn btn-secondary" type="button">Reject</button>
           </div>
@@ -195,40 +262,67 @@
     <!-- 4 · guardrail + permission denied -->
     <section class="pattern" data-design-id="pattern-guardrail">
       <h2>Guardrail + permission denied</h2>
+      <p class="pattern-note">Full hairline border plus tint — never a colored left border.</p>
       <div class="demo">
         <div class="guardrail">
-          <p class="meta" style="color: var(--fg); margin: 0 0 4px;">Blocked by policy [REPLACE · policy name]</p>
+          <p class="guardrail-head meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2.5 20h19L12 3Z"/><line x1="12" y1="10" x2="12" y2="14"/><circle cx="12" cy="17" r="0.5" fill="currentColor"/></svg>Blocked by policy [REPLACE · policy name]</p>
           <p class="meta" style="margin: 0;">[REPLACE] What was blocked and what to do next · <a href="#">View policy</a></p>
         </div>
         <div class="guardrail">
-          <p class="meta" style="color: var(--fg); margin: 0 0 4px;">Permission denied — production credentials</p>
+          <p class="guardrail-head meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Permission denied — production credentials</p>
           <p class="meta" style="margin: 0;">Request access from [REPLACE · owner] or run in dry-run mode.</p>
         </div>
       </div>
     </section>
 
-    <!-- 5 · activity feed -->
+    <!-- 5 · run header -->
+    <section class="pattern" data-design-id="pattern-run-header">
+      <h2>Run header — stop control + usage</h2>
+      <p class="pattern-note">Every run view wraps in <code>[data-run]</code> with a Stop control plus elapsed time, tokens, and cost. Unknown values stay labeled placeholders.</p>
+      <div class="demo">
+        <div data-run="example-run" style="display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <span class="tool-name">[REPLACE · run name]</span>
+            <button class="btn btn-secondary" type="button" data-run-control="stop">Stop run</button>
+          </div>
+          <p class="meta">Elapsed [REPLACE · mm:ss] · [REPLACE · tokens] tokens · [REPLACE · cost]</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 · activity feed -->
     <section class="pattern" data-design-id="pattern-activity">
       <h2>Live activity feed</h2>
+      <p class="pattern-note">Every item carries a status icon, a timestamp, and an unbroken identifier.</p>
       <div class="demo">
         <ul class="feed" aria-live="polite">
-          <li><span>Deployed frontend and database</span><span class="meta">Auto-approved · <a href="#">View logs</a></span></li>
-          <li><span>Restarted [REPLACE · node]</span><span class="meta">Needs review · <a href="#">View logs</a></span></li>
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5.5"/></svg>
+            <span>Deployed <code>frontend</code> and <code>database</code></span>
+            <span class="feed-status meta">Auto-approved · <time>2m ago</time> · <a href="#">View logs</a></span>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="12" y1="7" x2="12" y2="13"/><circle cx="12" cy="16.5" r="0.5" fill="currentColor"/></svg>
+            <span>Restarted <code>[REPLACE · node]</code></span>
+            <span class="feed-status meta">Needs review · <time>just now</time> · <a href="#">View logs</a></span>
+          </li>
         </ul>
         <p class="meta">Empty: no runs yet — start your first run. Loading: skeleton rows. Error: could not reach the runner — retry.</p>
       </div>
     </section>
 
-    <!-- 6 · run DAG + eval receipt -->
+    <!-- 7 · run DAG + eval receipt -->
     <section class="pattern" data-design-id="pattern-dag-eval">
       <h2>Run DAG + eval receipt</h2>
+      <p class="pattern-note">Done shows ✓ muted, current takes the accent with <code>aria-current="step"</code>, pending stays muted. Connectors join the steps.</p>
       <div class="demo">
         <div class="dag" aria-label="Run steps">
-          <span class="live">Saved</span><span class="live">Fork</span><span class="live">Prompt</span><span>Build</span><span>Eval</span>
+          <span class="done">✓ Saved</span><span class="done">✓ Fork</span><span class="current" aria-current="step">Prompt</span><span>Build</span><span>Eval</span>
         </div>
         <div class="tool-call" data-tool-call="EVAL_SUITE" data-status="success" data-latency="8.2s">
           <div class="tool-head"><span class="tool-name">EVAL_SUITE</span><span class="pill pill-ok"><span class="dot"></span>Success · 8.2s</span></div>
-          <p class="meta">[REPLACE] 4/4 checks passed · — tokens · — cost · <a href="#">Re-run eval</a></p>
+          <details class="tool-args"><summary>Output</summary><code>[REPLACE] 4/4 checks passed · — tokens · — cost</code></details>
+          <p class="meta"><a href="#">Re-run eval</a></p>
         </div>
       </div>
     </section>

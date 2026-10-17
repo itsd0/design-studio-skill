@@ -414,6 +414,35 @@ def lint(raw_html: str) -> list[Finding]:
 
 AGENT_STATUSES = {"queued", "running", "success", "error", "cancelled"}
 CLOSERS_RE = r"</(?:div|section|article|form|aside|main)\b[^>]*>"
+OUTPUT_RE = r"<(?:details|pre)\b[^>]*>|<code\b[^>]*>|\bdata-output\b|class\s*=\s*[\"'][^\"']*\b(?:output|preview)\b"
+
+
+def _norm_token(s: str) -> str:
+    return re.sub(r"[^a-z0-9]", "", (s or "").lower())
+
+
+def _element_span(body: str, open_start: int) -> tuple[int, int]:
+    """Best-effort (start, end) of the element opening at open_start."""
+    m = re.match(r"<([a-zA-Z][a-zA-Z0-9]*)", body[open_start:])
+    if not m:
+        return (open_start, open_start)
+    tag = m.group(1).lower()
+    open_end = body.find(">", open_start)
+    if open_end == -1:
+        return (open_start, len(body))
+    if body[open_end - 1] == "/":
+        return (open_start, open_end + 1)
+    depth = 1
+    pat = re.compile(r"</?%s\b[^>]*>" % tag, re.I)
+    for tm in pat.finditer(body, open_end + 1):
+        t = tm.group(0)
+        if t.startswith("</"):
+            depth -= 1
+        elif not t.endswith("/>"):
+            depth += 1
+        if depth == 0:
+            return (open_start, tm.end())
+    return (open_start, len(body))
 
 
 def check_agent(html: str) -> list[Finding]:
@@ -459,6 +488,83 @@ def check_agent(html: str) -> list[Finding]:
             "A destructive action has no approval control — irreversible actions need Approve/Reject/Edit.",
             'Place it inside a [data-approval] block, or point it at one with data-approval-for="plan-id" matching a data-approval="plan-id".',
             clip(tag),
+        ))
+
+    # ── P0: every [data-run] needs a Stop/Cancel control ──────────────
+    for m in re.finditer(r"<[^>]+\bdata-run(?:\s*=\s*[\"'][^\"']*[\"'])?[^>]*>", body, re.I):
+        _, end = _element_span(body, m.start())
+        if not re.search(r"""\bdata-run-control\s*=\s*["']stop["']""", body[m.start():end], re.I):
+            out.append(Finding(
+                "P0", "run-missing-stop",
+                "A run view ([data-run]) has no Stop/Cancel control — long runs need an exit.",
+                'Add <button type="button" data-run-control="stop">Stop run</button> to the run header, next to elapsed time, tokens, and cost.',
+                clip(m.group(0)),
+            ))
+
+    # ── P0: destructive approve buttons must name the action ───────────
+    for m in re.finditer(
+        r"<[^>]+\bdata-destructive(?:\s*=\s*[\"']([^\"']*)[\"'])?[^>]*>", body, re.I,
+    ):
+        target = _norm_token(m.group(1) or "")
+        if not target:
+            continue
+        d_start, _ = _element_span(body, m.start())
+        # enclosing approval block: nearest data-approval open whose span holds us
+        block = None
+        for am in re.finditer(r"<[^>]+\bdata-approval(?:\s*=|\s|>|/>)", body, re.I):
+            a_start, a_end = _element_span(body, am.start())
+            if a_start <= m.start() < a_end:
+                block = body[a_start:a_end]
+                break
+        named = False
+        if block:
+            for bm in re.finditer(
+                r"<button\b([^>]*)>([\s\S]*?)</button>", block, re.I,
+            ):
+                attrs, text = bm.group(1), re.sub(r"<[^>]+>", "", bm.group(2))
+                if not re.search(r"approv", text, re.I):
+                    continue
+                label = re.search(r"""\baria-label\s*=\s*["']([^"']+)["']""", attrs, re.I)
+                name = label.group(1) if label else text
+                if target in _norm_token(name):
+                    named = True
+                    break
+        if not named:
+            out.append(Finding(
+                "P0", "destructive-approve-unnamed",
+                "A destructive action's approve button does not name the action — approvers must see what they approve.",
+                'Name the target in the button, e.g. <button aria-label="Approve and restart checkout-api-02">Approve & restart checkout-api-02</button>.',
+                clip(m.group(0)),
+            ))
+
+    # ── P1: every active tool call needs an output/preview region ──────
+    for m in re.finditer(r"<[^>]+\bdata-tool-call\s*=\s*[\"']([^\"']+)[\"'][^>]*>", body, re.I):
+        tag, name = m.group(0), m.group(1)
+        status = re.search(r"""\bdata-status\s*=\s*["']([^"']+)["']""", tag, re.I)
+        if status and status.group(1).lower() in {"queued", "cancelled"}:
+            continue
+        _, end = _element_span(body, m.start())
+        if not re.search(OUTPUT_RE, body[m.start():end], re.I):
+            out.append(Finding(
+                "P1", "tool-call-missing-output",
+                f'Tool call "{name}" has no output/preview region — reviewers cannot verify the result.',
+                "Add <details>Args/Output</details>, a <pre> excerpt, or a [data-output] block inside the card. Queued/cancelled calls are exempt.",
+                clip(tag),
+            ))
+
+    # ── P1: accent budget on agent views (best-effort static count) ────
+    accent_uses = 0
+    for block in re.finditer(r"<style[^>]*>([\s\S]*?)</style>", body, re.I):
+        css = re.sub(r"/\*[\s\S]*?\*/", "", block.group(1))
+        css = re.sub(r":root\s*\{[^}]*\}", "", css)
+        css = re.sub(r"color-mix\((?:[^()]*\([^()]*\))*[^()]*\)", "", css)
+        css = re.sub(r"[^{}]*:focus-visible[^{]*\{[^}]*\}", "", css)
+        accent_uses += len(re.findall(r"var\(--accent\)", css))
+    if accent_uses > 2:
+        out.append(Finding(
+            "P1", "accent-overuse",
+            f"var(--accent) fills/text on {accent_uses} declarations — agent views keep accent to 2 or fewer visible uses.",
+            "Move success pills to the muted success tone (color-mix of --success), keep accent for the primary action and the current-step signal only.",
         ))
 
     # ── P1: streaming / working regions need aria-live ─────────────────
