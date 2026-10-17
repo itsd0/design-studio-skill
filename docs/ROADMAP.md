@@ -43,6 +43,14 @@ Where Design Studio is, and where it's heading. Directions, not promises.
 
 - `minmax(0, 1fr)` collapse + `min-width: 0` children + mobile code-wrap (verified `scrollWidth === clientWidth` at 390px); stacked activity meta; Thread view after eval; new P1 `mobile-grid-1fr` lint gate + fixture
 
+### v1.4.0 — enterprise-ready
+
+- Pinned verified installs (`VERSION=` + `SHA256SUMS`), `SECURITY.md`, frozen `lint --json` v1 contract, CI + release automation, branch protection
+
+### v1.4.1 — governance docs
+
+- `CONTRIBUTING.md`, issue/PR templates, Code of Conduct, `docs/adopting.md`
+
 ## Next
 
 - **Direction palettes v2** — extend each direction with a dark tier and accent alternates

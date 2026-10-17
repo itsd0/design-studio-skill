@@ -16,8 +16,8 @@ jobs:
         run: |
           TAG="${GITHUB_REF#refs/tags/}"
           VER="${TAG#v}"
-          awk -v ver="## \\[$VER\\]" '
-            $0 ~ ver { grab=1; next }
+          awk -v ver="[${VER}]" '
+            index($0, "## " ver) == 1 { grab=1; next }
             grab && /^## \[/ { exit }
             grab { print }
           ' CHANGELOG.md | sed -e :a -e '/./,$!d' > notes.md
@@ -27,7 +27,7 @@ jobs:
         run: |
           TAG="${GITHUB_REF#refs/tags/}"
           curl -fsSL "https://codeload.github.com/${{ github.repository }}/tar.gz/$TAG" -o skill.tar.gz
-          sha256sum skill.tar.gz | sed 's/  skill.tar.gz/  skill.tar.gz/' > SHA256SUMS
+          sha256sum skill.tar.gz > SHA256SUMS
           cat SHA256SUMS
       - name: Create release + upload checksums
         env:

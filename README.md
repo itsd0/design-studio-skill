@@ -143,6 +143,8 @@ The deck is keyboard, wheel, and touch navigable — counter, progress bar, dots
 | `install.sh` | One-line installer (`VERSION=` pin + `SHA256SUMS` verify) |
 | `CHANGELOG.md` | Release history (Keep a Changelog) |
 | `SECURITY.md` | Supported versions + private-report channel |
+| `CONTRIBUTING.md` | Checks, conventions, changelog duty |
+| `docs/adopting.md` | Pinning, air-gapped use, no-telemetry, review checklist |
 
 ## The linter
 

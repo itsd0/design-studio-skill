@@ -6,6 +6,11 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.4.1] — 2026-10-18
+
+### Added
+- Governance: `CONTRIBUTING.md`, issue/PR templates, Code of Conduct, `docs/adopting.md` (pinning, air-gapped use, no telemetry).
+
 ## [1.4.0] — 2026-10-18
 
 ### Added
