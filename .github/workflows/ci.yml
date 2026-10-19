@@ -51,11 +51,36 @@ jobs:
           python3 scripts/verify.py --require-browser /tmp/composed.html | tee compose.out
           if grep -qE 'FAIL' compose.out; then echo "compose gate failed"; exit 1; fi
 
+  contract:
+    name: contract + craft gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Every artifact must match its DESIGN.md
+        run: |
+          python3 scripts/contract.py demo/landing.html --design demo/design.md | tee contract.out
+          if grep -qE 'FAIL' contract.out; then echo "contract gate failed"; exit 1; fi
+      - name: Every artifact must pass the craft scorecard
+        run: |
+          files="index.html $(ls assets/*.html demo/*.html)"
+          # shellcheck disable=SC2086
+          python3 scripts/score.py $files | tee score.out
+          if grep -qE 'FAIL' score.out; then echo "craft gate failed"; exit 1; fi
+      - name: The design system extractor must round-trip
+        run: |
+          python3 scripts/extract.py index.html --out /tmp/extracted | tee extract.out
+          grep -q -- "--accent" /tmp/extracted/tokens.css
+      - name: The toolchain must be complete
+        run: python3 scripts/ds.py doctor
+
   pages-smoke:
     name: pages smoke
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
-    needs: [test, render]
+    needs: [test, render, contract]
     steps:
       - name: Probe live URLs (retry until the Pages build lands)
         run: |

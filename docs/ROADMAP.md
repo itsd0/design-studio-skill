@@ -60,15 +60,29 @@ Where Design Studio is, and where it's heading. Directions, not promises.
 - **CI `render` job** — the shipped artifacts and the composed library must render with zero P0/P1
 - **Real defects fixed in the shipped files** — sideways scroll at 390px in the landing page, a clipped trace log, accent-coloured small text failing AA in three seeds, a white-on-accent button at 3.9:1, an unstyled blue link on a dark surface, and six controls under the 24×24 tap target
 
+### v1.7.0 — the full toolchain
+
+Shipped the planned v1.6 → v2.0 scope as one release, because the pieces depend on each other: the render gate makes the scorecard possible, and the scorecard makes the design-library rules enforceable.
+
+- **Contract fidelity** (`scripts/contract.py`) — the artifact's `:root` is diffed against `DESIGN.md`; token drift is a P0
+- **Design-system extractor** (`scripts/extract.py`) — a URL, an HTML file or a screenshot becomes `DESIGN.md` + `tokens.css`
+- **Direction studio** (`scripts/directions.py`) — three candidate directions from the brief, rendered side by side into one comparison sheet
+- **Craft scorecard** (`scripts/score.py`) — sixteen review checks plus the distance from the default look
+- **The critique** (`references/critique.md`) — nine judgement steps with before/after examples
+- **Design DNA library** (`references/library/`) — six offline grammars with tokens, recipes and anti-patterns
+- **Distribution** — MCP server, one CLI, npm bin, plugin manifests for Claude Code, Codex, Cursor and Gemini, MCP registry entry
+- **Gallery + benchmarks** (`gallery/`, `scripts/benchmark.py`)
+- **The skill's own contract** — a root `DESIGN.md`; the landing page is built from it and passes its own checker
+
 ## Next
 
-- **Contract fidelity** — parse `DESIGN.md` and diff its tokens, section order and dials against the artifact, so "DESIGN.md is the contract" becomes a mechanical P0 gate instead of a prose instruction
+- **Reference grounding** — an optional live connector for award-winning-site corpora (Awwwards-style), so the method can look at real work before it invents its own
+- **More design DNA entries** — grow `references/library/` toward the depth competitors like `oh-my-design` reach with `DESIGN.md` references
 - **Linter v3** — parse the DOM (stdlib `html.parser`) so structural rules are precise rather than approximated: duplicate ids, button/link names, `target="_blank"` without `rel`, `tabindex > 0`, landmarks, table header scope
-- **Direction palettes v2** — extend each direction with a dark tier and accent alternates, as machine-readable `directions.json`
 - **More deck layouts** — comparison, timeline, and quote-wall slide skeletons
 - **Chart library** — additional inline-SVG chart types (stacked bars, sparklines, heatmap)
 - **Brief manifest** — `brief.json` recording must-keep facts, so "no invented metrics" is mechanically enforced
-- **Community gallery** — links to notable artifacts built with the skill
+- **Community gallery** — a review queue and a published index of submitted artifacts
 
 ## Non-goals
 

@@ -23,7 +23,7 @@ Precision-engineered dark structural architecture (`dark-structural-grid`). Expo
 - Anti-patterns: never use purple/indigo gradients; never put white text on luminous green buttons; never use floating drop-shadow cards where an exposed `1px` hairline grid belongs.
 
 ## Typography Rules
-- **Display / headings:** `-apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Display', system-ui, sans-serif`, weight 600
+- **Display / headings:** `ui-serif, 'Iowan Old Style', 'Charter', Georgia, 'Times New Roman', serif`, weight 600
 - **Body:** `-apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Text', system-ui, sans-serif`, weight 400
 - **Mono:** `'JetBrains Mono', 'Geist Mono', 'IBM Plex Mono', ui-monospace, Menlo, monospace` — bento titles (`.mono-title`), index tabs (`01`–`04`), CLI pills, latency metrics
 - Scale (px): 12.5 · 14 · 15.5 · 18 · 20 · 30–46 · 44–72 (clamped)

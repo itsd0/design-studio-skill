@@ -1,0 +1,50 @@
+{
+  "name": "design-studio-skill",
+  "version": "1.7.0",
+  "description": "Design Studio — build polished single-file HTML design artifacts with anti-slop quality gates, a render gate, DESIGN.md contract fidelity, and a design-system extractor.",
+  "keywords": [
+    "agent-skills",
+    "design",
+    "ui",
+    "ux",
+    "html",
+    "design-system",
+    "mcp",
+    "claude-code",
+    "codex",
+    "cursor"
+  ],
+  "license": "MIT",
+  "author": "itsd0",
+  "homepage": "https://github.com/itsd0/design-studio-skill",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itsd0/design-studio-skill.git"
+  },
+  "bugs": {
+    "url": "https://github.com/itsd0/design-studio-skill/issues"
+  },
+  "bin": {
+    "design-studio": "bin/design-studio.js"
+  },
+  "files": [
+    "bin/",
+    "scripts/",
+    "references/",
+    "assets/",
+    "docs/",
+    "SKILL.md",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {},
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ]
+}

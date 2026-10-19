@@ -34,8 +34,17 @@ Capture: product, audience, goal, artifact kind (landing / prototype / dashboard
 
 ### 2 · Direction & design system
 
-- **Brand exists** (URL, screenshot, brand assets): sample the core tokens (`--bg`, `--surface`, `--surface-2`, `--fg`, `--muted`, `--border`, `--accent`, `--accent-on`) and write or update `DESIGN.md` per `references/design-md.md` — including the dials. Start from `assets/design-md.template.md`.
-- **No brand**: pick ONE direction from `references/directions.md` (`dark-structural-grid` · `neo-brutalist-terminal` · `atmospheric-craft-dark` · `editorial-monocle` · `modern-minimal` · `human-approachable` · `tech-utility` · `brutalist-experimental`). For AI infrastructure, developer tools, agent runtimes, and technical SaaS, default to one of the dark-native flagship directions (`dark-structural-grid`, `neo-brutalist-terminal`, or `atmospheric-craft-dark`) unless light mode is requested. State the direction and its accent in one sentence.
+**Never pick a direction blind, and never let one become the house style.**
+
+- **Brand exists** (URL, screenshot, brand assets): build the contract with the extractor — `python3 scripts/extract.py <url|screenshot>` writes `DESIGN.md` + `tokens.css` from the *rendered* page. Review what it measured, correct the roles by hand (the extractor infers, it does not decide), and keep the dials. Start from `assets/design-md.template.md` if the brand has no contract yet.
+- **No brand**: derive three candidate directions from the brief and let the user pick one.
+
+  ```bash
+  python3 scripts/directions.py --brief "AI infrastructure for autonomous agents" --sheet sheet.png
+  ```
+
+  That prints three candidates (palette, type, density, and *why* each fits) and renders them side by side into `sheet.png` — one image, one decision. Show the sheet, ask which one, then bind that candidate's tokens **verbatim**.
+- **A reference system already exists** in `references/library/` (six offline design-DNA grammars: dark structural grid, light editorial serif, monochrome operator, warm human soft, clinical data, cinematic ember). Copy its `:root` block and its component recipes rather than inventing a system.
 - Bind palette and fonts **verbatim** — never improvise hex values from a direction's label.
 
 ### 3 · Plan before pixels
@@ -58,10 +67,12 @@ Capture: product, audience, goal, artifact kind (landing / prototype / dashboard
 ### 5 · Self-check & lint
 
 1. Run `python3 scripts/lint.py index.html` → fix every P0; read the contrast line and fix any `✗` pair (treat `(large/UI only)` pairs as fills and display text).
-2. Run `python3 scripts/verify.py index.html` → it renders the page in headless Chrome at 390px, 768px and 1440px and reports what source analysis cannot see. Fix every P0: `overflow-x`, `overflow-element`, `text-clipped`, `contrast-text`, `runtime-error`. Fix P1 tap targets and missing focus styles too. If no Chrome is installed the command says so and exits 0 — the page is still deliverable, but the render gate did not run.
-3. Walk the P0 checklist in `references/quality-gates.md`.
-4. Spot-check: no raw hex outside `:root`; accent visible ≤ 2× on the rendered screen; reflow at ≤ 920px; for decks `grep 'class="slide' index.html` reads as a healthy rhythm.
-5. Render and screenshot the file (any headless Chrome: `chrome --headless --screenshot=out.png --window-size=1440,900 index.html`) and apply the soul test to the image. `python3 scripts/verify.py --screenshot .shots index.html` writes one PNG per viewport for the same purpose.
+2. Run `python3 scripts/verify.py index.html` → it renders the page in headless Chrome at 390px, 768px and 1440px and reports what source analysis cannot see. Fix every P0: `overflow-x`, `overflow-element`, `text-clipped`, `contrast-text`, `runtime-error`, `min-content-overflow`. Fix P1 tap targets, tight fits and missing focus styles too. If no Chrome is installed the command says so and exits 0 — the page is still deliverable, but the render gate did not run.
+3. Run `python3 scripts/contract.py index.html` → the artifact must match its `DESIGN.md` (token drift is a P0). Skip only when the project has no contract.
+4. Run `python3 scripts/score.py index.html` → the craft scorecard. Fix any failed check, and read the **distance from the default** line: 2/4 is the floor, 3/4 is good, 4/4 means the direction was chosen rather than inherited.
+5. Walk the P0 checklist in `references/quality-gates.md`, then the judgement steps in `references/critique.md` — claim, hierarchy, accent, surface, evidence, states, rhythm, distance, handoff.
+6. Spot-check: no raw hex outside `:root`; accent visible ≤ 2× on the rendered screen; reflow at ≤ 920px; for decks `grep 'class="slide' index.html` reads as a healthy rhythm.
+7. Render and screenshot the file (`python3 scripts/verify.py --screenshot .shots index.html` writes one PNG per viewport) and apply the soul test to the image.
 
 ### 6 · Deliver & iterate
 
@@ -75,9 +86,11 @@ When the user asks to review or audit an existing artifact rather than build one
 
 1. Run the linter — human output for reading, `python3 scripts/lint.py --json <file>` for pasting into a report.
 2. Run the render gate — `python3 scripts/verify.py <file>` (and `--json` for the machine-readable shape). It catches what the source linter cannot: the page scrolls sideways, text is cut off, a token pair fails in the *rendered* result, a control is too small to tap.
-3. Walk `references/quality-gates.md` top to bottom against the file — rhythm and state coverage, not just mechanics.
-4. Report findings as a table — severity · id · where · fix — P0 first, before touching anything.
-5. Fix with surgical edits (never regenerate), re-run the linter and the render gate, and show the before/after contrast line when it changed.
+3. Run the contract check — `python3 scripts/contract.py <file>` — and the scorecard — `python3 scripts/score.py <file>`. The first finds brand drift; the second finds the mechanical craft gaps and the distance from the default look.
+4. Walk `references/quality-gates.md` top to bottom against the file — rhythm and state coverage, not just mechanics.
+5. Walk `references/critique.md` — claim, hierarchy, accent, surface, evidence, states, rhythm, distance, handoff. This is the part that needs judgement; the gates cannot tell you whether the page is *good*.
+6. Report findings as a table — severity · id · where · fix — P0 first, before touching anything.
+7. Fix with surgical edits (never regenerate), re-run the gates, and show the before/after contrast line when it changed.
 
 ## Resource map
 
@@ -88,6 +101,8 @@ When the user asks to review or audit an existing artifact rather than build one
 | `references/artifact-contract.md` | Output rules: layout, imagery, dark mode, dashboards, mobile, exports |
 | `references/deck-contract.md` | Deck mode: slides, theme rhythm, navigation runtime |
 | `references/quality-gates.md` | Anti-slop + craft rules, WCAG checklist, P0/P1/P2 gates, review protocol |
+| `references/critique.md` | The judgement layer: claim → hierarchy → accent → surface → evidence → states → rhythm → distance → handoff, with before/after examples |
+| `references/library/` | Six offline design-DNA grammars with tokens, recipes and anti-patterns |
 | `references/motion.md` | Durations, easing curves, choreography, reduced-motion recipes |
 | `references/ux-flows.md` | Five data states, empty/error/loading formulas, microcopy, navigation models |
 | `references/data-viz.md` | Chart selection, axis/label craft, KPI formula, inline-SVG conventions |
@@ -104,7 +119,13 @@ When the user asks to review or audit an existing artifact rather than build one
 | `assets/deck-seed.html` | Deck seed (visual system + navigation runtime) |
 | `scripts/lint.py` | Anti-slop + a11y + contrast linter — run it before any delivery |
 | `scripts/verify.py` | Render gate — loads the page in headless Chrome and reports overflow, clipping, computed contrast, tap targets, runtime errors |
-| `scripts/probe.js` | The in-page probe `verify.py` injects (not run by hand) |
+| `scripts/contract.py` | Contract fidelity — diffs the artifact's `:root` against `DESIGN.md` |
+| `scripts/extract.py` | Design-system extractor — URL / file / screenshot → `DESIGN.md` + `tokens.css` |
+| `scripts/score.py` | Craft scorecard + distance from the default look |
+| `scripts/directions.py` | Candidate directions from a brief + a rendered comparison sheet |
+| `scripts/ds.py` | One CLI for all of the above (`design-studio <command>`) |
+| `scripts/mcp_server.py` | MCP server — the same tools in any MCP-capable agent |
+| `scripts/probe.js` · `probe-design.js` · `probe-score.js` | The in-page probes the tools inject (not run by hand) |
 | `tests/run_tests.py` | Self-tests: rule fixtures + shipped artifacts stay clean (source **and** rendered) |
 | `tests/compose.py` | Paste a fragment into a seed so the result can be rendered and verified |
 

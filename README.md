@@ -9,7 +9,7 @@
 
 ![Design Studio — flagship landing page built with the skill](docs/landing-hero.png)
 
-The method, in one line: capture the brief → fix the brand in a `DESIGN.md` contract → pick one of eight flagship art directions → plan before pixels → build from an architectural seed → pass the anti-slop, WCAG contrast **and render** gates → deliver one `index.html` you can open, ship, print to PDF, or screenshot.
+The method, in one line: capture the brief → extract or derive a brand into a `DESIGN.md` contract → compare candidate directions, rendered side by side → plan before pixels → build from an architectural seed → pass four gates (source, render, contract, craft) → deliver one `index.html` you can open, ship, print to PDF, or screenshot.
 
 ## Install
 
@@ -24,7 +24,7 @@ npx skills add itsd0/design-studio-skill -g
 **Pinned, verified (recommended for teams):**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/itsd0/design-studio-skill/main/install.sh | VERSION=v1.5.0 sh
+curl -fsSL https://raw.githubusercontent.com/itsd0/design-studio-skill/main/install.sh | VERSION=v1.7.0 sh
 ```
 
 Pinned installs verify the tarball against the release's `SHA256SUMS`. See [`SECURITY.md`](SECURITY.md) and [`CHANGELOG.md`](CHANGELOG.md).
@@ -48,6 +48,27 @@ git clone --depth 1 https://github.com/itsd0/design-studio-skill "$env:USERPROFI
 ```
 
 Restart your agent afterwards. `install.sh` honors `SKILLS_DIR` and `XDG_CONFIG_HOME` if your skills live elsewhere.
+
+### The tools on their own
+
+The gates and the instrument work without the skill — useful in CI, and in any agent that speaks MCP.
+
+```bash
+npx design-studio doctor          # check this machine
+npx design-studio lint index.html # source gates
+npx design-studio verify index.html
+```
+
+| Platform | Install |
+|---|---|
+| Any MCP agent | `claude mcp add design-studio -- python3 scripts/mcp_server.py` |
+| Claude Code | `/plugin marketplace add itsd0/design-studio-skill` |
+| Codex | `codex plugin marketplace add itsd0/design-studio-skill` |
+| Cursor | copy `.cursor-plugin/` into the project's plugin directory |
+| Gemini CLI | `gemini extensions install https://github.com/itsd0/design-studio-skill` |
+| MCP registry | `server.json` — `npx design-studio-skill --stdio` |
+
+The MCP server exposes six tools: `design_studio_lint`, `design_studio_verify`, `design_studio_contract`, `design_studio_extract`, `design_studio_score`, `design_studio_directions`.
 
 ## Use it
 
@@ -77,6 +98,21 @@ Three artifacts built from one brief, each a single self-contained file — [`de
 </p>
 
 The deck is keyboard, wheel, and touch navigable — counter, progress bar, dots, print-to-PDF styles, and a self-contained navigation runtime included. All three demo files pass the linter with zero findings.
+
+## What's new in v1.7.0 (the full toolchain)
+
+The v1.5.0 render gate proved a page can be clean in a diff and broken on screen. v1.7.0 closes the rest of the loop: from a brand URL to a verified artifact, with the decisions visible.
+
+- **Contract fidelity** — `scripts/contract.py` diffs the artifact's `:root` against `DESIGN.md`: token drift and missing tokens are P0, font drift and unrecorded dials are P1. "DESIGN.md is the contract" is now mechanical, not a habit.
+- **Design-system extractor** — `scripts/extract.py` turns a live URL, an HTML file or a reference screenshot into `DESIGN.md` + `tokens.css`, measuring the *rendered* page (including `color-mix()` results) and inferring the roles. The step that used to ask an agent to sample tokens by eye now has an instrument.
+- **Direction studio** — `scripts/directions.py` derives three candidate directions from the brief and renders them side by side into one comparison sheet. The agent no longer picks a direction blind, and a fixed list of eight stops being the house style.
+- **Craft scorecard** — `scripts/score.py` grades a rendered artifact against a review (hierarchy, type discipline, accent budget, section rhythm, states, self-containment) and reports **distance from the default look** — headline font, body font, accent family, background family. 2/4 is the floor.
+- **The critique** — `references/critique.md` is the judgement layer: claim → hierarchy → accent → surface → evidence → states → rhythm → distance → handoff, with before/after examples for each.
+- **Design DNA library** — `references/library/` holds six offline, MIT design grammars with tokens, component recipes and anti-patterns.
+- **Distribution** — an MCP server (six tools, any MCP agent), one CLI (`design-studio <command>`), an npm bin, and plugin manifests for Claude Code, Codex, Cursor and Gemini.
+- **Gallery and benchmarks** — `gallery/` publishes artifacts with their contract, and `scripts/benchmark.py` publishes one brief rendered three ways so the method's decisions are visible.
+
+**The shipped artifacts got better too.** The scorecard measured our own pages at 2/4 from the default look — the display face was the system sans, which is exactly what every agent reaches for. They now lead with a serif (`ui-serif`, available on every platform without a webfont) and score 3/4.
 
 ## What's new in v1.5.0 (render gate)
 
@@ -158,8 +194,18 @@ The linter reads **source**. The verifier reads the **rendered page** — it loa
 | `assets/deck-seed.html` | Deck seed: themes, chrome, nav runtime, print CSS |
 | `scripts/lint.py` | Anti-slop + a11y + contrast linter (fails on P0, advises on P1/P2) |
 | `scripts/verify.py` | Render gate — loads the artifact in headless Chrome and reports overflow, clipping, computed contrast, tap targets, runtime errors |
+| `scripts/contract.py` | Contract fidelity — diffs the artifact's `:root` against `DESIGN.md` |
+| `scripts/extract.py` | Design-system extractor — URL / file / screenshot → `DESIGN.md` + `tokens.css` |
+| `scripts/score.py` | Craft scorecard + distance from the default look |
+| `scripts/directions.py` | Candidate directions from a brief + a rendered comparison sheet |
+| `scripts/benchmark.py` | Publishes a benchmark page: one brief, three directions, rendered |
+| `scripts/mcp_server.py` | MCP server — the same six tools in any MCP-capable agent |
+| `scripts/ds.py` | One CLI for all of the above |
 | `docs/lint-schema-v1.md` | Frozen `--json` contract (additive-only) for CI integrations |
 | `docs/verify-schema-v1.md` | Frozen `--json` contract for the render gate |
+| `references/critique.md` | The judgement layer — nine review steps with before/after examples |
+| `references/library/` | Six offline design-DNA grammars with tokens, recipes and anti-patterns |
+| `gallery/` | Published artifacts, their contracts, and the method's benchmarks |
 | `tests/run_tests.py` | Self-tests: rule fixtures + shipped artifacts stay clean |
 | `demo/` | Finished example artifacts + the DESIGN.md behind them |
 | `install.sh` | One-line installer (`VERSION=` pin + `SHA256SUMS` verify) |
@@ -211,10 +257,21 @@ Exit code `1` means at least one P0. Needs a Chrome/Chromium binary — without 
 
 One token block; one accent with a hard budget; a display face bound to the direction, never the default; measured contrast instead of vibes; loading, empty, and error states on anything stateful; no `scrollIntoView`; a 920px reflow that actually works; decks that alternate light/dark with a nav runtime that respects iframes. The full checklist — including the WCAG 2.2 AA pass — lives in [`references/quality-gates.md`](references/quality-gates.md).
 
+## The four gates
+
+| Gate | Reads | Needs | Catches |
+|---|---|---|---|
+| `lint.py` | the source | nothing | slop, raw hex, token names, structure, static a11y |
+| `verify.py` | the rendered page | Chrome/Chromium | horizontal overflow, clipped text, computed contrast, tap targets, runtime errors |
+| `contract.py` | the artifact and its `DESIGN.md` | nothing | brand drift — a token that no longer matches the contract |
+| `score.py` | the rendered page | Chrome/Chromium | hierarchy, type discipline, accent budget, rhythm, distance from the default look |
+
+Run all four. A file can pass the linter and still scroll sideways at 390px; a file can pass every gate and still be the same page every agent produces. The first pair is correctness, the second pair is taste.
+
 ## Requirements
 
-- Python 3 — for the linter and the render gate
-- Chrome or Chromium — for the render gate only (optional; the skill works without it)
+- Python 3.9+ — for the gates and the tools
+- Chrome or Chromium — for the render gate and the scorecard only (optional; the skill works without it)
 - The artifacts themselves are plain HTML/CSS/JS: no dependencies, no build step
 
 ## Credits

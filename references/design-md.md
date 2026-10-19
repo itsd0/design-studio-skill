@@ -2,6 +2,25 @@
 
 `DESIGN.md` is the single source of brand truth for every artifact. It is prose for humans and agents; `tokens.css` is the machine-readable twin. Every artifact binds the token block verbatim and never invents values.
 
+## Building a contract
+
+Do not write one by hand when a brand already exists — measure it:
+
+```bash
+python3 scripts/extract.py https://brand.example --out ./brand
+python3 scripts/extract.py screenshot.png --out ./brand --name "Acme"
+```
+
+The extractor renders the page (or reads the screenshot), measures the colours, type, spacing, radius and shadow scale, and infers the token roles. It writes both files. Review the result and correct the *roles* by hand — the extractor infers, it does not decide.
+
+Then check every artifact against the contract:
+
+```bash
+python3 scripts/contract.py index.html
+```
+
+Token drift and missing tokens are P0; font drift, a missing section, a wrong section order and an unrecorded dial are P1.
+
 ## Contract shape
 
 ```

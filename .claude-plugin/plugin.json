@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "design-studio",
+  "displayName": "Design Studio",
+  "version": "1.7.0",
+  "description": "Build polished single-file HTML design artifacts — landing pages, prototypes, dashboards, decks and agent screens — with anti-slop source gates, a headless-Chrome render gate, and DESIGN.md contract fidelity.",
+  "author": {
+    "name": "itsd0",
+    "url": "https://github.com/itsd0"
+  },
+  "homepage": "https://github.com/itsd0/design-studio-skill",
+  "repository": "https://github.com/itsd0/design-studio-skill",
+  "license": "MIT",
+  "keywords": [
+    "design",
+    "ui",
+    "ux",
+    "frontend",
+    "design-system",
+    "html",
+    "mcp"
+  ],
+  "documentationUrl": "https://github.com/itsd0/design-studio-skill#readme",
+  "supportUrl": "https://github.com/itsd0/design-studio-skill/issues"
+}

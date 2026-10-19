@@ -1,0 +1,11 @@
+{
+  "name": "design-studio",
+  "version": "1.7.0",
+  "description": "Build polished single-file HTML design artifacts with anti-slop source gates, a headless-Chrome render gate, and DESIGN.md contract fidelity.",
+  "mcpServers": {
+    "design-studio": {
+      "command": "python3",
+      "args": ["scripts/mcp_server.py"]
+    }
+  }
+}

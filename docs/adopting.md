@@ -17,20 +17,24 @@ and `verify --json` contracts (`docs/lint-schema-v1.md`,
 ## Air-gapped and offline use
 
 The skill runs fully offline after install: one `SKILL.md` workflow, local
-references and seeds, a zero-dependency Python linter, and a render gate
-that needs only a Chrome/Chromium binary already on the machine (without one
-it reports "skipped" and exits 0). The only network traffic is the
-install-time HTTPS download from `codeload.github.com` (plus `github.com`
-for checksum verification). Mirror the release tarball internally and point
-`install.sh` at it, or vendor the directory into your agent image.
+references and seeds, and a toolchain of standard-library Python scripts. The
+render gate and the scorecard need only a Chrome/Chromium binary already on
+the machine (without one they report "skipped" and exit 0). The only network
+traffic is the install-time HTTPS download from `codeload.github.com` (plus
+`github.com` for checksum verification). Mirror the release tarball internally
+and point `install.sh` at it, or vendor the directory into your agent image.
+
+The MCP server (`scripts/mcp_server.py`) is local too — it spawns the same
+scripts and opens no sockets. The only tool that touches the network is
+`scripts/extract.py`, and only when you point it at a URL.
 
 ## No telemetry
 
 The project collects nothing: no analytics, no phone-home, no update checks.
-Audit surface is small — `find . -type f | wc -l` files, two Python scripts,
-one JavaScript probe, static HTML/CSS otherwise. The render gate loads the
-artifact in a local headless browser and writes nothing outside the temp
-directory.
+Audit surface is small — `find . -type f | wc -l` files, eight Python
+scripts, three JavaScript probes, static HTML/CSS otherwise. The render gate
+and the scorecard load the artifact in a local headless browser and write
+nothing outside the temp directory. The MCP server opens no sockets.
 
 ## Trust checklist for security review
 

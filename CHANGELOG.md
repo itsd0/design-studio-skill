@@ -6,6 +6,34 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.7.0] — 2026-10-19
+
+The full toolchain: from a brand URL to a verified artifact, with the decisions visible.
+
+### Added
+- **Contract fidelity** — `scripts/contract.py` parses `DESIGN.md` and diffs it against the artifact: `design-md-token-drift` and `design-md-token-missing` (P0), `design-md-font-drift`, `design-md-section-missing`, `design-md-order-mismatch`, `design-md-dial-missing` (P1), `design-md-token-extra` (P2). "DESIGN.md is the contract" is now mechanical.
+- **Design-system extractor** — `scripts/extract.py` turns a live URL, a local HTML file or a reference screenshot into `DESIGN.md` + `tokens.css`. It measures the *rendered* page (including `color-mix()` and `oklch()` results), infers the token roles, and reads the type, spacing, radius and shadow scale. `scripts/probe-design.js` is the in-page probe.
+- **Direction studio** — `scripts/directions.py` derives three candidate directions from a brief (palette, type voice, density, and *why* each one fits) and renders them side by side into one comparison sheet. The agent no longer picks a direction blind, and a fixed list stops being the house style.
+- **Craft scorecard** — `scripts/score.py` grades a rendered artifact against a review: hierarchy, type discipline, accent budget, section rhythm, states, self-containment, and **distance from the default look** (headline font, body font, accent family, background family). 2/4 is the floor. `scripts/probe-score.js` is the in-page probe.
+- **The critique** — `references/critique.md`: the judgement layer, nine steps from claim to handoff, each with a before/after example.
+- **Design DNA library** — `references/library/`: six offline, MIT design grammars (dark structural grid, light editorial serif, monochrome operator, warm human soft, clinical data, cinematic ember) with tokens, component recipes and anti-patterns.
+- **Distribution** — `scripts/mcp_server.py` (six tools over stdio), `scripts/ds.py` (one CLI: `design-studio lint | verify | contract | extract | score | directions | doctor`), `bin/design-studio.js` + `package.json` (npm bin), and plugin manifests for Claude Code, Codex, Cursor and Gemini plus `server.json` for the MCP registry.
+- **Gallery and benchmarks** — `gallery/` (artifacts + their contracts + a review protocol) and `scripts/benchmark.py`, which publishes one brief rendered three ways.
+- `DESIGN.md` at the repository root — the skill's own brand contract; the landing page is built from it and passes `contract.py` against it.
+- `scripts/pngread.py` — a minimal, stdlib-only PNG reader (8-bit, grey/RGB/palette/RGBA, non-interlaced) so a reference screenshot can be measured without an image dependency.
+
+### Changed
+- The shipped artifacts now lead with a **serif display face** (`ui-serif, 'Iowan Old Style', 'Charter', Georgia, …`). The scorecard measured them at 2/4 from the default look — the system sans is exactly what every agent reaches for. They now score 3/4.
+- `<code>`, `<pre>`, `<kbd>` and `<samp>` bind `--font-mono` in every shipped artifact, instead of falling back to the browser's generic `monospace`.
+- The scorecard is artifact-kind aware: a deck's slides keep their own type scales, and a check that cannot apply to the artifact kind reports as not-applicable rather than as a failure.
+- `SKILL.md` step 2 now extracts or compares directions instead of picking one; step 5 runs all four gates; the review mode walks `references/critique.md`.
+- `references/quality-gates.md` documents the four gates; the delivery checklist requires all of them.
+- CI gains a `contract + craft gate` job: contract drift, the craft scorecard, an extraction round-trip and `ds.py doctor`.
+
+### Fixed
+- `demo/agent.html` shipped a `[REPLACE · spend]` placeholder in its run-usage row.
+- The scorecard's raw-colour check no longer counts `#418`-style issue numbers in prose, and no longer scans HTML comments.
+
 ## [1.5.0] — 2026-10-19
 
 ### Added

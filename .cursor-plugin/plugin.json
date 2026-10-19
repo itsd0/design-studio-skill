@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json.schemastore.org/cursor-plugin-manifest.json",
+  "name": "design-studio",
+  "displayName": "Design Studio",
+  "version": "1.7.0",
+  "description": "Build polished single-file HTML design artifacts with anti-slop source gates, a headless-Chrome render gate, and DESIGN.md contract fidelity.",
+  "author": {
+    "name": "itsd0",
+    "url": "https://github.com/itsd0"
+  },
+  "homepage": "https://github.com/itsd0/design-studio-skill",
+  "repository": "https://github.com/itsd0/design-studio-skill",
+  "license": "MIT",
+  "keywords": [
+    "design",
+    "ui",
+    "ux",
+    "frontend",
+    "html"
+  ]
+}

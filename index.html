@@ -27,7 +27,7 @@
       --fg-soft:     color-mix(in oklch, var(--fg) 6%, transparent);
       --specular:    inset 0 1px 0 color-mix(in oklch, var(--fg) 8%, transparent);
 
-      --font-display: -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Display', system-ui, sans-serif;
+      --font-display: ui-serif, 'Iowan Old Style', 'Charter', Georgia, 'Times New Roman', serif;
       --font-body:    -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Text', system-ui, sans-serif;
       --font-mono:    'JetBrains Mono', 'Geist Mono', 'IBM Plex Mono', ui-monospace, Menlo, monospace;
 
@@ -47,6 +47,8 @@
       --radius-lg: 10px;
       --ease-standard: cubic-bezier(0.2, 0, 0, 1);
     }
+    code, pre, kbd, samp { font-family: var(--font-mono); font-size: 0.92em; }
+
 
     /* ── reset & base ─────────────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; }
@@ -792,19 +794,19 @@
           <div class="index-list" role="tablist" aria-label="Skill system modules">
             <button class="index-item active" type="button" role="tab" aria-selected="true" data-tab="0">
               <span class="idx-num">01</span>
-              <span>ANTI-SLOP LINTER</span>
+              <span>SOURCE GATES</span>
             </button>
             <button class="index-item" type="button" role="tab" aria-selected="false" data-tab="1">
               <span class="idx-num">02</span>
-              <span>DESIGN.MD CONTRACT</span>
+              <span>RENDER GATE</span>
             </button>
             <button class="index-item" type="button" role="tab" aria-selected="false" data-tab="2">
               <span class="idx-num">03</span>
-              <span>SEEDS &amp; SKELETONS</span>
+              <span>CONTRACT &amp; EXTRACT</span>
             </button>
             <button class="index-item" type="button" role="tab" aria-selected="false" data-tab="3">
               <span class="idx-num">04</span>
-              <span>DECK &amp; DASHBOARD</span>
+              <span>SCORECARD &amp; MCP</span>
             </button>
           </div>
 
@@ -1051,9 +1053,9 @@
         {
           num: '01',
           cmd: '$ python3 scripts/lint.py index.html',
-          meta: 'exit code: 0',
-          title: 'Deterministic linting before delivery',
-          desc: 'An agent never guesses whether contrast or craft passed. It runs python3 scripts/lint.py in a loop until P0 findings hit zero and every token pair passes WCAG AA/AAA.',
+          meta: '0 P0 · 0 P1',
+          title: 'Source gates: the page cannot ship slop',
+          desc: 'An agent never guesses whether contrast or craft passed. It runs the linter in a loop until every P0 finding is gone and every token pair passes WCAG AA.',
           rows: [
             ['P0_CARDINAL_SINS', 'Blocks default LLM indigo, purple gradients, emoji icons, filler copy', '0 FOUND'],
             ['WCAG_CONTRAST_MATRIX', 'fg/bg 17.9:1 ✓ · muted/bg 7.0:1 ✓ · accent-on/accent 11.2:1 ✓', 'VERIFIED'],
@@ -1062,59 +1064,60 @@
           bullets: [
             ['Zero-dependency Python linter', ' — runs locally in milliseconds with human or --json output.'],
             ['OKLch + Hex contrast math', ' — computes relative luminance across light and dark theme scopes.'],
-            ['14 self-test fixtures', ' — tests/run_tests.py guarantees every shipped seed and demo stays clean.']
+            ['39 self-tests', ' — tests/run_tests.py keeps every shipped seed, demo, and tool honest.']
           ]
         },
         {
           num: '02',
-          cmd: 'DESIGN.md → :root token binding',
-          meta: '8 core tokens',
-          title: 'DESIGN.md is the single source of brand truth',
-          desc: 'Every artifact reads DESIGN.md before writing a single pixel, binding --bg, --surface, --surface-2, --fg, --muted, --border, --accent, and --accent-on verbatim.',
+          cmd: '$ python3 scripts/verify.py index.html',
+          meta: '390 · 768 · 1440',
+          title: 'Render gate: the page is measured, not assumed',
+          desc: 'The linter reads source. The verifier loads the artifact in headless Chrome and measures what a human actually sees — the gap that lets a broken page look clean in a diff.',
           rows: [
-            ['EXPERIENCE_DIALS', 'density: regular · expressiveness: assured · motion: standard', 'LOCKED'],
-            ['TOKEN_DISCIPLINE', 'Zero raw hex outside :root; derived tones use color-mix(in oklch)', 'ENFORCED'],
-            ['BUTTON_INK_SAFETY', '--accent-on guarantees dark ink on luminous mint/phosphor fills', '11.2:1 ✓']
+            ['OVERFLOW_X', 'Finds the element that pushes the page sideways, not just the symptom', '0 FOUND'],
+            ['TEXT_CLIPPED', 'Content cut off by overflow: hidden, with the culprit element named', '0 FOUND'],
+            ['COMPUTED_CONTRAST', 'Every text run measured against its real background, color-mix() included', 'VERIFIED'],
+            ['TAP_TARGETS', 'WCAG 2.2 AA 24×24 with the inline and spacing exceptions applied', 'PASS']
           ],
           bullets: [
-            ['Sample from any brand URL or screenshot', ' — or pick one of the 8 curated directions in references/directions.md.'],
-            ['Three recorded experience dials', ' — controls spacing steps, grid risk, and choreography.'],
-            ['Theme-aware contrast', ' — supports dark-first or light-first with automatic @media token swaps.']
+            ['Cross-platform fit checks', ' — min-content-overflow and tight-fit catch layouts that only fit on one platform’s fonts.'],
+            ['No new dependencies', ' — stdlib Python plus a Chrome binary most machines already have; skips cleanly without one.'],
+            ['Screenshots included', ' — --screenshot writes one PNG per viewport for the review pass.']
           ]
         },
         {
           num: '03',
-          cmd: 'assets/prototype-seed.html + section-skeletons.html',
-          meta: '11 flagship blocks',
-          title: 'Start from architectural seeds, not blank files',
-          desc: 'Seeds provide the reset, responsive 920px reflow, hairline bento grids, and studio window chrome so the agent focuses 100% on domain-specific schematics and copy.',
+          cmd: '$ python3 scripts/extract.py https://brand.example → DESIGN.md',
+          meta: '8 core tokens',
+          title: 'A brand becomes a contract, and the contract is enforced',
+          desc: 'Extract a design system from a live URL, a local file, or a screenshot, then bind it verbatim. The contract checker diffs the artifact against DESIGN.md on every run — drift is a P0, not a habit.',
           rows: [
-            ['HERO_PRODUCT_STAGE', 'Multi-pane .app-window with project tree, trace log, and dot-matrix canvas', 'SHIPPED'],
-            ['GAPLESS_BENTO_GRID', '1px exposed structural cells with SVG gauges, cubes, and DAG trees', 'SHIPPED'],
-            ['INDEXED_SHOWCASE', 'Numbered 01–04 monospace tab matrix with vertical-bar spec lists', 'SHIPPED']
+            ['EXTRACTED_TOKENS', 'bg, surface, fg, muted, border, accent, accent-on, plus type and spacing', 'MEASURED'],
+            ['CONTRACT_DRIFT', 'Token drift, missing tokens, font drift, section order, unrecorded dials', 'P0'],
+            ['DESIGN_DNA_LIBRARY', 'Six offline grammars in references/library — tokens, recipes, anti-patterns', '6 ENTRIES']
           ],
           bullets: [
-            ['Four specialized artifact seeds', ' — prototype-seed, dashboard-seed, mobile-seed, and deck-seed.'],
-            ['Paste-ready UI state gallery', ' — assets/ui-patterns.html covers loading, empty, error, modal, and toast states.'],
-            ['Responsive at 1440 / 768 / 375', ' — all multi-column grids collapse cleanly at 920px.']
+            ['One tool, three inputs', ' — a URL, an HTML file, or a reference screenshot all produce DESIGN.md + tokens.css.'],
+            ['Direction studio', ' — three candidate directions derived from the brief, rendered side by side, one image, one decision.'],
+            ['Dials are recorded', ' — density, expressiveness and motion are contract fields, not vibes.']
           ]
         },
         {
           num: '04',
-          cmd: 'open demo/landing.html demo/dashboard.html demo/agent.html demo/deck.html',
-          meta: '4 live demos',
-          title: 'Dashboards, agent screens, mobile frames, and keynote decks included',
-          desc: 'Beyond landing pages, Design Studio builds data-dense observability consoles with hand-rolled SVG charts, agent run/approval/activity screens with plan guardrails, iOS/Android mobile prototypes, and keyboard-navigable slide decks.',
+          cmd: '$ python3 scripts/score.py index.html',
+          meta: '16 checks · 3/4 from the default',
+          title: 'A scorecard, a critique, and the same tools in any agent',
+          desc: 'The scorecard grades what a review grades — hierarchy, type discipline, accent budget, section rhythm, states, self-containment — and measures how far the page sits from the default AI look. The judgement layer lives in references/critique.md.',
           rows: [
-            ['DASHBOARD_CONSOLE', '248px sticky rail + gapless KPI strip + inline SVG polyline chart', 'READY'],
-            ['AGENT_RUN_APPROVAL', 'Tool-call cards + plan approval + guardrails + eval receipt', 'READY'],
-            ['SLIDE_DECK_RUNTIME', 'Alternating hero dark / light slides, arrow/touch nav, PDF print CSS', 'READY'],
-            ['MOBILE_DEVICE_FRAME', 'Status bar, sensor cutout, 44px touch targets, bottom tab bar', 'READY']
+            ['DEFAULT_DISTANCE', 'Headline font, body font, accent family, background family — 2/4 is the floor', '3/4'],
+            ['CRAFT_CHECKS', '16 checks measured in a real browser, per artifact kind', '15 PASS'],
+            ['MCP_SERVER', 'Six tools over stdio — works in any MCP-capable agent', 'READY'],
+            ['SEEDS &amp; SKELETONS', 'Four seeds, 11 paste-ready sections, dashboards, decks, agent screens', 'SHIPPED']
           ],
           bullets: [
-            ['Data-viz craft rules', ' — references/data-viz.md governs axes, direct end-labels, and tabular numerals.'],
-            ['No scrollIntoView() bugs', ' — deck navigation uses container scrollTo() so iframe embeds never jump.'],
-            ['Print-to-PDF ready', ' — decks export cleanly to landscape PDF slides out of the box.']
+            ['One CLI, every gate', ' — design-studio lint | verify | contract | extract | score | directions | doctor.'],
+            ['Installs everywhere', ' — npm bin, Claude Code plugin, Codex, Cursor, Gemini extension, MCP registry.'],
+            ['Zero telemetry, MIT, offline', ' — the whole toolchain is local files and standard-library Python.']
           ]
         }
       ];
