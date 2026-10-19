@@ -9,7 +9,7 @@
 
 ![Design Studio — flagship landing page built with the skill](docs/landing-hero.png)
 
-The method, in one line: capture the brief → fix the brand in a `DESIGN.md` contract → pick one of eight flagship art directions → plan before pixels → build from an architectural seed → pass the anti-slop & WCAG contrast gates → deliver one `index.html` you can open, ship, print to PDF, or screenshot.
+The method, in one line: capture the brief → fix the brand in a `DESIGN.md` contract → pick one of eight flagship art directions → plan before pixels → build from an architectural seed → pass the anti-slop, WCAG contrast **and render** gates → deliver one `index.html` you can open, ship, print to PDF, or screenshot.
 
 ## Install
 
@@ -24,7 +24,7 @@ npx skills add itsd0/design-studio-skill -g
 **Pinned, verified (recommended for teams):**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/itsd0/design-studio-skill/main/install.sh | VERSION=v1.4.0 sh
+curl -fsSL https://raw.githubusercontent.com/itsd0/design-studio-skill/main/install.sh | VERSION=v1.5.0 sh
 ```
 
 Pinned installs verify the tarball against the release's `SHA256SUMS`. See [`SECURITY.md`](SECURITY.md) and [`CHANGELOG.md`](CHANGELOG.md).
@@ -59,7 +59,7 @@ Just ask:
 - "Build a six-slide pitch deck as a single HTML file."
 - "Review this index.html against the quality gates and fix what fails."
 
-The agent writes a real `index.html`, runs the linter, and iterates until it passes.
+The agent writes a real `index.html`, runs the linter **and** the render gate, and iterates until both pass.
 
 ## Demo
 
@@ -77,6 +77,26 @@ Three artifacts built from one brief, each a single self-contained file — [`de
 </p>
 
 The deck is keyboard, wheel, and touch navigable — counter, progress bar, dots, print-to-PDF styles, and a self-contained navigation runtime included. All three demo files pass the linter with zero findings.
+
+## What's new in v1.5.0 (render gate)
+
+The linter reads **source**. The verifier reads the **rendered page** — it loads the artifact in headless Chrome and measures what a human actually sees. It closes the gap between "the linter is clean" and "the page works".
+
+- **New `scripts/verify.py`** — renders at 390px, 768px and 1440px and reports horizontal overflow (with the element that causes it), text clipped by an `overflow: hidden` box, **computed** text contrast (4.5:1 / 3:1 for large text), tap targets under 24×24, runtime JavaScript errors, missing image dimensions, missing focus indicators and a missing viewport meta. `--json` speaks a frozen shape ([`docs/verify-schema-v1.md`](docs/verify-schema-v1.md)); `--screenshot DIR` writes one PNG per viewport.
+- **No new dependencies** — stdlib Python plus a Chrome/Chromium binary that already exists on most machines. Without one, the gate says so and exits 0.
+- **New tests** — render fixtures, a rendered-regression pass over every shipped artifact, and a composition test that pastes the section library into the prototype seed and renders the result.
+- **Real defects fixed in the shipped files** — the landing page scrolled sideways at 390px (comparison table, topnav row, app-window tabs), the app-window clipped its trace log, accent-coloured small text failed AA in the deck and mobile seeds (3.7:1), a white-on-accent button failed at 3.9:1, and several controls were under the 24×24 tap target.
+
+## What's new in v1.4.1 (governance)
+
+- `CONTRIBUTING.md`, issue and PR templates, Code of Conduct, and `docs/adopting.md` (pinning, air-gapped use, no-telemetry audit surface).
+
+## What's new in v1.4.0 (enterprise-ready)
+
+- **Pinned, verified installs** — `install.sh` accepts `VERSION=v1.4.0 … | sh` and checks the tarball against the release's `SHA256SUMS`.
+- **`SECURITY.md`** — supported versions and a private-report channel.
+- **Frozen `lint --json` contract** (`docs/lint-schema-v1.md`, additive-only), enforced by a schema test.
+- **CI** — rule fixtures, shipped-artifact lint (zero P0/P1), and a GitHub Pages smoke check on every push and pull request; plus release automation that builds the notes from the changelog.
 
 ## What's new in v1.3.2 (Agent-UX hotfix)
 
@@ -137,7 +157,9 @@ The deck is keyboard, wheel, and touch navigable — counter, progress bar, dots
 | `assets/section-skeletons.html` | 11 paste-ready sections (hero-stage, schematic bentos, indexed showcase, pricing, CTA…) |
 | `assets/deck-seed.html` | Deck seed: themes, chrome, nav runtime, print CSS |
 | `scripts/lint.py` | Anti-slop + a11y + contrast linter (fails on P0, advises on P1/P2) |
+| `scripts/verify.py` | Render gate — loads the artifact in headless Chrome and reports overflow, clipping, computed contrast, tap targets, runtime errors |
 | `docs/lint-schema-v1.md` | Frozen `--json` contract (additive-only) for CI integrations |
+| `docs/verify-schema-v1.md` | Frozen `--json` contract for the render gate |
 | `tests/run_tests.py` | Self-tests: rule fixtures + shipped artifacts stay clean |
 | `demo/` | Finished example artifacts + the DESIGN.md behind them |
 | `install.sh` | One-line installer (`VERSION=` pin + `SHA256SUMS` verify) |
@@ -162,13 +184,37 @@ Exit code `1` means at least one must-fix (P0) finding. Works on any single-file
 python3 scripts/lint.py --json index.html
 ```
 
+## The render gate
+
+The linter reads source. The verifier reads the **rendered page**.
+
+```bash
+python3 scripts/verify.py index.html
+```
+
+It loads the artifact in headless Chrome at 390px, 768px and 1440px and reports what source analysis cannot see:
+
+- **horizontal overflow** — the page scrolls sideways, and which element causes it;
+- **clipped text** — content cut off by an `overflow: hidden` box, with the culprit element named;
+- **computed contrast** — every text run measured against its real background, including `color-mix()` results (the token-level check only covers the declared pairs);
+- **tap targets** — interactive controls under 24×24 CSS px, with the WCAG 2.2 inline and spacing exceptions applied;
+- **runtime errors**, missing image dimensions, missing focus indicators, a missing viewport meta.
+
+```bash
+python3 scripts/verify.py --json index.html          # machine-readable
+python3 scripts/verify.py --screenshot .shots index.html   # one PNG per viewport
+```
+
+Exit code `1` means at least one P0. Needs a Chrome/Chromium binary — without one it reports "skipped" and exits 0, so it never blocks an offline install. The frozen output shape lives in [`docs/verify-schema-v1.md`](docs/verify-schema-v1.md).
+
 ## Quality gates, in one breath
 
 One token block; one accent with a hard budget; a display face bound to the direction, never the default; measured contrast instead of vibes; loading, empty, and error states on anything stateful; no `scrollIntoView`; a 920px reflow that actually works; decks that alternate light/dark with a nav runtime that respects iframes. The full checklist — including the WCAG 2.2 AA pass — lives in [`references/quality-gates.md`](references/quality-gates.md).
 
 ## Requirements
 
-- Python 3 — for the linter only
+- Python 3 — for the linter and the render gate
+- Chrome or Chromium — for the render gate only (optional; the skill works without it)
 - The artifacts themselves are plain HTML/CSS/JS: no dependencies, no build step
 
 ## Credits

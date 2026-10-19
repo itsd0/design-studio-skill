@@ -29,6 +29,9 @@
 
       --accent-soft: color-mix(in oklch, var(--accent) 14%, transparent);
       --fg-soft:     color-mix(in oklch, var(--fg) 6%, transparent);
+      /* Accent as small text needs a darker weight than accent-as-fill
+         (4.9:1 on --bg instead of 3.7:1). */
+      --accent-strong: color-mix(in srgb, var(--accent), black 15%);
 
       --font-display: 'Iowan Old Style', 'Charter', Georgia, 'Times New Roman', serif;
       --font-body:    -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
@@ -181,7 +184,7 @@
       color: var(--muted); font-size: 10.5px;
     }
     .tab-item svg { width: 21px; height: 21px; }
-    .tab-item.active { color: var(--accent); }
+    .tab-item.active { color: var(--accent-strong); }
     .home-indicator {
       width: 122px; height: 5px; border-radius: 999px;
       background: var(--fg); opacity: 0.85;

@@ -18,7 +18,7 @@ Turn a brief into **single-file HTML artifacts** driven by a **DESIGN.md brand c
 6. **No AI-slop tropes**: no purple/indigo defaults, no two-stop "trust" gradients, no emoji-as-icons, no rounded card with a colored left border, no invented metrics, no filler copy. Full list in `references/quality-gates.md`.
 7. **Anchor every section.** `data-design-id="kebab-slug"` on each top-level `<section>`; decks use `data-screen-label="01 Cover"`.
 8. **No `scrollIntoView()`** anywhere — it breaks embed and preview iframes.
-9. **Self-check before delivery.** Run `python3 scripts/lint.py <file>` until zero P0 findings — fix every contrast `✗` — then walk the P0/P1 checklist in `references/quality-gates.md`.
+9. **Self-check before delivery.** Run `python3 scripts/lint.py <file>` until zero P0 findings — fix every contrast `✗` — then walk the P0/P1 checklist in `references/quality-gates.md`. When Chrome or Chromium is available, also run `python3 scripts/verify.py <file>`: it renders the page and catches what source analysis cannot see (horizontal overflow, clipped text, computed contrast, tap targets, runtime errors).
 10. **Deliver with a one-line summary** naming the file. Never paste the full HTML into chat.
 
 ## Workflow
@@ -58,9 +58,10 @@ Capture: product, audience, goal, artifact kind (landing / prototype / dashboard
 ### 5 · Self-check & lint
 
 1. Run `python3 scripts/lint.py index.html` → fix every P0; read the contrast line and fix any `✗` pair (treat `(large/UI only)` pairs as fills and display text).
-2. Walk the P0 checklist in `references/quality-gates.md`.
-3. Spot-check: no raw hex outside `:root`; accent visible ≤ 2× on the rendered screen; reflow at ≤ 920px; for decks `grep 'class="slide' index.html` reads as a healthy rhythm.
-4. Render and screenshot the file (any headless Chrome: `chrome --headless --screenshot=out.png --window-size=1440,900 index.html`) and apply the soul test to the image.
+2. Run `python3 scripts/verify.py index.html` → it renders the page in headless Chrome at 390px, 768px and 1440px and reports what source analysis cannot see. Fix every P0: `overflow-x`, `overflow-element`, `text-clipped`, `contrast-text`, `runtime-error`. Fix P1 tap targets and missing focus styles too. If no Chrome is installed the command says so and exits 0 — the page is still deliverable, but the render gate did not run.
+3. Walk the P0 checklist in `references/quality-gates.md`.
+4. Spot-check: no raw hex outside `:root`; accent visible ≤ 2× on the rendered screen; reflow at ≤ 920px; for decks `grep 'class="slide' index.html` reads as a healthy rhythm.
+5. Render and screenshot the file (any headless Chrome: `chrome --headless --screenshot=out.png --window-size=1440,900 index.html`) and apply the soul test to the image. `python3 scripts/verify.py --screenshot .shots index.html` writes one PNG per viewport for the same purpose.
 
 ### 6 · Deliver & iterate
 
@@ -73,9 +74,10 @@ Capture: product, audience, goal, artifact kind (landing / prototype / dashboard
 When the user asks to review or audit an existing artifact rather than build one:
 
 1. Run the linter — human output for reading, `python3 scripts/lint.py --json <file>` for pasting into a report.
-2. Walk `references/quality-gates.md` top to bottom against the file — rhythm and state coverage, not just mechanics.
-3. Report findings as a table — severity · id · where · fix — P0 first, before touching anything.
-4. Fix with surgical edits (never regenerate), re-run the linter, and show the before/after contrast line when it changed.
+2. Run the render gate — `python3 scripts/verify.py <file>` (and `--json` for the machine-readable shape). It catches what the source linter cannot: the page scrolls sideways, text is cut off, a token pair fails in the *rendered* result, a control is too small to tap.
+3. Walk `references/quality-gates.md` top to bottom against the file — rhythm and state coverage, not just mechanics.
+4. Report findings as a table — severity · id · where · fix — P0 first, before touching anything.
+5. Fix with surgical edits (never regenerate), re-run the linter and the render gate, and show the before/after contrast line when it changed.
 
 ## Resource map
 
@@ -98,10 +100,13 @@ When the user asks to review or audit an existing artifact rather than build one
 | `assets/agent-seed.html` | Agent seed: runs sidebar, thread/run pane, inspector |
 | `assets/agent-ux-patterns.html` | Paste-ready agent patterns (tool call → eval receipt) |
 | `assets/ui-patterns.html` | Paste-ready component states (buttons through table toolbar) |
-| `assets/section-skeletons.html` | 10 paste-ready sections (hero → pricing → prose) |
+| `assets/section-skeletons.html` | 11 paste-ready sections (hero → pricing → prose) |
 | `assets/deck-seed.html` | Deck seed (visual system + navigation runtime) |
 | `scripts/lint.py` | Anti-slop + a11y + contrast linter — run it before any delivery |
-| `tests/run_tests.py` | Self-tests: rule fixtures + shipped artifacts stay clean |
+| `scripts/verify.py` | Render gate — loads the page in headless Chrome and reports overflow, clipping, computed contrast, tap targets, runtime errors |
+| `scripts/probe.js` | The in-page probe `verify.py` injects (not run by hand) |
+| `tests/run_tests.py` | Self-tests: rule fixtures + shipped artifacts stay clean (source **and** rendered) |
+| `tests/compose.py` | Paste a fragment into a seed so the result can be rendered and verified |
 
 Paths are relative to this skill's directory.
 

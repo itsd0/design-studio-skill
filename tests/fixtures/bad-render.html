@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Bad render fixture</title>
+  <style>
+    body { margin: 0; font-family: system-ui, sans-serif; background: #ffffff; color: #111111; }
+    .wide { width: 1400px; height: 20px; background: #eeeeee; }
+    .clip { width: 110px; overflow: hidden; white-space: nowrap; background: #eeeeee; }
+    .faint { color: #b3b3b3; background: #ffffff; font-size: 14px; }
+    .tiny { display: inline-block; width: 12px; height: 12px; padding: 0; }
+  </style>
+</head>
+<body>
+  <p class="wide">this row is wider than any phone will ever be</p>
+  <p class="clip">clipped text nobody can read</p>
+  <p class="faint">low contrast body copy</p>
+  <button class="tiny" type="button" aria-label="tiny control"></button>
+  <button class="tiny" type="button" aria-label="tiny control two"></button>
+  <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="a dot" />
+  <script>
+    throw new Error("boom");
+  </script>
+</body>
+</html>

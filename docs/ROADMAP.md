@@ -51,12 +51,23 @@ Where Design Studio is, and where it's heading. Directions, not promises.
 
 - `CONTRIBUTING.md`, issue/PR templates, Code of Conduct, `docs/adopting.md`
 
+### v1.5.0 — the render gate
+
+- **`scripts/verify.py`** — loads an artifact in headless Chrome at 390px, 768px and 1440px and reports what source analysis cannot see: horizontal overflow (with the element that causes it), clipped text (with the culprit), computed contrast for every text run, tap targets under 24×24, runtime JS errors, missing image dimensions, missing focus indicators, missing/zoom-blocking viewport meta
+- **`scripts/probe.js`** — the in-page probe: parses `color(srgb …)`, `oklch()` and `color-mix()` results, composites alpha backgrounds, applies the WCAG 2.2 inline and spacing exceptions for tap targets
+- **Frozen `--json` contract** (`docs/verify-schema-v1.md`), pinned by a schema test
+- **Rendered regression** — every shipped artifact must render clean; the section library is verified by composing it into the prototype seed (`tests/compose.py`)
+- **CI `render` job** — the shipped artifacts and the composed library must render with zero P0/P1
+- **Real defects fixed in the shipped files** — sideways scroll at 390px in the landing page, a clipped trace log, accent-coloured small text failing AA in three seeds, a white-on-accent button at 3.9:1, an unstyled blue link on a dark surface, and six controls under the 24×24 tap target
+
 ## Next
 
-- **Direction palettes v2** — extend each direction with a dark tier and accent alternates
+- **Contract fidelity** — parse `DESIGN.md` and diff its tokens, section order and dials against the artifact, so "DESIGN.md is the contract" becomes a mechanical P0 gate instead of a prose instruction
+- **Linter v3** — parse the DOM (stdlib `html.parser`) so structural rules are precise rather than approximated: duplicate ids, button/link names, `target="_blank"` without `rel`, `tabindex > 0`, landmarks, table header scope
+- **Direction palettes v2** — extend each direction with a dark tier and accent alternates, as machine-readable `directions.json`
 - **More deck layouts** — comparison, timeline, and quote-wall slide skeletons
 - **Chart library** — additional inline-SVG chart types (stacked bars, sparklines, heatmap)
-- **Findings schema docs** — a stable, documented shape for `--json` so it can gate CI pipelines
+- **Brief manifest** — `brief.json` recording must-keep facts, so "no invented metrics" is mechanically enforced
 - **Community gallery** — links to notable artifacts built with the skill
 
 ## Non-goals

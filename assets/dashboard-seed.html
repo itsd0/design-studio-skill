@@ -137,6 +137,7 @@
     .search input {
       border: 0; outline: none; background: transparent;
       font: inherit; font-size: 13px; color: var(--fg); width: 180px;
+      min-height: 24px;
     }
     .search svg { width: 15px; height: 15px; flex: none; }
 
@@ -223,6 +224,7 @@
       font-size: 13px; text-decoration: underline;
       text-decoration-color: color-mix(in oklch, var(--fg) 30%, transparent);
       text-underline-offset: 3px;
+      display: inline-flex; align-items: center; min-height: 24px;
     }
     .link:hover { text-decoration-color: var(--fg); }
     .tablewrap {

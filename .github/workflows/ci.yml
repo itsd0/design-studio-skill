@@ -26,18 +26,46 @@ jobs:
             echo "lint gate failed"; exit 1
           fi
 
+  render:
+    name: render gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Chrome is preinstalled on ubuntu-latest
+        run: google-chrome --version
+      - name: Render every shipped HTML (zero P0/P1)
+        run: |
+          files="index.html $(ls assets/*.html demo/*.html)"
+          # shellcheck disable=SC2086
+          python3 scripts/verify.py --require-browser $files | tee verify.out
+          p1=$(grep -cE '^\s+\[P1\]' verify.out || true)
+          if grep -qE 'FAIL' verify.out || [ "$p1" != "0" ]; then
+            echo "render gate failed"; exit 1
+          fi
+      - name: Render the composed section library
+        run: |
+          python3 tests/compose.py assets/prototype-seed.html assets/section-skeletons.html > /tmp/composed.html
+          python3 scripts/verify.py --require-browser /tmp/composed.html | tee compose.out
+          if grep -qE 'FAIL' compose.out; then echo "compose gate failed"; exit 1; fi
+
   pages-smoke:
     name: pages smoke
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
-    needs: test
+    needs: [test, render]
     steps:
-      - name: Wait for Pages build
-        run: sleep 90
-      - name: Probe live URLs
+      - name: Probe live URLs (retry until the Pages build lands)
         run: |
-          for p in "" demo/landing.html demo/dashboard.html demo/agent.html demo/deck.html; do
-            curl -fsS -o /dev/null "https://itsd0.github.io/design-studio-skill/$p" \
-              || { echo "smoke failed: /$p"; exit 1; }
+          for attempt in $(seq 1 20); do
+            ok=1
+            for p in "" demo/landing.html demo/dashboard.html demo/agent.html demo/deck.html; do
+              curl -fsS -o /dev/null "https://itsd0.github.io/design-studio-skill/$p" || ok=0
+            done
+            if [ "$ok" = "1" ]; then echo "pages smoke OK"; exit 0; fi
+            echo "attempt $attempt: pages not live yet, waiting 15s"
+            sleep 15
           done
-          echo "pages smoke OK"
+          echo "pages smoke failed after 20 attempts"; exit 1

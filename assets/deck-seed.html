@@ -39,6 +39,10 @@
 
       --accent-soft: color-mix(in oklch, var(--accent) 14%, transparent);
 
+      /* Accent as small text (and as a fill that holds light ink) needs a
+         darker weight than accent-as-fill: 4.9:1 on --bg, not 3.7:1. */
+      --accent-strong: color-mix(in srgb, var(--accent), black 15%);
+
       --font-display: 'Iowan Old Style', 'Charter', Georgia, serif;
       --font-body:    -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
       --font-mono:    ui-monospace, 'JetBrains Mono', 'SF Mono', Menlo, monospace;
@@ -96,9 +100,10 @@
       font-size: 12px;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: var(--accent);
+      color: var(--accent-strong);
       margin: 0 0 28px;
     }
+    .slide.dark .eyebrow { color: color-mix(in srgb, var(--accent), white 10%); }
 
     /* ── type ─────────────────────────────────────────────────────────── */
     .h-hero {
@@ -152,6 +157,9 @@
       max-width: 26ch;
       margin: 0 auto;
     }
+    /* --muted is tuned for the light surface; the dark slide needs a
+       lighter secondary. */
+    .slide.dark .stat-caption { color: color-mix(in oklch, var(--bg) 78%, transparent); }
 
     /* ── big-quote layout (one quote per deck) ────────────────────────── */
     .quote-mark {

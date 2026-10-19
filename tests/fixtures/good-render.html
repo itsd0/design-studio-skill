@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Good render fixture</title>
+  <style>
+    :root {
+      --bg: #fafaf7; --surface: #ffffff; --fg: #1a1916;
+      --muted: #6b6964; --border: #e8e5df; --accent: #c96442;
+    }
+    body { margin: 0; font-family: system-ui, sans-serif; background: var(--bg); color: var(--fg); }
+    main { max-width: 60ch; margin: 0 auto; padding: 48px 24px; }
+    .lead { color: var(--muted); font-size: 15px; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 32px; padding: 8px 16px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--surface); color: var(--fg);
+    }
+    .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>One claim, stated plainly.</h1>
+    <p class="lead">A short paragraph with no filler and no invented numbers.</p>
+    <div class="row">
+      <button class="btn" type="button">Read the docs</button>
+      <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="a dot" width="16" height="16" />
+    </div>
+  </main>
+</body>
+</html>

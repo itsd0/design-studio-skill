@@ -6,6 +6,30 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.5.0] — 2026-10-19
+
+### Added
+- **Render gate** — `scripts/verify.py` loads an artifact in headless Chrome at 390px, 768px and 1440px and reports what source analysis cannot see: horizontal overflow (naming the element that causes it), text clipped by an `overflow: hidden` box (naming the culprit), computed text contrast for every text run, tap targets under 24×24 CSS px, runtime JavaScript errors, missing image dimensions, missing focus indicators, and a missing or zoom-blocking viewport meta.
+- `scripts/probe.js` — the in-page probe the verifier injects. It parses `color(srgb …)`, `oklch()` and `color-mix()` results, composites alpha backgrounds, and applies the WCAG 2.2 inline and spacing exceptions for tap targets.
+- `docs/verify-schema-v1.md` — frozen `--json` contract for the render gate (additive-only), pinned by a schema test.
+- `tests/compose.py` — paste a fragment into a seed so the result can be rendered and verified; used by the new composition test.
+- Render fixtures (`tests/fixtures/good-render.html`, `bad-render.html`) and a rendered-regression pass over every shipped artifact in `tests/run_tests.py`.
+- CI job `render` — every shipped artifact plus the composed section library must render with zero P0/P1 findings.
+
+### Fixed
+- `index.html` scrolled sideways at 390px: the comparison table, the topnav button row and the app-window tab strip now constrain themselves.
+- `demo/landing.html` clipped its app-window trace log at 390px.
+- `assets/prototype-seed.html` and `demo/landing.html` app bars now wrap instead of clipping.
+- Accent-coloured small text failed WCAG AA in the deck seed (3.7:1), the mobile seed (3.7:1) and the deck demo (3.8:1 / 4.3:1) — a darker `--accent-strong` weight now carries it, with a lighter one for dark surfaces.
+- A white-on-accent primary button failed at 3.9:1 in `assets/ui-patterns.html` — the fill now uses `--accent-strong` with a bound `--accent-on`.
+- Unstyled links in `assets/agent-ux-patterns.html` fell back to the browser's default blue on a dark surface (2.1:1).
+- Controls under the 24×24 tap target: search inputs, nav links, standalone "View all" links, link-buttons and text fields in the seeds and demos.
+
+### Changed
+- `references/quality-gates.md` documents the two gates side by side; the delivery checklist now requires both.
+- `SKILL.md` step 5 and the review mode run the render gate alongside the linter.
+- CI pages-smoke retries the live probe instead of sleeping a fixed 90 seconds.
+
 ## [1.4.1] — 2026-10-18
 
 ### Added

@@ -124,6 +124,7 @@
     .search input {
       border: 0; outline: none; background: transparent;
       font: inherit; font-size: 13px; color: var(--fg); width: 180px;
+      min-height: 24px;
     }
     .search input::placeholder { color: var(--muted); }
     .search svg { width: 15px; height: 15px; flex: none; }
@@ -204,7 +205,7 @@
       display: flex; align-items: baseline; justify-content: space-between;
       gap: var(--gap-md); flex-wrap: wrap; margin-bottom: 14px;
     }
-    .link { font-size: 13px; text-decoration: underline; text-decoration-color: var(--border); text-underline-offset: 3px; }
+    .link { font-size: 13px; text-decoration: underline; text-decoration-color: var(--border); text-underline-offset: 3px; display: inline-flex; align-items: center; min-height: 24px; }
     .link:hover { text-decoration-color: var(--fg); }
     .tablewrap {
       overflow-x: auto;

@@ -60,12 +60,23 @@ Every interactive element defines: default → hover → focus-visible → activ
 - [ ] Labels: every control has a visible label or `aria-label` (lint P0).
 - [ ] Motion: `prefers-reduced-motion` path present wherever anything animates (`references/motion.md`).
 - [ ] Structure: one `h1`, headings in order, semantic landmarks.
+- [ ] **Rendered:** `python3 scripts/verify.py index.html` reports zero P0 — computed contrast, no sideways scroll, no clipped text, no runtime error.
+
+## The two gates
+
+| Gate | Reads | Catches | Needs |
+|---|---|---|---|
+| `scripts/lint.py` | the source | slop, raw hex, token names, structure, static a11y | nothing |
+| `scripts/verify.py` | the rendered page | horizontal overflow, clipped text, computed contrast, tap targets, runtime errors | Chrome/Chromium |
+
+Run both. The linter is fast and deterministic; the verifier is the one that sees what a human sees. A file can pass the linter and still scroll sideways at 390px — that is exactly what the verifier is for.
 
 ## Delivery checklist
 
 **P0 — must pass**
 
 - [ ] `python3 scripts/lint.py index.html` reports **zero P0** findings.
+- [ ] `python3 scripts/verify.py index.html` reports **zero P0** findings (skip only when no Chrome is installed — say so).
 - [ ] No raw hex outside `:root` (grep `#[0-9a-fA-F]{3,8}` outside the token block).
 - [ ] `--accent-on` defined in `:root`; `accent-on/accent` passes contrast check.
 - [ ] Accent ≤ 2 visible uses per screen; headings use `var(--font-display)`.
