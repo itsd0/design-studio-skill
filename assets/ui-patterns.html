@@ -251,6 +251,13 @@
     }
     .bulkbar .spacer { margin-left: auto; }
     .tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+    /* A prose table cannot shrink below its longest word. Let the table
+       scroll inside its own box instead of pushing the page sideways. */
+    .tablewrap {
+      overflow-x: auto; -webkit-overflow-scrolling: touch;
+      min-width: 0; max-width: 100%;
+    }
+    .tablewrap > .tbl { min-width: 520px; }
     .tbl th {
       text-align: left;
       font-family: var(--font-mono); font-size: 11px;
@@ -444,7 +451,8 @@
           <button class="btn btn-secondary btn-sm" type="button">Archive</button>
           <button class="btn btn-danger btn-sm" type="button">Delete</button>
         </div>
-        <table class="tbl">
+        <div class="tablewrap">
+          <table class="tbl">
           <thead>
             <tr>
               <th class="check"><input type="checkbox" aria-label="Select all transfers" /></th>
@@ -473,7 +481,8 @@
               <td>Complete</td>
             </tr>
           </tbody>
-        </table>
+          </table>
+        </div>
       </div>
     </section>
   </div>

@@ -104,7 +104,9 @@ Only `severity` and `id` are safe to match on programmatically; treat
 | `overflow-element` | P0 | An element extends past its frame (viewport, or slide for decks) |
 | `text-clipped` | P0 | Content is cut off by an `overflow: hidden` box, with no ellipsis |
 | `contrast-text` | P0 | Rendered text below its WCAG AA ratio (4.5:1, or 3:1 for large text) |
+| `min-content-overflow` | P0 | An element's min-content width exceeds the space available — it overflows, and a wider font fallback will make it worse |
 | `tap-target-small` | P1 | Interactive target under 24×24 CSS px, with no inline or spacing exception |
+| `tight-fit` | P1 | A layout that fits with under 3% to spare — a slightly wider font fallback will push it over |
 | `img-missing-dimensions` | P1 | `<img>` without intrinsic `width`/`height` — layout shift on load |
 | `focus-style-missing` | P1 | No `:focus` / `:focus-visible` rule ships with the artifact |
 | `focus-indicator-removed` | P1 | Focus rules remove the indicator without replacing it |

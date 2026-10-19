@@ -15,6 +15,7 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `tests/compose.py` — paste a fragment into a seed so the result can be rendered and verified; used by the new composition test.
 - Render fixtures (`tests/fixtures/good-render.html`, `bad-render.html`) and a rendered-regression pass over every shipped artifact in `tests/run_tests.py`.
 - CI job `render` — every shipped artifact plus the composed section library must render with zero P0/P1 findings.
+- **Cross-platform fit checks** — `min-content-overflow` (P0) forces a table's min-content width and compares it with the space actually available; `tight-fit` (P1) flags a layout that fits with under 3% to spare. A page that only fits because the current font is narrow now fails the gate instead of breaking on the next platform's font fallback.
 
 ### Fixed
 - `index.html` scrolled sideways at 390px: the comparison table, the topnav button row and the app-window tab strip now constrain themselves.
@@ -24,6 +25,7 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - A white-on-accent primary button failed at 3.9:1 in `assets/ui-patterns.html` — the fill now uses `--accent-strong` with a bound `--accent-on`.
 - Unstyled links in `assets/agent-ux-patterns.html` fell back to the browser's default blue on a dark surface (2.1:1).
 - Controls under the 24×24 tap target: search inputs, nav links, standalone "View all" links, link-buttons and text fields in the seeds and demos.
+- Comparison tables overflowed the page by 5px on Linux, where the font fallback is wider than on macOS. Every prose table now sits in a `.tablewrap` scroll container with `min-width: 0`, so its width no longer depends on the font metrics.
 
 ### Changed
 - `references/quality-gates.md` documents the two gates side by side; the delivery checklist now requires both.

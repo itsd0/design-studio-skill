@@ -344,6 +344,28 @@ def findings_from(data: dict, viewport: str) -> list[VFinding]:
             viewports=[viewport],
         ))
 
+    for item in data.get("minContent") or []:
+        if item.get("overflow"):
+            out.append(VFinding(
+                "P0", "min-content-overflow",
+                f"`{item['sel']}` needs {item['minContent']}px but only {item['available']}px is "
+                "available — it overflows, and a wider font fallback will make it worse.",
+                "Give it a scroll container, let it wrap, or reduce the content — the layout must "
+                "survive a different font.",
+                selector=item["sel"],
+                viewports=[viewport],
+            ))
+        else:
+            out.append(VFinding(
+                "P1", "tight-fit",
+                f"`{item['sel']}` fits with only {item['available'] - item['minContent']}px to "
+                "spare — a slightly wider font fallback will push it over.",
+                "Leave a little slack, or give the element a scroll container so the page never "
+                "scrolls sideways.",
+                selector=item["sel"],
+                viewports=[viewport],
+            ))
+
     for item in data.get("tapTargets") or []:
         out.append(VFinding(
             "P1", "tap-target-small",

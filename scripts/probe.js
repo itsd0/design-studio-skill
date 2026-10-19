@@ -232,6 +232,7 @@
       contrastSkipped: 0,
       tapTargets: [],
       images: [],
+      minContent: [],
       focus: null,
       viewportMeta: null,
       errors: []
@@ -590,6 +591,56 @@
 
     /* 8 · collected runtime errors */
     data.errors = W.__ds.errors.slice(0, 20);
+
+    /* 9 · min-content pressure. A table (or nowrap block) that only fits
+     * because the current font is narrow will overflow on the next platform
+     * whose font fallback is wider. Force the min-content width and compare
+     * it with the space actually available. */
+    var tight = document.querySelectorAll("table, [data-mincontent]");
+    for (var t2 = 0; t2 < tight.length; t2++) {
+      var tb = tight[t2];
+      var tcs3 = getComputedStyle(tb);
+      if (!visible(tb, tcs3)) continue;
+      if (tcs3.position === "fixed") continue;
+      var host = tb.parentElement;
+      if (!host) continue;
+      /* Inside a scroller the width is allowed to exceed the box. */
+      var contained = false;
+      var anc = host;
+      while (anc && anc !== document.documentElement) {
+        var ox2 = getComputedStyle(anc).overflowX;
+        if (ox2 === "auto" || ox2 === "scroll" || ox2 === "hidden" || ox2 === "clip") {
+          contained = true;
+          break;
+        }
+        anc = anc.parentElement;
+      }
+      if (contained) continue;
+      var hcs = getComputedStyle(host);
+      var avail = host.clientWidth
+        - (parseFloat(hcs.paddingLeft) || 0)
+        - (parseFloat(hcs.paddingRight) || 0);
+      if (avail <= 0) continue;
+      var prevWidth = tb.style.width;
+      tb.style.width = "min-content";
+      var minW = tb.getBoundingClientRect().width;
+      tb.style.width = prevWidth;
+      if (minW - avail > 1) {
+        data.minContent.push({
+          sel: selector(tb),
+          minContent: Math.round(minW),
+          available: Math.round(avail),
+          overflow: true
+        });
+      } else if (minW > avail * 0.97) {
+        data.minContent.push({
+          sel: selector(tb),
+          minContent: Math.round(minW),
+          available: Math.round(avail),
+          overflow: false
+        });
+      }
+    }
 
     return data;
   }
