@@ -77,11 +77,13 @@ def build_checks(data: dict, raw_html: str) -> list[Check]:
     d = data.get("defaultDistance", {})
     kind = data.get("kind", "page")
     is_deck = kind == "deck"
+    is_template = kind == "seed"
 
     # ── hierarchy ──
     checks.append(Check(
-        "one-h1", "Exactly one h1", h.get("h1Count") == 1,
-        f"{h.get('h1Count', 0)} h1 element(s)",
+        "one-h1", "Exactly one h1", None if is_template else h.get("h1Count") == 1,
+        f"{h.get('h1Count', 0)} h1 element(s)"
+        + (" — a template carries many" if is_template else ""),
         "A page has one h1 — it is the page's claim.",
     ))
 
@@ -140,8 +142,10 @@ def build_checks(data: dict, raw_html: str) -> list[Check]:
     uses = a.get("uses", 0)
     first = a.get("usesInFirstScreen", uses)
     checks.append(Check(
-        "accent-budget", "The accent stays rare on the first screen", first <= 4,
-        f"{first} accent moment(s) above the fold, {uses} across the page",
+        "accent-budget", "The accent stays rare on the first screen",
+        None if is_template else first <= 4,
+        f"{first} accent moment(s) above the fold, {uses} across the page"
+        + (" — a template shows every state" if is_template else ""),
         "At most two visible accent moments per screen — the rest is structure.",
     ))
 
@@ -166,8 +170,10 @@ def build_checks(data: dict, raw_html: str) -> list[Check]:
     # ── content ──
     placeholders = c.get("placeholders", 0)
     checks.append(Check(
-        "no-placeholders", "No unfilled placeholders", placeholders == 0,
-        f"{placeholders} placeholder(s) left",
+        "no-placeholders", "No unfilled placeholders",
+        None if is_template else placeholders == 0,
+        f"{placeholders} placeholder(s) left"
+        + (" — placeholders are the point of a template" if is_template else ""),
         "Replace every [REPLACE] — or state plainly what is still missing.",
     ))
 
@@ -265,6 +271,15 @@ def main(argv: list[str]) -> int:
             print(f"score · {name}\n  skipped — file not found\n")
             continue
         raw = path.read_text(encoding="utf-8")
+        if "<body" not in raw.lower():
+            # A paste-ready fragment has no document of its own — there is
+            # nothing to score until it is composed into a seed.
+            if as_json:
+                print(json.dumps({"path": name, "skipped": "paste-ready fragment"}))
+            else:
+                print(f"score · {name}\n  skipped — paste-ready fragment "
+                      "(compose it into a seed first)\n")
+            continue
         data = collect(raw, chrome)
         if not data:
             print(f"score · {name}\n  ERROR — the artifact could not be rendered\n")

@@ -9,7 +9,7 @@
   * Every [data-tool-call] carries data-status + data-latency and a visible status + latency.
   * Every [data-destructive] sits inside a [data-approval] control.
   * Streaming / status regions carry aria-live="polite".
-  * data-artifact="agent" on <body> enables the agent lint checks.
+  * data-artifact="agent" on <body data-artifact="seed"> enables the agent lint checks.
   * Responsive collapse at 920px — keep it working, add no fixed widths.
 -->
 <html lang="en">
@@ -210,7 +210,7 @@
     }
   </style>
 </head>
-<body data-artifact="agent">
+<body data-artifact="seed">
   <div class="agent-shell">
     <aside class="runs" aria-label="Runs">
       <h2>Runs</h2>

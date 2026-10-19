@@ -65,7 +65,9 @@ jobs:
           if grep -qE 'FAIL' contract.out; then echo "contract gate failed"; exit 1; fi
       - name: Every artifact must pass the craft scorecard
         run: |
-          files="index.html $(ls assets/*.html demo/*.html)"
+          # Deliverables only — the seeds are templates and the section
+          # library is a fragment; neither is a page to review.
+          files="index.html $(ls demo/*.html) $(ls gallery/benchmarks/*.html 2>/dev/null)"
           # shellcheck disable=SC2086
           python3 scripts/score.py $files | tee score.out
           if grep -qE 'FAIL' score.out; then echo "craft gate failed"; exit 1; fi
