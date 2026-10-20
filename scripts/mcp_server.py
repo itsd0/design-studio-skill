@@ -132,6 +132,40 @@ TOOLS = [
             "required": ["brief"],
         },
     },
+    {
+        "name": "design_studio_handoff",
+        "description": (
+            "Turn an approved artifact into an implementation spec another engineer or "
+            "agent can build from: tokens, type, page inventory, components, states, "
+            "breakpoints, the accessibility contract and the acceptance checks. Writes "
+            "HANDOFF.md next to the artifact."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "path": {"type": "string", "description": "Path to the HTML artifact."},
+                "design": {"type": "string", "description": "Optional path to DESIGN.md."},
+                "out": {"type": "string", "description": "Optional output path."},
+            },
+            "required": ["path"],
+        },
+    },
+    {
+        "name": "design_studio_review",
+        "description": (
+            "Run all four gates over an artifact and write a publishable review document: "
+            "a verdict, findings per gate, the craft scorecard, screenshots and the "
+            "judgement checklist that still needs a human. Exits non-zero on a P0."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "path": {"type": "string", "description": "Path to the HTML artifact."},
+                "out": {"type": "string", "description": "Optional output path for the report."},
+            },
+            "required": ["path"],
+        },
+    },
 ]
 
 
@@ -162,6 +196,16 @@ def run_tool(name: str, args: dict) -> str:
         if args.get("sheet"):
             cmd += ["--sheet", args["sheet"]]
         cmd += ["--json"]
+    elif name == "design_studio_handoff":
+        cmd = [sys.executable, str(HERE / "handoff.py"), path, "--json"]
+        if args.get("design"):
+            cmd += ["--design", args["design"]]
+        if args.get("out"):
+            cmd += ["--out", args["out"]]
+    elif name == "design_studio_review":
+        cmd = [sys.executable, str(HERE / "review.py"), path, "--json"]
+        if args.get("out"):
+            cmd += ["--out", args["out"]]
     else:
         return f"unknown tool: {name}"
 
@@ -191,7 +235,7 @@ def handle(message: dict) -> None:
             "result": {
                 "protocolVersion": PROTOCOL_VERSION,
                 "capabilities": {"tools": {}},
-                "serverInfo": {"name": "design-studio", "version": "1.7.0"},
+                "serverInfo": {"name": "design-studio", "version": "1.8.0"},
             },
         })
     elif method == "tools/list":

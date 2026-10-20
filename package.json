@@ -1,6 +1,6 @@
 {
   "name": "design-studio-skill",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "Design Studio — build polished single-file HTML design artifacts with anti-slop quality gates, a render gate, DESIGN.md contract fidelity, and a design-system extractor.",
   "keywords": [
     "agent-skills",

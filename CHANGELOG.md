@@ -6,6 +6,33 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.8.0] — 2026-10-20
+
+The skill file now follows the Agent Skills authoring rules, and the gaps the
+official design plugin exposed are closed.
+
+### Added
+- **Gotchas** in `SKILL.md` — ten hard-won facts from this repository's own releases: a prose table cannot shrink below its longest word; `1fr` means `minmax(auto, 1fr)`; headless Chrome clamps its window to ~500px; `color-mix()` serialises as `color(srgb …)`; `var()` in a shorthand hides its longhands; the accent is inherited; a flex item's `min-width: auto` blocks shrinking; a direction everyone uses becomes the default; `scrollIntoView()` breaks embeds; placeholders are the point of a template.
+- **Quick start** and a **workflow checklist** in `SKILL.md`.
+- **Load triggers** replace the resource-map menu: every reference now says *when* to read it, not just where it is.
+- **`scripts/handoff.py`** — turns an approved artifact into an implementation spec (`HANDOFF.md`): tokens, type, page inventory, components, states, breakpoints, the accessibility contract and the acceptance checks. Closes the gap against the official `design-handoff` skill and bridges to framework work.
+- **`scripts/review.py`** — a publishable review document across all four gates: verdict, findings per gate, scorecard, screenshots and the judgement checklist.
+- **`references/copy.md`** — error, empty-state, CTA, confirmation and onboarding copy, with the two rules the scorecard now enforces (`no-generic-error`, `cta-specific`).
+- **Twelve new design-DNA entries** — `swiss-poster`, `bauhaus-primary`, `japanese-minimal`, `desert-warm`, `noir-luxe`, `terminal-green`, `civic-blue`, `pastel-playful`, `neon-cyber`, `monochrome-print`, `arctic-precision`, `trading-desk` — bringing the library to eighteen.
+- **`design-studio library`** — list the entries or print one (`--show <id>`).
+- **`docs/compatibility.md`** — the verification matrix with dates: OpenCode ✅ connected (tools loaded in-session), Claude Code ✅ resolved, Gemini CLI ✅ connected, Codex ✅ registered, Cursor ⚠️ manifest only.
+- **`tests/test_skill_md.py`** — gates the skill file itself: name, description length, trigger and boundary, token and line budgets, required sections, **and that every path it mentions exists**.
+- Copy checks in the scorecard; handoff, review and library tests in `tests/run_tests.py`; the CI contract job runs handoff, review and the library.
+
+### Changed
+- `SKILL.md` rewritten: 3,896 → ~2,950 tokens, and it now carries the sections the authoring guidance says matter most.
+- The description names the triggers and the boundary (single-file HTML artifacts, not framework components) so the skill loads on the right prompts.
+- The MCP server exposes eight tools (adds `design_studio_handoff` and `design_studio_review`).
+- `docs/compatibility.md` is explicit about the four verification levels and what was *not* verified.
+
+### Fixed
+- Three library entries (`arctic-precision`, `clinical-data`, `warm-human-soft`) failed `accent-on/accent` contrast at 3.3–4.3:1; the accents are now dark enough to carry their ink.
+
 ## [1.7.0] — 2026-10-19
 
 The full toolchain: from a brand URL to a verified artifact, with the decisions visible.

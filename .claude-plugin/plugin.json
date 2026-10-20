@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "design-studio",
   "displayName": "Design Studio",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "Build polished single-file HTML design artifacts — landing pages, prototypes, dashboards, decks and agent screens — with anti-slop source gates, a headless-Chrome render gate, and DESIGN.md contract fidelity.",
   "author": {
     "name": "itsd0",

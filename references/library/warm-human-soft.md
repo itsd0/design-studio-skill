@@ -17,7 +17,7 @@ to shout.
   --fg:        oklch(28% 0.02 50);
   --muted:     oklch(52% 0.018 55);
   --border:    oklch(89% 0.014 85);
-  --accent:    oklch(58% 0.13 40);
+  --accent:    oklch(54% 0.13 40);
   --accent-on: oklch(98% 0.01 90);
   --accent-soft: color-mix(in oklch, var(--accent) 12%, transparent);
   --fg-soft:     color-mix(in oklch, var(--fg) 5%, transparent);

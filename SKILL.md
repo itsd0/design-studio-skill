@@ -1,31 +1,43 @@
 ---
 name: design-studio
-description: Build polished single-file HTML design artifacts — landing pages, web/app prototypes, dashboards, slide decks, and AI-agent screens (thread, run-detail, approval, activity) — driven by a DESIGN.md brand contract, with anti-AI-slop quality gates, computed WCAG contrast, and a self-lint script. Use when the user wants to design or prototype a page, UI, dashboard, agent thread/run/approval/activity screen, or presentation/deck as HTML; turn a brief into a polished visual artifact; establish or apply a brand/design system; or review and refine an existing HTML artifact.
+description: Build polished single-file HTML design artifacts — landing pages, prototypes, dashboards, slide decks, mobile screens and AI-agent screens — driven by a DESIGN.md brand contract and verified by four gates. Use when the user wants to design or prototype a page, UI, dashboard, agent screen or deck as HTML; extract a design system from a URL or screenshot; establish or apply a brand; compare visual directions; or review and fix an existing HTML artifact. Not for React/Vue/Next.js component work inside an existing app — finish the artifact, then hand off with `design-studio handoff`.
 license: MIT
 ---
 
 # Design Studio
 
-Turn a brief into **single-file HTML artifacts** driven by a **DESIGN.md brand contract**, passing **anti-slop craft gates**, delivered as real, handoff-ready files.
+Turn a brief into **single-file HTML artifacts** driven by a **DESIGN.md brand contract**, verified by four gates, delivered as real handoff-ready files.
 
-## Non-negotiables
+## Quick start
 
-1. **One self-contained file.** `index.html` — all CSS in a single `<style>` block, no external CSS/JS, inline SVG for charts, system-first fonts. Real images are copied into the project and referenced relatively.
-2. **One token block.** Palette and type live in a single `:root` with standard names (`--bg`, `--surface`, `--surface-2`, `--fg`, `--muted`, `--border`, `--accent`, `--accent-on`, `--font-display`, `--font-body`, `--font-mono`). No raw hex outside it; derive tones with `color-mix()`.
-3. **DESIGN.md is the brand contract.** Read it before writing HTML. Never invent tokens — if a value is missing, use the closest existing token.
-4. **2025–2026 Flagship Visual Architecture (when brand allows).** An existing `DESIGN.md` always wins over this rule — adapt flagship patterns to the brand's tokens, or skip them if the brand forbids them. When no `DESIGN.md`/brand exists, or when the brand allows it: never ship a bare text-only hero or "3 small icons over paragraphs" feature sections. Every product/landing page must include a **Hero Product Stage** (`.app-window` multi-pane studio/IDE frame, `.term` session, or live telemetry schematic) and **Schematic Bento / Indexed Feature Sections** (`.bento-hairline` with `.bento-visual` SVG diagrams: gauges, isometric layers, `FORK → BUILD → EVAL` DAG pipelines, wireframe globes, and `.index-showcase` `01`–`04` tabs).
-5. **Accent budget: at most 2 visible uses per screen.** Links demote to `--fg` when a CTA shares the screen. Always bind `--accent-on` so primary buttons have crisp WCAG contrast.
-6. **No AI-slop tropes**: no purple/indigo defaults, no two-stop "trust" gradients, no emoji-as-icons, no rounded card with a colored left border, no invented metrics, no filler copy. Full list in `references/quality-gates.md`.
-7. **Anchor every section.** `data-design-id="kebab-slug"` on each top-level `<section>`; decks use `data-screen-label="01 Cover"`.
-8. **No `scrollIntoView()`** anywhere — it breaks embed and preview iframes.
-9. **Self-check before delivery.** Run `python3 scripts/lint.py <file>` until zero P0 findings — fix every contrast `✗` — then walk the P0/P1 checklist in `references/quality-gates.md`. When Chrome or Chromium is available, also run `python3 scripts/verify.py <file>`: it renders the page and catches what source analysis cannot see (horizontal overflow, clipped text, computed contrast, tap targets, runtime errors).
-10. **Deliver with a one-line summary** naming the file. Never paste the full HTML into chat.
+```bash
+# brand → contract (skip when a DESIGN.md already exists)
+python3 scripts/extract.py https://brand.example --out .
+
+# no brand? three candidates, rendered side by side, one image, one decision
+python3 scripts/directions.py --brief "AI infrastructure for autonomous agents" --sheet sheet.png
+
+# build from the seed, then run all four gates
+python3 scripts/lint.py index.html && python3 scripts/verify.py index.html
+python3 scripts/contract.py index.html && python3 scripts/score.py index.html
+```
+
+## Workflow checklist
+
+- [ ] **0 · Preflight** — find `DESIGN.md`, read the artifact contract
+- [ ] **1 · Brief** — product, audience, kind, must-keep facts, three experience dials
+- [ ] **2 · Direction** — extract the brand, or compare three candidates and let the user pick
+- [ ] **3 · Plan** — name the sections/slides before writing HTML
+- [ ] **4 · Build** — start from the seed, paste patterns, customize every schematic
+- [ ] **5 · Gate** — lint → verify → contract → score; fix until clean
+- [ ] **6 · Deliver** — one-line summary, then offer `handoff`
+- [ ] **7 · Review** — only when asked to audit an artifact
 
 ## Workflow
 
 ### 0 · Preflight
 
-- Read `references/artifact-contract.md` (always) and `references/deck-contract.md` when the artifact is a deck. Skim `references/quality-gates.md` once.
+- Read `references/artifact-contract.md` (always) and `references/deck-contract.md` when the artifact is a deck.
 - Look for `DESIGN.md` (and `tokens.css`) in the working directory. If found, read both before writing anything.
 
 ### 1 · Brief
@@ -36,102 +48,106 @@ Capture: product, audience, goal, artifact kind (landing / prototype / dashboard
 
 **Never pick a direction blind, and never let one become the house style.**
 
-- **Brand exists** (URL, screenshot, brand assets): build the contract with the extractor — `python3 scripts/extract.py <url|screenshot>` writes `DESIGN.md` + `tokens.css` from the *rendered* page. Review what it measured, correct the roles by hand (the extractor infers, it does not decide), and keep the dials. Start from `assets/design-md.template.md` if the brand has no contract yet.
-- **No brand**: derive three candidate directions from the brief and let the user pick one.
+- **Brand exists** (URL, screenshot, brand assets): `python3 scripts/extract.py <url|screenshot>` writes `DESIGN.md` + `tokens.css` from the *rendered* page. Review what it measured and correct the roles by hand — the extractor infers, it does not decide.
+- **No brand**: derive three candidates and let the user pick.
 
   ```bash
   python3 scripts/directions.py --brief "AI infrastructure for autonomous agents" --sheet sheet.png
   ```
 
-  That prints three candidates (palette, type, density, and *why* each fits) and renders them side by side into `sheet.png` — one image, one decision. Show the sheet, ask which one, then bind that candidate's tokens **verbatim**.
-- **A reference system already exists** in `references/library/` (six offline design-DNA grammars: dark structural grid, light editorial serif, monochrome operator, warm human soft, clinical data, cinematic ember). Copy its `:root` block and its component recipes rather than inventing a system.
+  It prints three candidates (palette, type, density, and *why* each fits) and renders them side by side into `sheet.png`. Show the sheet, ask which one, then bind that candidate's tokens **verbatim**.
+- **A reference grammar fits** (eighteen offline entries in `references/library/` — `design-studio library` lists them): copy its `:root` block and component recipes instead of inventing a system.
 - Bind palette and fonts **verbatim** — never improvise hex values from a direction's label.
 
 ### 3 · Plan before pixels
 
-- **Landing / prototype**: choose 4–6 sections with flagship visual rhythm (`hero-stage` with `.app-window` studio/runtime preview → `bento-telemetry` gapless hairline schematics → `bento-architecture` *or* `indexed-showcase` `01`–`04` tab matrix → `compare` hairline table *or* `pricing` → `cta`). State the section list to the user before writing HTML.
-- **Deck**: pick the slide count by format (5–10 min talk ≈ 6 slides; 15 min ≈ 8–10; 20–30 min ≈ 12–18) and sketch the theme rhythm — `01 hero light · 02 light · 03 hero dark …`. No 3+ same-theme slides in a row; for 8+ slides include at least one `hero dark` and one `hero light`.
+- **Landing / prototype**: 4–6 sections with flagship rhythm (`hero-stage` with `.app-window` → `bento-telemetry` hairline schematics → `bento-architecture` *or* `indexed-showcase` → `compare` *or* `pricing` → `cta`). State the section list before writing HTML.
+- **Deck**: slide count by format (5–10 min ≈ 6; 15 min ≈ 8–10; 20–30 min ≈ 12–18). No 3+ same-theme slides in a row; 8+ slides need one `hero dark` and one `hero light`.
 - **Dashboard**: classify the monitored domain, then define specific KPI names and plausible values — no "Metric A / Metric B".
-- **Agent**: pick one screen type — `thread` (chat + inline tool calls), `run-detail` (step timeline/DAG + logs + eval), `approval` (plan preview, approve/reject/edit), `activity` (live feed of agent actions across runs). Define the agent's real domain, its real tool names, and which actions are destructive.
-- **Mobile**: one screen = one job. Pick the screen (feed, detail, onboarding, profile, checkout) and the single decision it supports.
+- **Agent**: pick one screen type — `thread`, `run-detail`, `approval`, `activity` — and define the real tool names and which actions are destructive.
+- **Mobile**: one screen = one job. Pick the screen and the single decision it supports.
 
 ### 4 · Build
 
-- Start from the seed for the artifact kind: `assets/prototype-seed.html` (pages), `assets/dashboard-seed.html`, `assets/agent-seed.html` (agent thread/run/approval/activity), `assets/mobile-seed.html`, `assets/deck-seed.html` — copy it to `index.html` (or the slug the user expects).
-- For app/UI states beyond the seeds, paste from `assets/ui-patterns.html` (buttons, fields, modal, toast, empty, skeleton, tabs, menu, table toolbar) and `assets/agent-ux-patterns.html` (tool-call card, streaming message, plan approval, guardrail warning, activity feed, run DAG, eval receipt); paste page sections from `assets/section-skeletons.html` (`hero-stage`, `bento-telemetry`, `bento-architecture`, `indexed-showcase`, `compare`, `pricing`, `cta`). Customize every `.bento-visual` SVG schematic, `.app-window` pane, and `.dag-grid` to match the brief's exact domain — zero filler. For `agent` artifacts follow `references/agent-ux.md` contracts: every tool call carries status + latency, destructive actions sit inside approval controls, streaming regions carry `aria-live`.
-- Imagery: use real assets when obtainable (fetch the correct real image, copy it into the project, set intrinsic `width`/`height` on `<img class="content-img">`). Otherwise keep an **intentionally labeled** placeholder and disclose the limitation. Never hotlink; never invent a stand-in for a real person, product, or landmark.
-- Motion follows `references/motion.md`: transform/opacity only, exits faster than enters, and any artifact that animates ships the reduced-motion path.
-- Stateful and data surfaces cover the five states per `references/ux-flows.md`; charts follow `references/data-viz.md`.
-- Keep the seeds' responsive breakpoints (920px) and, for decks, the navigation script intact.
+- Start from the seed for the kind: `assets/prototype-seed.html`, `dashboard-seed.html`, `agent-seed.html`, `mobile-seed.html`, `deck-seed.html` — copy it to `index.html`.
+- Paste from `assets/ui-patterns.html` (states), `agent-ux-patterns.html` (tool call → eval receipt) and `section-skeletons.html` (11 page sections). Customize every `.bento-visual` SVG, `.app-window` pane and `.dag-grid` to the brief's exact domain — zero filler.
+- Imagery: fetch the real asset, copy it in, set intrinsic `width`/`height`. Otherwise keep a labeled placeholder and disclose it. Never hotlink.
+- Motion per `references/motion.md`; states per `references/ux-flows.md`; charts per `references/data-viz.md`.
+- Keep the seeds' 920px breakpoint and, for decks, the navigation script intact.
 
-### 5 · Self-check & lint
+### 5 · Gate, then fix
 
-1. Run `python3 scripts/lint.py index.html` → fix every P0; read the contrast line and fix any `✗` pair (treat `(large/UI only)` pairs as fills and display text).
-2. Run `python3 scripts/verify.py index.html` → it renders the page in headless Chrome at 390px, 768px and 1440px and reports what source analysis cannot see. Fix every P0: `overflow-x`, `overflow-element`, `text-clipped`, `contrast-text`, `runtime-error`, `min-content-overflow`. Fix P1 tap targets, tight fits and missing focus styles too. If no Chrome is installed the command says so and exits 0 — the page is still deliverable, but the render gate did not run.
-3. Run `python3 scripts/contract.py index.html` → the artifact must match its `DESIGN.md` (token drift is a P0). Skip only when the project has no contract.
-4. Run `python3 scripts/score.py index.html` → the craft scorecard. Fix any failed check, and read the **distance from the default** line: 2/4 is the floor, 3/4 is good, 4/4 means the direction was chosen rather than inherited.
-5. Walk the P0 checklist in `references/quality-gates.md`, then the judgement steps in `references/critique.md` — claim, hierarchy, accent, surface, evidence, states, rhythm, distance, handoff.
-6. Spot-check: no raw hex outside `:root`; accent visible ≤ 2× on the rendered screen; reflow at ≤ 920px; for decks `grep 'class="slide' index.html` reads as a healthy rhythm.
-7. Render and screenshot the file (`python3 scripts/verify.py --screenshot .shots index.html` writes one PNG per viewport) and apply the soul test to the image.
+1. `python3 scripts/lint.py index.html` — fix every P0; fix any contrast `✗`.
+2. `python3 scripts/verify.py index.html` — renders at 390/768/1440. Fix every P0 (`overflow-x`, `overflow-element`, `text-clipped`, `contrast-text`, `runtime-error`, `min-content-overflow`) and the P1 tap targets, tight fits and focus styles.
+3. `python3 scripts/contract.py index.html` — token drift against `DESIGN.md` is a P0. Skip only when the project has no contract.
+4. `python3 scripts/score.py index.html` — fix any failed check; 2/4 is the floor on distance from the default.
+5. Walk the P0 checklist in `references/quality-gates.md`, then the judgement steps in `references/critique.md`.
+6. Screenshot: `python3 scripts/verify.py --screenshot .shots index.html`, then apply the soul test to the image.
 
 ### 6 · Deliver & iterate
 
 - One short summary: file name plus what it contains. Nothing after.
-- Handoff note: the artifact is real HTML/CSS — drop it into a repository, open it in a browser, print to PDF, or screenshot for review.
-- Revisions: apply surgical edits to the same file (do not regenerate wholesale), re-run the linter, and keep the copy specific to the brief.
+- Offer `python3 scripts/handoff.py index.html` when the work continues in a framework.
+- Revisions: surgical edits to the same file, never a wholesale regeneration. Re-run the gates.
 
 ### 7 · Review mode (audit requests)
 
-When the user asks to review or audit an existing artifact rather than build one:
+1. `lint.py` → `verify.py` → `contract.py` → `score.py`, each with `--json` for the report.
+2. `python3 scripts/review.py index.html --out review.md` produces the publishable review document (findings table, scorecard, screenshots).
+3. Walk `references/critique.md` — claim, hierarchy, accent, surface, evidence, states, rhythm, distance, handoff.
+4. Report findings as a table — severity · id · where · fix — P0 first.
+5. Fix surgically, re-run the gates, show the before/after contrast line when it changed.
 
-1. Run the linter — human output for reading, `python3 scripts/lint.py --json <file>` for pasting into a report.
-2. Run the render gate — `python3 scripts/verify.py <file>` (and `--json` for the machine-readable shape). It catches what the source linter cannot: the page scrolls sideways, text is cut off, a token pair fails in the *rendered* result, a control is too small to tap.
-3. Run the contract check — `python3 scripts/contract.py <file>` — and the scorecard — `python3 scripts/score.py <file>`. The first finds brand drift; the second finds the mechanical craft gaps and the distance from the default look.
-4. Walk `references/quality-gates.md` top to bottom against the file — rhythm and state coverage, not just mechanics.
-5. Walk `references/critique.md` — claim, hierarchy, accent, surface, evidence, states, rhythm, distance, handoff. This is the part that needs judgement; the gates cannot tell you whether the page is *good*.
-6. Report findings as a table — severity · id · where · fix — P0 first, before touching anything.
-7. Fix with surgical edits (never regenerate), re-run the gates, and show the before/after contrast line when it changed.
+## Gotchas
 
-## Resource map
+- **A prose table cannot shrink below its longest word.** `width: 100%` does not save it. Put every table in `.tablewrap { overflow-x: auto; min-width: 0 }` and give the table `min-width: 520px` — otherwise the page scrolls sideways on the platform whose font fallback is wider.
+- **`1fr` means `minmax(auto, 1fr)`.** A grid child with a long string stops the track shrinking. Use `minmax(0, 1fr)` and `min-width: 0` on the children.
+- **Headless Chrome clamps its window to ~500px.** `--window-size=390` does not give you a 390px layout. Render inside an iframe of the exact width — that is what `verify.py` does.
+- **`color-mix()` serialises as `color(srgb …)`**, and `oklch()` stays `oklch()`. A contrast checker that only parses `rgb()` silently skips every mixed token.
+- **`var()` inside a shorthand hides its longhands.** `outline: 2px solid var(--accent)` reads as `outline: ""` and `outlineStyle: ""`. Parse the declaration text, not the computed property.
+- **The accent is inherited.** Counting `color === accent` counts every descendant. Count elements that *own* the text or fill with it.
+- **A flex item's `min-width: auto` blocks shrinking.** A scroll container inside a flex row needs `min-width: 0`, not just `overflow: auto`.
+- **A direction everyone uses becomes the new default.** Cream + teal + serif is the current one. `score.py` measures the distance — 2/4 is the floor, 3/4 is good.
+- **`scrollIntoView()` breaks embeds.** It scrolls the parent document, not the artifact. Use `container.scrollTo()`.
+- **Placeholders are the point of a template.** Only a deliverable fails the placeholder check; `data-artifact="seed"` says which is which.
 
-| Path | Use |
+## Non-negotiables
+
+1. **One self-contained file.** `index.html` — one `<style>` block, no external CSS/JS, inline SVG for charts, system-first fonts. Real images are copied in and referenced relatively.
+2. **One token block.** Standard names in a single `:root` (`--bg`, `--surface`, `--surface-2`, `--fg`, `--muted`, `--border`, `--accent`, `--accent-on`, `--font-display`, `--font-body`, `--font-mono`). No raw hex outside it; derive tones with `color-mix()`.
+3. **DESIGN.md is the brand contract.** Read it before writing HTML. Never invent tokens — use the closest existing token.
+4. **No AI-slop, and a product stage when the brand allows it.** No purple/indigo defaults, no trust gradients, no emoji icons, no left-accent cards, no invented metrics. No bare text-only hero, no three-icon feature row — every landing page carries a hero product stage (`.app-window`/`.term`/live schematic) and schematic bento or indexed features. An existing `DESIGN.md` always wins; see `references/artifact-contract.md`.
+5. **Accent budget: at most 2 visible uses per screen.** Links demote to `--fg` when a CTA shares the screen. Bind `--accent-on` so primary buttons keep WCAG contrast.
+6. **Anchor every section.** `data-design-id="kebab-slug"` on each top-level `<section>`; decks use `data-screen-label="01 Cover"`.
+7. **No `scrollIntoView()`** anywhere.
+8. **Deliver with a one-line summary** naming the file. Never paste the full HTML into chat.
+
+## Load what you need, when you need it
+
+| Read this | When |
 |---|---|
-| `references/design-md.md` | DESIGN.md contract, standard token names, experience dials, brand authoring |
-| `references/directions.md` | 8 curated visual directions with palettes and fonts |
-| `references/artifact-contract.md` | Output rules: layout, imagery, dark mode, dashboards, mobile, exports |
-| `references/deck-contract.md` | Deck mode: slides, theme rhythm, navigation runtime |
-| `references/quality-gates.md` | Anti-slop + craft rules, WCAG checklist, P0/P1/P2 gates, review protocol |
-| `references/critique.md` | The judgement layer: claim → hierarchy → accent → surface → evidence → states → rhythm → distance → handoff, with before/after examples |
-| `references/library/` | Six offline design-DNA grammars with tokens, recipes and anti-patterns |
-| `references/motion.md` | Durations, easing curves, choreography, reduced-motion recipes |
-| `references/ux-flows.md` | Five data states, empty/error/loading formulas, microcopy, navigation models |
-| `references/data-viz.md` | Chart selection, axis/label craft, KPI formula, inline-SVG conventions |
-| `references/ui-patterns.md` | Overlay ladder, component contracts, the state machine |
-| `references/agent-ux.md` | Agent screens: tool-call card, streaming, plan approval, guardrails, activity feed, run DAG, eval receipt |
-| `assets/design-md.template.md` | Starter brand contract |
-| `assets/prototype-seed.html` | Page/app seed: tokens, class system, pricing + prose blocks |
-| `assets/dashboard-seed.html` | Dashboard seed: rail, topbar, KPI row, SVG chart, table |
-| `assets/mobile-seed.html` | Mobile seed: device frame, status bar, tab bar |
-| `assets/agent-seed.html` | Agent seed: runs sidebar, thread/run pane, inspector |
-| `assets/agent-ux-patterns.html` | Paste-ready agent patterns (tool call → eval receipt) |
-| `assets/ui-patterns.html` | Paste-ready component states (buttons through table toolbar) |
-| `assets/section-skeletons.html` | 11 paste-ready sections (hero → pricing → prose) |
-| `assets/deck-seed.html` | Deck seed (visual system + navigation runtime) |
-| `scripts/lint.py` | Anti-slop + a11y + contrast linter — run it before any delivery |
-| `scripts/verify.py` | Render gate — loads the page in headless Chrome and reports overflow, clipping, computed contrast, tap targets, runtime errors |
-| `scripts/contract.py` | Contract fidelity — diffs the artifact's `:root` against `DESIGN.md` |
-| `scripts/extract.py` | Design-system extractor — URL / file / screenshot → `DESIGN.md` + `tokens.css` |
-| `scripts/score.py` | Craft scorecard + distance from the default look |
-| `scripts/directions.py` | Candidate directions from a brief + a rendered comparison sheet |
-| `scripts/ds.py` | One CLI for all of the above (`design-studio <command>`) |
-| `scripts/mcp_server.py` | MCP server — the same tools in any MCP-capable agent |
-| `scripts/probe.js` · `probe-design.js` · `probe-score.js` | The in-page probes the tools inject (not run by hand) |
-| `tests/run_tests.py` | Self-tests: rule fixtures + shipped artifacts stay clean (source **and** rendered) |
-| `tests/compose.py` | Paste a fragment into a seed so the result can be rendered and verified |
+| `references/artifact-contract.md` | Always, before the first line of HTML |
+| `references/quality-gates.md` | Before delivery — the P0/P1 checklist |
+| `references/deck-contract.md` | The artifact is a deck |
+| `references/agent-ux.md` | The artifact is an agent screen |
+| `references/critique.md` | Reviewing, or judging an artifact that passes the gates |
+| `references/copy.md` | Writing errors, empty states, CTAs or onboarding copy |
+| `references/ux-flows.md` | Any stateful surface needs loading/empty/error states |
+| `references/data-viz.md` | The artifact contains a chart or KPI row |
+| `references/ui-patterns.md` | A component's states are unclear |
+| `references/motion.md` | Anything animates |
+| `references/design-md.md` | Authoring or repairing a `DESIGN.md` |
+| `references/directions.md` | You need the eight curated directions in detail |
+| `references/library/<id>.md` | You are binding that grammar — read one, not all |
+| `assets/design-md.template.md` | Starting a contract from scratch |
+| `assets/section-skeletons.html` | Planning the section list |
+| `assets/ui-patterns.html` · `assets/agent-ux-patterns.html` | Pasting ready component states |
+| `tests/run_tests.py` · `tests/compose.py` | Changing the gates or the seeds |
 
-Paths are relative to this skill's directory.
+Tools: `lint.py` (source), `verify.py` (render), `contract.py` (brand), `score.py` (craft), `extract.py` (brand → contract), `directions.py` (candidates), `handoff.py` (framework spec), `review.py` (review document), `benchmark.py` (published comparison), `ds.py` (all of them, `design-studio <command>`), `mcp_server.py` (the same eight tools over MCP). `pngread.py` is the internal PNG reader used by `extract.py` — not run by hand.
 
 ## When not to use
 
-- Multi-page apps with routing, backend logic, or build tooling — this produces single-file artifacts, not codebases. Keep it as the design step, then hand off to a framework.
-- Formal accessibility certification — the gates here are a professional baseline, not an audit.
+- **React / Vue / Next.js / Svelte component work inside an existing app.** This makes single-file HTML artifacts, not framework components. Finish the artifact, then `design-studio handoff` to produce the spec another agent implements.
+- **Multi-page apps with routing or backend logic** — keep this as the design step, then hand off.
+- **Formal accessibility certification** — the gates are a professional baseline, not an audit.

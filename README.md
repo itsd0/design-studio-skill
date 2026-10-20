@@ -24,7 +24,7 @@ npx skills add itsd0/design-studio-skill -g
 **Pinned, verified (recommended for teams):**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/itsd0/design-studio-skill/main/install.sh | VERSION=v1.7.0 sh
+curl -fsSL https://raw.githubusercontent.com/itsd0/design-studio-skill/main/install.sh | VERSION=v1.8.0 sh
 ```
 
 Pinned installs verify the tarball against the release's `SHA256SUMS`. See [`SECURITY.md`](SECURITY.md) and [`CHANGELOG.md`](CHANGELOG.md).
@@ -68,7 +68,7 @@ npx design-studio verify index.html
 | Gemini CLI | `gemini extensions install https://github.com/itsd0/design-studio-skill` |
 | MCP registry | `server.json` — `npx design-studio-skill --stdio` |
 
-The MCP server exposes six tools: `design_studio_lint`, `design_studio_verify`, `design_studio_contract`, `design_studio_extract`, `design_studio_score`, `design_studio_directions`.
+The MCP server exposes eight tools: `design_studio_lint`, `design_studio_verify`, `design_studio_contract`, `design_studio_extract`, `design_studio_score`, `design_studio_directions`, `design_studio_handoff`, `design_studio_review`.
 
 ## Use it
 
@@ -99,6 +99,16 @@ Three artifacts built from one brief, each a single self-contained file — [`de
 
 The deck is keyboard, wheel, and touch navigable — counter, progress bar, dots, print-to-PDF styles, and a self-contained navigation runtime included. All three demo files pass the linter with zero findings.
 
+## What's new in v1.8.0 (the skill file, the handoff, and the evidence)
+
+- **`SKILL.md` rewritten to the Agent Skills authoring rules** — a Quick start, a workflow checklist, **ten Gotchas** from this repository's own releases, and **load triggers** instead of a resource-map menu. 3,896 → ~2,950 tokens.
+- **The skill file is gated** — `tests/test_skill_md.py` checks the name, the description's triggers and boundary, the token and line budgets, the required sections, and that **every path it mentions exists**.
+- **Handoff** — `design-studio handoff index.html` writes `HANDOFF.md`: tokens, type, page inventory, components, states, breakpoints, the accessibility contract and the acceptance checks. This is how a single-file artifact becomes work inside a framework.
+- **Review** — `design-studio review index.html` writes a publishable review: verdict, findings per gate, scorecard, screenshots, and the judgement checklist that still needs a human.
+- **Copy is now checked** — `references/copy.md` plus two scorecard rules: no generic errors, no vague buttons.
+- **The design DNA library grew 6 → 18** — Swiss Poster, Bauhaus Primary, Japanese Minimal, Desert Warm, Noir Luxe, Terminal Green, Civic Blue, Pastel Playful, Neon Cyber, Monochrome Print, Arctic Precision, Trading Desk.
+- **Compatibility is published, with dates** — [`docs/compatibility.md`](docs/compatibility.md): OpenCode ✅ connected (tools loaded in-session), Claude Code ✅ resolved, Gemini ✅ connected, Codex ✅ registered, Cursor ⚠️ manifest only.
+
 ## What's new in v1.7.0 (the full toolchain)
 
 The v1.5.0 render gate proved a page can be clean in a diff and broken on screen. v1.7.0 closes the rest of the loop: from a brand URL to a verified artifact, with the decisions visible.
@@ -108,8 +118,8 @@ The v1.5.0 render gate proved a page can be clean in a diff and broken on screen
 - **Direction studio** — `scripts/directions.py` derives three candidate directions from the brief and renders them side by side into one comparison sheet. The agent no longer picks a direction blind, and a fixed list of eight stops being the house style.
 - **Craft scorecard** — `scripts/score.py` grades a rendered artifact against a review (hierarchy, type discipline, accent budget, section rhythm, states, self-containment) and reports **distance from the default look** — headline font, body font, accent family, background family. 2/4 is the floor.
 - **The critique** — `references/critique.md` is the judgement layer: claim → hierarchy → accent → surface → evidence → states → rhythm → distance → handoff, with before/after examples for each.
-- **Design DNA library** — `references/library/` holds six offline, MIT design grammars with tokens, component recipes and anti-patterns.
-- **Distribution** — an MCP server (six tools, any MCP agent), one CLI (`design-studio <command>`), an npm bin, and plugin manifests for Claude Code, Codex, Cursor and Gemini.
+- **Design DNA library** — `references/library/` holds eighteen offline, MIT design grammars with tokens, component recipes and anti-patterns.
+- **Distribution** — an MCP server (eight tools, any MCP agent), one CLI (`design-studio <command>`), an npm bin, and plugin manifests for Claude Code, Codex, Cursor and Gemini.
 - **Gallery and benchmarks** — `gallery/` publishes artifacts with their contract, and `scripts/benchmark.py` publishes one brief rendered three ways so the method's decisions are visible.
 
 **The shipped artifacts got better too.** The scorecard measured our own pages at 2/4 from the default look — the display face was the system sans, which is exactly what every agent reaches for. They now lead with a serif (`ui-serif`, available on every platform without a webfont) and score 3/4.
@@ -199,12 +209,16 @@ The linter reads **source**. The verifier reads the **rendered page** — it loa
 | `scripts/score.py` | Craft scorecard + distance from the default look |
 | `scripts/directions.py` | Candidate directions from a brief + a rendered comparison sheet |
 | `scripts/benchmark.py` | Publishes a benchmark page: one brief, three directions, rendered |
-| `scripts/mcp_server.py` | MCP server — the same six tools in any MCP-capable agent |
+| `scripts/mcp_server.py` | MCP server — the same eight tools in any MCP-capable agent |
+| `scripts/handoff.py` | Implementation spec from an approved artifact |
+| `scripts/review.py` | Publishable review document across all four gates |
 | `scripts/ds.py` | One CLI for all of the above |
 | `docs/lint-schema-v1.md` | Frozen `--json` contract (additive-only) for CI integrations |
 | `docs/verify-schema-v1.md` | Frozen `--json` contract for the render gate |
 | `references/critique.md` | The judgement layer — nine review steps with before/after examples |
-| `references/library/` | Six offline design-DNA grammars with tokens, recipes and anti-patterns |
+| `references/copy.md` | Error, empty-state, CTA and onboarding copy rules |
+| `docs/compatibility.md` | Verified platforms, dates, and what is *not* verified |
+| `references/library/` | Eighteen offline design-DNA grammars with tokens, recipes and anti-patterns |
 | `gallery/` | Published artifacts, their contracts, and the method's benchmarks |
 | `tests/run_tests.py` | Self-tests: rule fixtures + shipped artifacts stay clean |
 | `demo/` | Finished example artifacts + the DESIGN.md behind them |

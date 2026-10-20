@@ -455,6 +455,133 @@ def run_score() -> int:
 # ── MCP server ────────────────────────────────────────────────────────────
 
 
+# ── design DNA library ────────────────────────────────────────────────────
+
+
+LIBRARY_SECTIONS = ["Use it for", "Tokens", "Anti-patterns"]
+
+
+def run_library() -> int:
+    """Every design-DNA entry must be complete and contrast-safe."""
+    failures = 0
+    print("· design DNA library")
+    lib = ROOT / "references" / "library"
+    entries = sorted(p for p in lib.glob("*.md") if p.name != "README.md")
+    ok = len(entries) >= 18
+    print(f"  {'ok  ' if ok else 'FAIL'} {len(entries)} entries (18 required)")
+    failures += 0 if ok else 1
+
+    for path in entries:
+        text = path.read_text(encoding="utf-8")
+        missing = [s for s in LIBRARY_SECTIONS if s not in text]
+        tokens = contract_mod.parse_root_tokens(text)
+        problems = []
+        if missing:
+            problems.append(f"missing sections: {', '.join(missing)}")
+        if len(tokens) < 6:
+            problems.append(f"only {len(tokens)} tokens")
+
+        # Core pairs must pass the same contrast the artifacts do.
+        def rgb(name):
+            value = tokens.get(name, "")
+            return extract_mod.to_rgb(value) if value else None
+
+        bg, fg = rgb("--bg"), rgb("--fg")
+        accent, accent_on = rgb("--accent"), rgb("--accent-on")
+        if bg and fg and extract_mod.contrast(fg, bg) < 4.5:
+            problems.append(f"fg/bg {extract_mod.contrast(fg, bg):.1f}:1")
+        if bg and tokens.get("--muted"):
+            muted = rgb("--muted")
+            if muted and extract_mod.contrast(muted, bg) < 4.5:
+                problems.append(f"muted/bg {extract_mod.contrast(muted, bg):.1f}:1")
+        if accent and accent_on and extract_mod.contrast(accent_on, accent) < 4.5:
+            problems.append(f"accent-on/accent {extract_mod.contrast(accent_on, accent):.1f}:1")
+
+        good = not problems
+        print(f"  {'ok  ' if good else 'FAIL'} {path.stem}")
+        for p in problems:
+            print(f"       {p}")
+        failures += 0 if good else 1
+
+    return failures
+
+
+# ── handoff + review ──────────────────────────────────────────────────────
+
+
+def run_handoff() -> int:
+    """The handoff spec must carry the tokens, sections and acceptance checks."""
+    failures = 0
+    print("· handoff spec")
+    import handoff as handoff_mod
+
+    artifact = ROOT / "demo" / "landing.html"
+    design = ROOT / "demo" / "design.md"
+    spec = handoff_mod.build(artifact, design)
+    text = handoff_mod.render(spec)
+
+    for needle, label in (
+        ("## Design tokens", "token table"),
+        ("## Page inventory", "page inventory"),
+        ("## Accessibility contract", "accessibility contract"),
+        ("## Acceptance checks", "acceptance checks"),
+        ("--accent", "accent token"),
+    ):
+        ok = needle in text
+        print(f"  {'ok  ' if ok else 'FAIL'} handoff includes {label}")
+        failures += 0 if ok else 1
+
+    ok = len(spec["sections"]) >= 4 and len(spec["tokens"]) >= 8
+    print(f"  {'ok  ' if ok else 'FAIL'} handoff reads the artifact "
+          f"({len(spec['sections'])} sections, {len(spec['tokens'])} tokens)")
+    failures += 0 if ok else 1
+    return failures
+
+
+def run_review() -> int:
+    """The review document must run every gate and reach the right verdict."""
+    failures = 0
+    print("· review document")
+    chrome = verify.find_chrome()
+    if not chrome:
+        print("  skip — no Chrome/Chromium found")
+        return 0
+
+    import review as review_mod
+
+    artifact = ROOT / "demo" / "landing.html"
+    report = review_mod.collect(artifact, chrome, None)
+    text = review_mod.render(report, None)
+
+    ok = "**Verdict: PASS" in text
+    print(f"  {'ok  ' if ok else 'FAIL'} a clean artifact passes review")
+    failures += 0 if ok else 1
+
+    gates = {f["gate"] for f in report["findings"]}
+    ok = "source" in gates or "contract" in gates or not report["findings"]
+    print(f"  {'ok  ' if ok else 'FAIL'} every gate reports ({', '.join(sorted(gates)) or 'clean'})")
+    failures += 0 if ok else 1
+
+    ok = "## Craft scorecard" in text and "## Judgement checklist" in text
+    print(f"  {'ok  ' if ok else 'FAIL'} the review carries the scorecard and the checklist")
+    failures += 0 if ok else 1
+
+    return failures
+
+
+def run_skill_md() -> int:
+    """SKILL.md must match the Agent Skills authoring rules."""
+    print("· skill file spec")
+    proc = subprocess.run(
+        [sys.executable, str(ROOT / "tests" / "test_skill_md.py")],
+        capture_output=True, text=True, timeout=120,
+    )
+    for line in proc.stdout.splitlines():
+        if line.startswith("  "):
+            print(line)
+    return 0 if proc.returncode == 0 else 1
+
+
 def run_mcp() -> int:
     """The MCP server must answer initialize, tools/list and tools/call."""
     failures = 0
@@ -514,6 +641,8 @@ def main() -> int:
     total += 4
     failures += run_contract() + run_extract() + run_directions() + run_score() + run_mcp()
     total += 12
+    failures += run_library() + run_handoff() + run_review() + run_skill_md()
+    total += 25
     print(f"\n{total - failures}/{total} passed")
     return 1 if failures else 0
 

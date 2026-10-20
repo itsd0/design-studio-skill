@@ -75,6 +75,21 @@ jobs:
         run: |
           python3 scripts/extract.py index.html --out /tmp/extracted | tee extract.out
           grep -q -- "--accent" /tmp/extracted/tokens.css
+      - name: The handoff spec must be complete
+        run: |
+          python3 scripts/handoff.py demo/landing.html --out /tmp/HANDOFF.md
+          for needle in "## Design tokens" "## Page inventory" "## Acceptance checks"; do
+            grep -qF "$needle" /tmp/HANDOFF.md || { echo "handoff missing: $needle"; exit 1; }
+          done
+      - name: The review document must run every gate
+        run: |
+          python3 scripts/review.py demo/landing.html --out /tmp/REVIEW.md
+          grep -q "## Craft scorecard" /tmp/REVIEW.md
+          grep -q "## Judgement checklist" /tmp/REVIEW.md
+      - name: The design DNA library must list
+        run: |
+          python3 scripts/ds.py library | tee library.out
+          grep -q "18 entries" library.out
       - name: The toolchain must be complete
         run: python3 scripts/ds.py doctor
 

@@ -74,10 +74,21 @@ Shipped the planned v1.6 → v2.0 scope as one release, because the pieces depen
 - **Gallery + benchmarks** (`gallery/`, `scripts/benchmark.py`)
 - **The skill's own contract** — a root `DESIGN.md`; the landing page is built from it and passes its own checker
 
+### v1.8.0 — the skill file, the handoff, and the evidence
+
+- **`SKILL.md` rewritten to the authoring guidance** — Gotchas, Quick start, a workflow checklist, and load triggers instead of a resource-map menu; 3,896 → ~2,950 tokens
+- **`tests/test_skill_md.py`** — the skill file is gated like the artifacts: budget, sections, description triggers and boundary, and every path it mentions must exist
+- **`scripts/handoff.py`** — an approved artifact becomes an implementation spec (`HANDOFF.md`)
+- **`scripts/review.py`** — a publishable review document across all four gates
+- **`references/copy.md`** + two scorecard checks — generic errors and vague buttons are now failures
+- **Design DNA library grown 6 → 18 entries**, each with tokens, recipes and anti-patterns; `design-studio library` lists and shows them
+- **`docs/compatibility.md`** — the verification matrix with dates and four explicit levels: format → tools → registration → in-session
+- **MCP server exposes eight tools**
+
 ## Next
 
 - **Reference grounding** — an optional live connector for award-winning-site corpora (Awwwards-style), so the method can look at real work before it invents its own
-- **More design DNA entries** — grow `references/library/` toward the depth competitors like `oh-my-design` reach with `DESIGN.md` references
+- **Framework handoff depth** — emit a component manifest in the target framework's idiom (React/Tailwind, SwiftUI, Compose) from `HANDOFF.md`
 - **Linter v3** — parse the DOM (stdlib `html.parser`) so structural rules are precise rather than approximated: duplicate ids, button/link names, `target="_blank"` without `rel`, `tabindex > 0`, landmarks, table header scope
 - **More deck layouts** — comparison, timeline, and quote-wall slide skeletons
 - **Chart library** — additional inline-SVG chart types (stacked bars, sparklines, heatmap)

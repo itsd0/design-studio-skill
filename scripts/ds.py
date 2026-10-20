@@ -18,6 +18,7 @@ usable and 1 when a required piece is missing.
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -32,7 +33,49 @@ COMMANDS = {
     "extract": ("extract.py", "Extract a design system into DESIGN.md + tokens.css."),
     "score": ("score.py", "Craft scorecard and distance from the default look."),
     "directions": ("directions.py", "Candidate directions from a brief; render a comparison sheet."),
+    "handoff": ("handoff.py", "Implementation spec from an approved artifact."),
+    "review": ("review.py", "Publishable review document across all four gates."),
+    "benchmark": ("benchmark.py", "Publish a one-brief-three-directions comparison page."),
 }
+
+
+def library(argv: list[str]) -> int:
+    """List or show the design-DNA entries."""
+    lib = ROOT / "references" / "library"
+    entries = sorted(p for p in lib.glob("*.md") if p.name != "README.md")
+    if not entries:
+        print("design-studio: no library entries found", file=sys.stderr)
+        return 2
+
+    show = None
+    i = 0
+    while i < len(argv):
+        if argv[i] == "--show":
+            i += 1
+            show = argv[i] if i < len(argv) else None
+        i += 1
+
+    if show:
+        match = next((p for p in entries if p.stem == show), None)
+        if not match:
+            print(f"design-studio: no entry '{show}'. Try: "
+                  + ", ".join(p.stem for p in entries), file=sys.stderr)
+            return 2
+        print(match.read_text(encoding="utf-8"))
+        return 0
+
+    print(f"design-studio · design DNA library ({len(entries)} entries)\n")
+    for p in entries:
+        text = p.read_text(encoding="utf-8")
+        use = ""
+        m = re.search(r"\*\*Use it for:\*\*\s*(.+)", text)
+        if m:
+            use = m.group(1).strip().rstrip(".")
+        title = p.stem.replace("-", " ").title()
+        print(f"  {p.stem:<22} {title:<24} {use[:58]}")
+    print("\n  design-studio library --show <id>   print one entry")
+    print("  Bind its :root block verbatim, then run the four gates.")
+    return 0
 
 
 def run(script: str, argv: list[str]) -> int:
@@ -75,7 +118,8 @@ def doctor() -> int:
     print(f"  references    {len(ref_files)} files — " +
           ("ok" if refs.is_dir() else "MISSING"))
     lib = refs / "library"
-    print(f"  library       {len(list(lib.glob('*.md')))} design-DNA entries — " +
+    entries = [p for p in lib.glob("*.md") if p.name != "README.md"]
+    print(f"  library       {len(entries)} design-DNA entries — " +
           ("ok" if lib.is_dir() else "MISSING"))
 
     print("\n  MCP:  claude mcp add design-studio -- python3 " + str(HERE / "mcp_server.py"))
@@ -98,6 +142,8 @@ def main(argv: list[str]) -> int:
         return doctor()
     if command == "mcp":
         return run("mcp_server.py", rest)
+    if command == "library":
+        return library(rest)
     if command in COMMANDS:
         script, summary = COMMANDS[command]
         if not rest:

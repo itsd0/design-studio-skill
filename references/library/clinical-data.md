@@ -16,7 +16,7 @@ scale let the numbers dominate. Nothing competes with the data.
   --fg:        oklch(26% 0.02 220);
   --muted:     oklch(54% 0.02 220);
   --border:    oklch(91% 0.008 210);
-  --accent:    oklch(62% 0.11 195);
+  --accent:    oklch(52% 0.11 195);
   --accent-on: oklch(99% 0.002 200);
   --accent-soft: color-mix(in oklch, var(--accent) 10%, transparent);
   --fg-soft:     color-mix(in oklch, var(--fg) 5%, transparent);

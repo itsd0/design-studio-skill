@@ -84,6 +84,7 @@ Run both. The linter is fast and deterministic; the verifier is the one that see
 - [ ] `data-design-id` on every top-level `<section>` (decks: `data-screen-label` on every slide).
 - [ ] No `scrollIntoView()`; mobile reflow works at ≤ 920px.
 - [ ] A11y statics clear: `lang` present, every `<img>` has `alt`, every control has a label.
+- [ ] Copy passes the two automated rules: no generic error phrase, no vague button label (`references/copy.md`).
 
 **P1 — should pass (Flagship Craft Bar)**
 

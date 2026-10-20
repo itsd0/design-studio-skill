@@ -35,6 +35,33 @@ SCORE_PROBE = Path(__file__).resolve().parent / "probe-score.js"
 
 MAX_ACCENT_USES = 12  # the visible budget is 2; this counts DOM occurrences
 
+GENERIC_ERROR = re.compile(
+    r"something went wrong|an error occurred|oops|uh oh|whoops|"
+    r"an unexpected error|please try again later",
+    re.I,
+)
+VAGUE_CTA = {
+    "submit", "send", "go", "proceed", "continue", "click here", "ok", "okay",
+    "done", "yes", "no", "next", "back", "learn more", "read more",
+}
+
+
+def extract_copy(raw_html: str) -> dict:
+    """The strings a user actually reads, pulled from the source."""
+    without_comments = re.sub(r"<!--[\s\S]*?-->", "", raw_html)
+    body = re.sub(r"<(script|style)[^>]*>[\s\S]*?</\1>", " ", without_comments, flags=re.I)
+    text = re.sub(r"<[^>]+>", " ", body)
+    text = re.sub(r"&[a-z]+;", " ", text)
+    text = re.sub(r"\s+", " ", text).strip()
+
+    buttons = []
+    for m in re.finditer(r"<(button|a)\b[^>]*>([\s\S]*?)</\1>", without_comments, re.I):
+        label = re.sub(r"<[^>]+>", " ", m.group(2))
+        label = re.sub(r"\s+", " ", label).strip()
+        if label:
+            buttons.append(label)
+    return {"text": text, "buttons": buttons}
+
 
 class Check:
     def __init__(self, cid: str, label: str, ok: bool | None, detail: str, fix: str = "",
@@ -213,6 +240,26 @@ def build_checks(data: dict, raw_html: str) -> list[Check]:
             else f"{animated} animated element(s), no reduced-motion block",
             "Ship the reduced-motion path whenever anything animates.",
         ))
+
+    # ── copy (see references/copy.md) ──
+    copy = extract_copy(raw_html)
+    generic = GENERIC_ERROR.findall(copy["text"])
+    checks.append(Check(
+        "no-generic-error", "No generic error copy",
+        None if is_template else not generic,
+        f"{len(generic)} generic error phrase(s)"
+        + (f": {', '.join(sorted(set(g.lower() for g in generic))[:3])}" if generic else ""),
+        "Name what happened, why, and what to do next — never “Something went wrong”.",
+    ))
+
+    vague = [b for b in copy["buttons"] if b.strip().lower().rstrip("….") in VAGUE_CTA]
+    checks.append(Check(
+        "cta-specific", "Buttons say verb + object",
+        None if is_template else not vague,
+        f"{len(vague)} vague label(s)"
+        + (f": {', '.join(sorted(set(vague))[:4])}" if vague else ""),
+        "“Send files” beats “Send”; “Submit” says nothing about what happens.",
+    ))
 
     # ── source hygiene: raw colour in the CSS outside the token block ──
     without_comments = re.sub(r"<!--[\s\S]*?-->", "", raw_html)

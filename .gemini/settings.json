@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "design-studio": {
+      "command": "python3",
+      "args": ["scripts/mcp_server.py"]
+    }
+  }
+}
